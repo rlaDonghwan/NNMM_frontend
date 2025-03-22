@@ -1,7 +1,7 @@
 // src/services/auth.ts
 import axios from 'axios'
 
-const API = 'http://localhost:3000' // Nest 백엔드 주소
+const API = 'http://localhost:4000' // ✅ 백엔드 주소
 
 export const login = (data: {email: string; password: string}) =>
   axios.post(`${API}/auth/login`, data)
