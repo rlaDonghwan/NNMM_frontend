@@ -1,5 +1,5 @@
 // 애플리케이션의 전역 CSS 스타일을 가져옵니다.
-import '../styles/globals.css'
+import '@/styles/globals.css'
 
 // Next.js에서 제공하는 AppProps 타입을 가져옵니다. (타입 안전성을 위해 사용)
 import type {AppProps} from 'next/app'
