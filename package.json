@@ -1,23 +1,34 @@
 {
-  "private": true,
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "This is a really simple project that shows the usage of Next.js with TypeScript.",
+  "main": ".prettierrc.js",
   "scripts": {
+    "dev": "next dev",
     "build": "next build",
-    "dev": "next dev --turbopack",
     "start": "next start",
-    "seed": "node -r dotenv/config ./scripts/seed.js",
     "lint": "next lint"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rlaDonghwan/NNMM_frontend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rlaDonghwan/NNMM_frontend/issues"
+  },
+  "homepage": "https://github.com/rlaDonghwan/NNMM_frontend#readme",
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/forms": "^0.5.10",
     "autoprefixer": "10.4.20",
+    "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
-    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "mongodb": "^6.15.0",
-    "next": "^15.2.3",
-    "next-auth": "^4.24.11",
+    "next": "15.3.0-canary.14",
     "postcss": "8.5.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -27,6 +38,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.15",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "22.10.7",
     "@types/react": "19.0.7",
