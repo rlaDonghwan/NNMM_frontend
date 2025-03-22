@@ -1,71 +1,19 @@
-import {signIn} from 'next-auth/react'
-import {useState} from 'react'
-import Link from 'next/link'
+// React의 useEffect 훅을 가져옵니다.
+import {useEffect} from 'react'
+// Next.js의 useRouter 훅을 가져옵니다.
+import {useRouter} from 'next/router'
 
-export default function SignIn() {
-  const [email, setEmail] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [error, setError] = useState<string>('')
+// 이 컴포넌트는 Next.js의 메인 페이지(index 페이지)로, 사용자를 '/auth/login' 경로로 리다이렉트합니다.
+export default function Home() {
+  // Next.js의 라우터 객체를 가져옵니다.
+  const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // 컴포넌트가 렌더링된 후 실행되는 useEffect 훅입니다.
+  useEffect(() => {
+    // 사용자를 '/auth/login' 경로로 리다이렉트합니다.
+    router.replace('/auth/signin')
+  }, []) // 빈 배열을 전달하여 이 효과는 컴포넌트가 처음 렌더링될 때 한 번만 실행됩니다.
 
-    const res = await signIn('credentials', {
-      redirect: false, // 리디렉션을 수동으로 처리
-      email,
-      password
-    })
-
-    if (res?.error) {
-      setError('Invalid email or password')
-    } else {
-      // 로그인 성공 시 리디렉션
-      window.location.href = '/dashboard'
-    }
-  }
-
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-100 border border-gray-300 shadow-xl rounded-xl">
-      <div className="flex flex-col items-center justify-center flex-1 max-w-sm px-2 mx-auto">
-        <div className="w-full px-6 py-8 text-black bg-white rounded shadow-md">
-          <h1 className="mb-8 text-2xl text-center text-primary">Login</h1>
-
-          {error && <p className="mb-4 text-center text-red-500">{error}</p>}
-
-          <form onSubmit={handleSubmit}>
-            <input
-              type="email"
-              className="w-full p-3 mb-4 border border-gray-300 rounded"
-              placeholder="Email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-
-            <input
-              type="password"
-              className="w-full p-3 mb-4 border border-gray-300 rounded"
-              placeholder="Password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
-
-            <button
-              type="submit"
-              className="w-full py-3 text-white bg-blue-500 rounded hover:bg-blue-700">
-              Login
-            </button>
-          </form>
-        </div>
-
-        <div className="mt-6 text-gray-600">
-          Create account?
-          <Link
-            href="/auth/signup"
-            className="text-blue-500 underline hover:text-blue-700">
-            Sign Up
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
+  // 이 컴포넌트는 화면에 아무것도 렌더링하지 않습니다.
+  return null
 }
