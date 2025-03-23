@@ -9,6 +9,9 @@ export default function Dashboard() {
       try {
         const token = localStorage.getItem('token') // 로컬 스토리지에서 토큰 가져오기
 
+        console.log('토큰 있음?', token) // ✅ 토큰 존재 여부 확인
+        console.log('Authorization Header:', `Bearer ${token}`) // ✅ 실제 전송될 헤더 확인
+
         if (!token) {
           console.warn('토큰이 없습니다. 로그인 필요') // 토큰이 없을 경우 경고 메시지 출력
           return

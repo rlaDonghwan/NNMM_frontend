@@ -1,7 +1,8 @@
 // React의 useState 훅을 가져옵니다.
 import {useState} from 'react'
-// Next.js의 Link 컴포넌트를 가져옵니다.
+// Next.js의 Link 컴포넌트와 useRouter 훅을 가져옵니다.
 import Link from 'next/link'
+import {useRouter} from 'next/router'
 // AuthFormWrapper 컴포넌트를 가져옵니다.
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper'
 // 회원가입 API 호출을 위한 register 함수를 가져옵니다.
@@ -9,6 +10,8 @@ import {register} from '@/services/auth'
 
 // SignUpForm 컴포넌트를 기본 내보내기로 정의합니다.
 export default function SignUpForm() {
+  const router = useRouter() // useRouter 훅을 초기화합니다.
+
   // 이메일 상태를 관리합니다.
   const [email, setEmail] = useState('')
   // 이름 상태를 관리합니다.
@@ -52,6 +55,9 @@ export default function SignUpForm() {
       // 성공 메시지를 설정합니다.
       setSuccess('Account created successfully')
       setError('') // 에러 메시지를 초기화합니다.
+
+      // 로그인 화면으로 리다이렉트합니다.
+      router.push('/auth/signin')
     } catch (err: any) {
       console.error('회원가입 실패:', err)
       // 에러 메시지를 설정합니다.
