@@ -5,20 +5,29 @@ import AuthFormWrapper from '@/components/auth/AuthFormWrapper'
 import {login} from '@/services/auth'
 
 export default function SignInForm() {
+  // 이메일 상태를 관리하는 useState 훅
   const [email, setEmail] = useState('')
+  // 비밀번호 상태를 관리하는 useState 훅
   const [password, setPassword] = useState('')
+  // 에러 메시지 상태를 관리하는 useState 훅
   const [error, setError] = useState('')
 
+  // 폼 제출 시 호출되는 함수
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault() // 기본 폼 제출 동작 방지
 
     try {
+      // 로그인 API 호출
       const res = await login({email, password})
-      console.log('로그인 성공:', res.data)
+      // 로그인 성공 시 토큰을 로컬 스토리지에 저장
+      localStorage.setItem('token', res.data.token)
+      console.log('로그인 성공:', res.data, localStorage.getItem('token'))
+      // 대시보드 페이지로 리다이렉트
       window.location.href = '/dashboard'
     } catch (err: any) {
+      // 로그인 실패 시 에러 처리
       console.error('로그인 실패:', err)
-      setError('이메일 또는 비밀번호가 올바르지 않습니다')
+      setError('이메일 또는 비밀번호가 올바르지 않습니다') // 에러 메시지 설정
     }
   }
 
