@@ -1,4 +1,3 @@
-// src/services/auth.ts
 import axios from 'axios'
 
 const API = process.env.NEXT_PUBLIC_API_URL // 환경변수 사용
