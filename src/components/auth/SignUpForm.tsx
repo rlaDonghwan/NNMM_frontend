@@ -45,6 +45,13 @@ export default function SignUpForm() {
       return
     }
 
+    // 이메일 형식 검사 정규식
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast.error('유효한 이메일 형식을 입력해주세요.')
+      return
+    }
+
     try {
       await register({email, name, companyName, password}) // 회원가입 API를 호출합니다.
       toast.success('회원가입 성공!') // 성공 메시지를 설정합니다.
