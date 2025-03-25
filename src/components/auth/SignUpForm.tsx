@@ -1,12 +1,9 @@
-// React의 useState 훅을 가져옵니다.
 import {useState} from 'react'
-// Next.js의 Link 컴포넌트와 useRouter 훅을 가져옵니다.
 import Link from 'next/link'
 import {useRouter} from 'next/router'
-// AuthFormWrapper 컴포넌트를 가져옵니다.
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper'
-// 회원가입 API 호출을 위한 register 함수를 가져옵니다.
 import {register} from '@/services/auth'
+import {toast} from 'react-hot-toast'
 
 // SignUpForm 컴포넌트를 기본 내보내기로 정의합니다.
 export default function SignUpForm() {
@@ -44,25 +41,20 @@ export default function SignUpForm() {
 
     // 비밀번호와 비밀번호 확인이 일치하지 않을 경우 에러 메시지를 설정합니다.
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
+      toast.error('비밀번호가 일치하지 않습니다.')
       return
     }
 
     try {
-      // 회원가입 API를 호출합니다.
-      const res = await register({email, name, companyName, password})
-      console.log('회원가입 성공:', res.data)
-      // 성공 메시지를 설정합니다.
-      setSuccess('Account created successfully')
-      setError('') // 에러 메시지를 초기화합니다.
+      await register({email, name, companyName, password}) // 회원가입 API를 호출합니다.
+      toast.success('회원가입 성공!') // 성공 메시지를 설정합니다.
 
-      // 로그인 화면으로 리다이렉트합니다.
-      router.push('/auth/signin')
+      setTimeout(() => {
+        router.push('/auth/signin') // 로그인 페이지로 이동합니다.
+      }, 1000) // 2초 후에 이동합니다.
     } catch (err: any) {
-      console.error('회원가입 실패:', err)
-      // 에러 메시지를 설정합니다.
-      setError('Failed to create account')
-      setSuccess('') // 성공 메시지를 초기화합니다.
+      const msg = err?.response.data?.message || '회원가입에 실패했습니다.'
+      toast.error(msg) // 에러 메시지를 설정합니다.
     }
   }
 
