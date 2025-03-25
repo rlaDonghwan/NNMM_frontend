@@ -17,7 +17,7 @@ export default function SignUpForm() {
   // 이름 상태를 관리합니다.
   const [name, setName] = useState('')
   // 직책 상태를 관리합니다.
-  const [position, setPosition] = useState('')
+  const [companyName, setCompanyName] = useState('')
   // 비밀번호 상태를 관리합니다.
   const [password, setPassword] = useState('')
   // 비밀번호 확인 상태를 관리합니다.
@@ -33,7 +33,7 @@ export default function SignUpForm() {
     // 필드에 따라 상태를 업데이트합니다.
     if (field === 'email') setEmail(value)
     if (field === 'name') setName(value)
-    if (field === 'position') setPosition(value)
+    if (field === 'companyName') setCompanyName(value)
     if (field === 'password') setPassword(value)
     if (field === 'confirmPassword') setConfirmPassword(value)
   }
@@ -50,7 +50,7 @@ export default function SignUpForm() {
 
     try {
       // 회원가입 API를 호출합니다.
-      const res = await register({email, name, position, password})
+      const res = await register({email, name, companyName, password})
       console.log('회원가입 성공:', res.data)
       // 성공 메시지를 설정합니다.
       setSuccess('Account created successfully')
@@ -98,13 +98,13 @@ export default function SignUpForm() {
           value={name}
           onChange={handleChange('name')}
         />
-        {/* 직책 입력 필드 */}
+        {/* 회사명 입력 필드 */}
         <input
           type="text"
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Position"
-          value={position}
-          onChange={handleChange('position')}
+          placeholder="companyName"
+          value={companyName}
+          onChange={handleChange('companyName')}
         />
         {/* 비밀번호 입력 필드 */}
         <input

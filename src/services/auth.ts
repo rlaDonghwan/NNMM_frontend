@@ -12,7 +12,7 @@ export const login = (data: {email: string; password: string}) =>
 export const register = (data: {
   email: string
   name: string
-  position: string
+  companyName: string
   password: string
 }) => axios.post(`${API}/auth/signup`, data) // 회원가입 요청 함수, 이메일, 이름, 직책, 비밀번호를 서버로 전송
 //----------------------------------------------------------------------------------------------------
