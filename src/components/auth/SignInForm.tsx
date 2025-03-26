@@ -42,7 +42,7 @@ export default function SignInForm() {
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{backgroundImage: 'url("/images/login.png")'}}>
-      <div className="mb-6 text-7xl font-bold text-center text-gray-800">
+      <div className="mb-20 text-7xl font-bold text-center text-gray-800">
         나만의 ESG
         <br />
         대시보드를
@@ -59,14 +59,14 @@ export default function SignInForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 border-b-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="이메일"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
             <input
               type="password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 border-b-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="비밀번호"
               value={password}
               onChange={e => setPassword(e.target.value)}
