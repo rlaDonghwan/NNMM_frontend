@@ -39,18 +39,26 @@ export default function SignInForm() {
     //     {error}
     //   </p>
     // )}
-    <div
-      //public/images/login.png 파일을 배경 이미지로 사용------------------------------------------------
-      className="min-h-screen flex items-center justify-center bg-cover bg-center"
-      style={{backgroundImage: 'url("/images/login.png")'}}>
+    <div className="flex h-screen w-full overflow-hidden">
+      <div className="relative w-[50vw] z-0">
+        <div
+          className="absolute inset-0"
+          style={{
+            clipPath: 'polygon(0% -100%, 100% 5%, 80% 100%, 0% 90%)',
+            background: 'linear-gradient(to bottom, #88CCE6, #E5E5E5 95%)',
+            zIndex: 0
+          }}
+        />
+      </div>
       {/* 배경 이미지에 들어갈 타이틀 텍스트 ---------------------------------------------------------------*/}
       <div
-        className="mb-20 text-7xl font-bold text-center"
+        className="absolute top-64 left-40 text-7xl font-bold  text-center"
         style={{
           background: 'linear-gradient(to bottom, #466AB7, #000000 95%)',
           WebkitBackgroundClip: 'text', // Safari 및 WebKit 기반 브라우저에 적용
           backgroundClip: 'text', // 다른 브라우저 지원
-          color: 'transparent' // 텍스트 색을 투명하게 설정
+          color: 'transparent', // 텍스트 색을 투명하게 설정
+          zIndex: 10
         }}>
         나만의 ESG
         <br />
@@ -61,7 +69,7 @@ export default function SignInForm() {
         생성하세요.
       </div>
       {/* shadcn에서 다운받은 card component를 활용하여 로그인 폼 생성---------------------------------------- */}
-      <div className="flex items-center justify-center min-h-screen bg-[rgba(255,255,255,0.0)] ml-96">
+      <div className="flex items-center justify-center min-h-screen bg-[rgba(255,255,255,0.0)] ml-20">
         <Card className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-10">
           <CardTitle className="mb-6 text-3xl font-semibold text-center text-gray-800">
             NNMM에 로그인하세요
