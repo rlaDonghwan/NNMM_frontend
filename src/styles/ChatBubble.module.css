@@ -1,0 +1,60 @@
+.container {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.left {
+  flex-direction: row;
+}
+
+.right {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  border-radius: 50%;
+}
+
+.bubbleWrapper {
+  max-width: 70%;
+  margin: 0 1rem;
+}
+
+.bubble {
+  position: relative;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  color: #fff;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.bubbleLeft {
+  background-color: #2f4f6f;
+}
+
+.bubbleRight {
+  background-color: #3c5b45;
+}
+
+.tail {
+  position: absolute;
+  top: 12px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.tailLeft {
+  left: -8px;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent #2f4f6f transparent transparent;
+}
+
+.tailRight {
+  right: -8px;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent #3c5b45;
+}
