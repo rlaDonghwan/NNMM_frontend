@@ -5,6 +5,8 @@ import AuthFormWrapper from '@/components/auth/AuthFormWrapper'
 import {login} from '@/services/auth'
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
 import {Input} from '@/components/ui/input'
+import {toast} from 'react-hot-toast'
+import router from 'next/router'
 
 export default function SignInForm() {
   // 이메일 상태를 관리하는 useState 훅
@@ -12,33 +14,61 @@ export default function SignInForm() {
   // 비밀번호 상태를 관리하는 useState 훅
   const [password, setPassword] = useState('')
   // 에러 메시지 상태를 관리하는 useState 훅
-  const [error, setError] = useState('')
+  // const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const validateInputs = () => {
+    if (!email || !password) {
+      alert('이메일과 비밀번호를 입력해주세요')
+      return false
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast.error('유효한 이메일 주소를 입력해주세요.')
+      return false
+    }
+    return true
+  }
 
   // 폼 제출 시 호출되는 함수
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault() // 기본 폼 제출 동작 방지
 
+    if (!validateInputs()) return
+
+    setLoading(true)
+
     try {
       // 로그인 API 호출
       const res = await login({email, password})
-      // 로그인 성공 시 토큰을 로컬 스토리지에 저장
-      localStorage.setItem('token', res.data.token)
-      console.log('로그인 성공:', res.data, localStorage.getItem('token'))
-      // 대시보드 페이지로 리다이렉트
-      window.location.href = '/dashboard'
+      const token = res.data.token
+
+      if (token) {
+        localStorage.setItem('token', token)
+        toast.success('로그인 성공')
+        router.push('/dashboard')
+      } else {
+        throw new Error('토큰이 없습니다')
+      }
     } catch (err: any) {
-      // 로그인 실패 시 에러 처리
-      console.error('로그인 실패:', err)
-      setError('이메일 또는 비밀번호가 올바르지 않습니다') // 에러 메시지 설정
+      // console.error('로그인 실패', err)
+
+      const status = err?.response?.status
+      const msg = err?.response?.data?.message || err.message
+
+      if (status === 401) {
+        toast.error('이메일 또는 비밀번호가 올바르지 않습니다.')
+      } else if (status === 404) {
+        toast.error('등록되지 않는 이메일입니다.')
+      } else if (status >= 500) {
+        toast.error('서버 에러가 발생했습니다. 잠시후 다시 시도해주세요.')
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    // {error && (
-    //   <p className="mb-4 text-center text-sm text-red-500 bg-red-100 p-2 rounded">
-    //     {error}
-    //   </p>
-    // )}
     <div className="flex h-screen w-full overflow-hidden">
       <div className="relative w-[50vw] z-0">
         <div
