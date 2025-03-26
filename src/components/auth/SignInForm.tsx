@@ -9,14 +9,14 @@ import {toast} from 'react-hot-toast'
 import router from 'next/router'
 
 export default function SignInForm() {
-  // 이메일 상태를 관리하는 useState 훅
-  const [email, setEmail] = useState('')
-  // 비밀번호 상태를 관리하는 useState 훅
-  const [password, setPassword] = useState('')
-  // 에러 메시지 상태를 관리하는 useState 훅
-  // const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  // 이 코드들은 유지가 되어야 백엔드와 통신이 가능합니다.-----------------------------------------------------------------------
+  const [email, setEmail] = useState('') // 이메일 상태를 관리하는 useState 훅
 
+  const [password, setPassword] = useState('') // 비밀번호 상태를 관리하는 useState 훅
+
+  const [loading, setLoading] = useState(false) // 에러 메시지 상태를 관리하는 useState 훅
+
+  // 입력값 검증 함수
   const validateInputs = () => {
     if (!email || !password) {
       alert('이메일과 비밀번호를 입력해주세요')
@@ -29,11 +29,11 @@ export default function SignInForm() {
     }
     return true
   }
+  // ------------------------------------------------------------------------------------
 
   // 폼 제출 시 호출되는 함수
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault() // 기본 폼 제출 동작 방지
-
     if (!validateInputs()) return
 
     setLoading(true)
@@ -51,10 +51,8 @@ export default function SignInForm() {
         throw new Error('토큰이 없습니다')
       }
     } catch (err: any) {
-      // console.error('로그인 실패', err)
-
-      const status = err?.response?.status
-      const msg = err?.response?.data?.message || err.message
+      const status = err?.response?.status // 에러 상태 코드
+      const msg = err?.response?.data?.message || err.message // 에러 메시지
 
       if (status === 401) {
         toast.error('이메일 또는 비밀번호가 올바르지 않습니다.')
@@ -66,6 +64,7 @@ export default function SignInForm() {
     } finally {
       setLoading(false)
     }
+    // ------------------------------------------------------------------------------------
   }
 
   return (

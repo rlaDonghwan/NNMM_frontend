@@ -1,0 +1,292 @@
+/* ===== 기본 레이아웃 ===== */
+.div {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2px;
+  text-align: left;
+  font-size: 62px;
+  color: #000;
+  font-family: AppleSDGothicNeoB00;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+}
+
+/* ===== 헤더 ===== */
+.div1 {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 40px;
+  font-size: 35px;
+  background-color: white;
+}
+.div2 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+.icon {
+  width: 70px;
+  object-fit: cover;
+}
+.div3 {
+  font-size: 30px;
+  font-weight: bold;
+}
+.div4 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+.settings1Icon,
+.icon1 {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+.div5,
+.div6 {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== 히어로 배너 영역 ===== */
+.div7 {
+  position: relative;
+  width: 100%;
+  height: 925px;
+  overflow: hidden;
+  font-size: 36px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 80px;
+  background: linear-gradient(to bottom, #b4e0f2, #e4edf5);
+}
+.child {
+  display: none;
+}
+.div10 {
+  z-index: 1;
+  max-width: 50%;
+  font-size: 36px;
+  line-height: 1.4;
+}
+.div12 {
+  font-size: 48px;
+  color: #466ab7;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.image5Icon {
+  position: absolute;
+  right: 80px;
+  top: 140px;
+  width: 700px;
+  height: auto;
+}
+.div8 {
+  margin-top: 40px;
+  background-color: #000;
+  border-radius: 50px;
+  width: 260px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ===== 설명 문구 + 말풍선 ===== */
+.div13 {
+  width: 100%;
+  padding: 80px;
+  background-color: #fff;
+  text-align: center;
+  font-size: 32px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+.div18 {
+  font-size: 28px;
+  font-weight: bold;
+}
+.div15 {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== 서비스 특징 영역 ===== */
+.div19,
+.div22 {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 52px 74px;
+  gap: 155px;
+  height: 720px;
+}
+.div19 {
+  background-color: #f5f7fa;
+}
+.div22 {
+  background-color: #fff;
+}
+.frameParent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+.barChartParent,
+.lightBulbParent {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.barChartIcon {
+  width: 72px;
+  height: 72px;
+}
+.div20 {
+  font-size: 32px;
+  background: linear-gradient(180deg, #466ab7, #000);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.div21 {
+  font-size: 24px;
+  line-height: 1.5;
+}
+.child1 {
+  width: 747px;
+  height: 553px;
+  background-color: #d9d9d9;
+}
+
+/* ===== CTA 영역 ===== */
+.div28 {
+  position: relative;
+  background: linear-gradient(180deg, #88cce6, #e5e5e5 94.56%);
+  padding: 100px 20px;
+  text-align: center;
+  color: #000;
+}
+.div29 {
+  margin: 40px auto 0;
+  border-radius: 80px;
+  background-color: #000;
+  width: 322px;
+  height: 87px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.div31 {
+  font-size: 48px;
+  font-weight: 500;
+}
+
+/* ===== 공통 텍스트 ===== */
+.p,
+.p1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+.txt {
+  width: 100%;
+}
+
+/* ===== 반응형 처리 ===== */
+@media screen and (max-width: 1024px) {
+  .image5Icon,
+  .child,
+  .child1,
+  .child4,
+  .barChartIcon,
+  .icon1,
+  .icon,
+  .settings1Icon {
+    display: none !important;
+  }
+
+  .div1 {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .div4 {
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .div7,
+  .div13,
+  .div19,
+  .div22,
+  .div28 {
+    height: auto !important;
+    padding: 40px 20px !important;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .div20 {
+    font-size: 22px !important;
+    width: 100% !important;
+    text-align: center;
+  }
+
+  .div21 {
+    font-size: 16px !important;
+    height: auto !important;
+    text-align: center;
+  }
+
+  .frameParent {
+    align-items: center !important;
+  }
+
+  .div9 {
+    font-size: 20px;
+  }
+
+  .div29 {
+    top: auto;
+    bottom: 40px;
+  }
+
+  .div31 {
+    font-size: 28px;
+  }
+}

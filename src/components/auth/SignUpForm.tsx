@@ -7,22 +7,15 @@ import {toast} from 'react-hot-toast'
 
 // SignUpForm 컴포넌트를 기본 내보내기로 정의합니다.
 export default function SignUpForm() {
+  // 이 코드들은 유지가 되어야 백엔드와 통신이 가능합니다.-----------------------------------------------------------------------
   const router = useRouter() // useRouter 훅을 초기화합니다.
-
-  // 이메일 상태를 관리합니다.
-  const [email, setEmail] = useState('')
-  // 이름 상태를 관리합니다.
-  const [name, setName] = useState('')
-  // 직책 상태를 관리합니다.
-  const [companyName, setCompanyName] = useState('')
-  // 비밀번호 상태를 관리합니다.
-  const [password, setPassword] = useState('')
-  // 비밀번호 확인 상태를 관리합니다.
-  const [confirmPassword, setConfirmPassword] = useState('')
-  // 에러 메시지 상태를 관리합니다.
-  const [error, setError] = useState('')
-  // 성공 메시지 상태를 관리합니다.
-  const [success, setSuccess] = useState('')
+  const [email, setEmail] = useState('') // 이메일 상태를 관리합니다.
+  const [name, setName] = useState('') // 이름 상태를 관리합니다.
+  const [companyName, setCompanyName] = useState('') // 직책 상태를 관리합니다.
+  const [password, setPassword] = useState('') // 비밀번호 상태를 관리합니다.
+  const [confirmPassword, setConfirmPassword] = useState('') // 비밀번호 확인 상태를 관리합니다.
+  const [error, setError] = useState('') // 에러 메시지 상태를 관리합니다.
+  const [success, setSuccess] = useState('') // 성공 메시지 상태를 관리합니다.
 
   // 입력 필드의 값을 변경하는 핸들러 함수입니다.
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,6 +27,7 @@ export default function SignUpForm() {
     if (field === 'password') setPassword(value)
     if (field === 'confirmPassword') setConfirmPassword(value)
   }
+  // ------------------------------------------------------------------------------------
 
   // 계정을 생성하는 함수입니다.
   const createAccount = async (e: React.FormEvent) => {
@@ -64,6 +58,7 @@ export default function SignUpForm() {
       toast.error(msg) // 에러 메시지를 설정합니다.
     }
   }
+  // ------------------------------------------------------------------------------------
 
   return (
     // AuthFormWrapper 컴포넌트를 사용하여 회원가입 폼을 감쌉니다.
