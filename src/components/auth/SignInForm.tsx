@@ -3,6 +3,8 @@ import {useState} from 'react'
 import Link from 'next/link'
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper'
 import {login} from '@/services/auth'
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
+import {Input} from '@/components/ui/input'
 
 export default function SignInForm() {
   // 이메일 상태를 관리하는 useState 훅
@@ -32,41 +34,59 @@ export default function SignInForm() {
   }
 
   return (
-    <AuthFormWrapper title="Login">
-      {error && (
-        <p className="mb-4 text-center text-sm text-red-500 bg-red-100 p-2 rounded">
-          {error}
-        </p>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="email"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
-        <button
-          type="submit"
-          className="w-full py-2 font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600 transition">
-          Login
-        </button>
-      </form>
-
-      <div className="mt-6 text-sm text-gray-600 text-center">
-        Create account?{' '}
-        <Link href="/auth/signup" className="text-blue-500 underline hover:text-blue-700">
-          Sign Up
-        </Link>
+    // {error && (
+    //   <p className="mb-4 text-center text-sm text-red-500 bg-red-100 p-2 rounded">
+    //     {error}
+    //   </p>
+    // )}
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{backgroundImage: 'url("/images/login.png")'}}>
+      <div className="mb-6 text-7xl font-bold text-center text-gray-800">
+        나만의 ESG
+        <br />
+        대시보드를
+        <br />
+        무한히
+        <br />
+        생성하세요.
       </div>
-    </AuthFormWrapper>
+      <div className="flex items-center justify-center min-h-screen bg-[rgba(255,255,255,0.0)] ml-96">
+        <Card className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-10">
+          <CardTitle className="mb-6 text-3xl font-semibold text-center text-gray-800">
+            NNMM에 로그인하세요
+          </CardTitle>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="이메일"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="비밀번호"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="w-full py-2 font-semibold text-white bg-black rounded-md hover:bg-blue-600 transition">
+              로그인
+            </button>
+          </form>
+          <div className="mt-6 text-sm text-gray-600 text-center">
+            계정이 없으신가요?{' '}
+            <Link
+              href="/auth/signup"
+              className="text-blue-500 underline hover:text-blue-700">
+              지금 만드세요.
+            </Link>
+          </div>
+        </Card>
+      </div>
+    </div>
   )
 }
