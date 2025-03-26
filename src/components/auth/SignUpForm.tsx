@@ -154,17 +154,17 @@ export default function SignUpForm() {
               <button
                 type="submit"
                 className="w-full py-2 font-semibold text-white bg-black rounded-md hover:bg-blue-600 transition">
-                Create Account
+                계정 생성
               </button>
             </form>
 
             {/* 로그인 페이지로 이동하는 링크 */}
             <div className="mt-6 text-sm text-gray-600 text-center">
-              Already have an account?{' '}
+              이미 계정이 있으신가요?{' '}
               <Link
                 href="/auth/signin"
                 className="text-blue-500 underline hover:text-blue-700">
-                Log in
+                로그인
               </Link>
             </div>
           </Card>
