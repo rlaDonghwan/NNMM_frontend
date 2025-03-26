@@ -9,7 +9,7 @@ export default function MyApp({Component, pageProps}: AppProps) {
   const router = useRouter()
 
   // Layout이 필요 없는 페이지 경로를 정의합니다.
-  const noLayoutPages = ['/auth/signin', '/auth/signup']
+  const noLayoutPages = ['/auth/signin', '/auth/signup', 'main/main']
   const isNoLayoutPage = noLayoutPages.includes(router.pathname)
 
   return isNoLayoutPage ? (

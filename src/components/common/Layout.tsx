@@ -10,11 +10,13 @@ import {
   NavigationMenuContent,
   NavigationMenuLink
 } from '../ui/navigation-menu'
+import {SidebarProvider, SidebarTrigger} from '@/components/ui/sidebar'
+import {AppSidebar} from '@/components/dashboard/app-sidebar'
 
-export default function Layout({children}) {
+export default function Layout({children}: {children: React.ReactNode}) {
   return (
     <>
-      <NavigationMenu className="justify-between min-w-full p-4 bg-white shadow">
+      <NavigationMenu className="flex justify-between min-w-full p-4 bg-white shadow">
         <NavigationMenuList className="text-2xl font-bold">
           <img
             src="/images/Dashboard.png"
@@ -33,6 +35,13 @@ export default function Layout({children}) {
           </Avatar>
         </NavigationMenuList>
       </NavigationMenu>
+      <SidebarProvider>
+        <AppSidebar />
+        <main>
+          {/* <SidebarTrigger /> */}
+          {children}
+        </main>
+      </SidebarProvider>
     </>
   )
 }
