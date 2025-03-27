@@ -1,3 +1,4 @@
+import React from 'react'
 import {useState} from 'react'
 import {DndProvider, useDrag, useDrop} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
@@ -7,26 +8,33 @@ const ItemType = {
 }
 
 export default function Environment() {
-  const [isModalOpen, setIsModalOpen] = useState(false) // 모달 열기/닫기 상태
-  const [modalContent, setModalContent] = useState('') // 모달에 표시할 내용
-  const [gridItems, setGridItems] = useState([]) // 초기 그리드 항목
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false) // 수정 팝업 상태
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalContent, setModalContent] = useState('')
+  const [gridItems, setGridItems] = useState([])
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
 
   const handleClick = item => {
-    if (item === '텍스트') {
-      setIsEditModalOpen(true) // 수정 팝업 열기
+    if (item.id) {
+      setSelectedItemId(item.id) // 선택된 칼럼 ID 설정
+      setIsEditModalOpen(true)
     } else {
       setModalContent(`당신이 클릭한 항목: ${item}`)
-      setIsModalOpen(true) // 일반 팝업 열기
+      setIsModalOpen(true)
     }
   }
 
   const closeModal = () => {
-    setIsModalOpen(false) // 일반 팝업 닫기
+    setIsModalOpen(false)
   }
 
   const closeEditModal = () => {
-    setIsEditModalOpen(false) // 수정 팝업 닫기
+    setIsEditModalOpen(false)
+  }
+
+  const handleDeleteItem = () => {
+    setGridItems(prevItems => prevItems.filter(item => item.id !== selectedItemId)) // 선택된 아이템 삭제
+    closeEditModal() // 모달 닫기
   }
 
   const getRandomColor = () => {
@@ -41,8 +49,8 @@ export default function Environment() {
   }
 
   const handleAddItem = () => {
-    setGridItems(prevItems => [...prevItems, {id: Date.now(), color: getRandomColor()}]) // 랜덤 색상으로 "텍스트" 추가
-    setIsModalOpen(false) // 모달 닫기
+    setGridItems(prevItems => [...prevItems, {id: Date.now(), color: getRandomColor()}])
+    setIsModalOpen(false)
   }
 
   const moveItem = (dragIndex, hoverIndex) => {
@@ -52,11 +60,21 @@ export default function Environment() {
     setGridItems(updatedItems)
   }
 
-  const GridItem = ({item, index, isLast}) => {
+  const GridItem = ({
+    item,
+    index,
+    isLast
+  }: {
+    item: any
+    index: number
+    isLast: boolean
+  }) => {
+    const ref = React.useRef<HTMLDivElement>(null)
+
     const [{isDragging}, dragRef] = useDrag({
       type: ItemType.BOX,
-      item: {index},
-      canDrag: !isLast, // "+" 칸은 드래그 불가능
+      item: {index, id: item?.id},
+      canDrag: !isLast,
       collect: monitor => ({
         isDragging: monitor.isDragging()
       })
@@ -64,7 +82,7 @@ export default function Environment() {
 
     const [, dropRef] = useDrop({
       accept: ItemType.BOX,
-      hover: draggedItem => {
+      hover: (draggedItem: {index: number}) => {
         if (!isLast && draggedItem.index !== index) {
           moveItem(draggedItem.index, index)
           draggedItem.index = index
@@ -72,14 +90,16 @@ export default function Environment() {
       }
     })
 
+    dragRef(dropRef(ref))
+
     return (
       <div
-        ref={node => dragRef(dropRef(node))}
+        ref={ref} // 병합된 ref를 연결
         className={`p-6 rounded-xl shadow flex items-center justify-center cursor-pointer ${
           isLast ? 'bg-blue-100' : item.color
         }`}
         style={{opacity: isDragging ? 0.5 : 1}}
-        onClick={() => handleClick(isLast ? '+' : '텍스트')}>
+        onClick={() => handleClick(isLast ? '+' : item)}>
         <span className={`text-9xl ${isLast ? 'text-gray-500' : 'text-black'}`}>
           {isLast ? '+' : '텍스트'}
         </span>
@@ -94,14 +114,13 @@ export default function Environment() {
         <div
           className="grid gap-4"
           style={{
-            gridTemplateColumns: 'repeat(3, 400px)', // 한 줄에 3개의 칸
-            gridAutoRows: '300px' // 각 줄의 높이
+            gridTemplateColumns: 'repeat(3, 400px)',
+            gridAutoRows: '300px'
           }}>
           {gridItems.map((item, index) => (
-            <GridItem key={item.id} item={item} index={index} />
+            <GridItem key={item.id} item={item} index={index} isLast={undefined} />
           ))}
-          {/* "+" 칸은 항상 마지막에 고정 */}
-          <GridItem key="add-button" isLast />
+          <GridItem key="add-button" isLast item={undefined} index={undefined} />
         </div>
 
         {/* 일반 모달 팝업 */}
@@ -128,17 +147,17 @@ export default function Environment() {
         {isEditModalOpen && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-              <h2 className="text-xl font-semibold mb-4">수정 팝업</h2>
-              <p>이곳에서 텍스트 칸을 수정할 수 있습니다.</p>
+              <h2 className="text-xl font-semibold mb-4">삭제 팝업</h2>
+              <p>이 칼럼을 삭제하시겠습니까?</p>
               <button
                 onClick={closeEditModal}
                 className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
                 닫기
               </button>
               <button
-                onClick={closeEditModal}
-                className="mt-4 bg-yellow-500 text-white py-2 px-4 rounded ml-4">
-                수정
+                onClick={handleDeleteItem}
+                className="mt-4 bg-red-500 text-white py-2 px-4 rounded ml-4">
+                삭제
               </button>
             </div>
           </div>
