@@ -27,9 +27,9 @@ export default function Layout({children}: {children: React.ReactNode}) {
         </NavigationMenuList>
         <NavigationMenuList>
           <Link href="/auth/signin" legacyBehavior passHref>
-            <Button>로그아웃</Button>
+            <Button className="mr-4">로그아웃</Button>
           </Link>
-          <Avatar className="ml-4">
+          <Avatar>
             <AvatarImage src="https://avatars.githubusercontent.com/u/118759932?v=4&size=64" />
             <AvatarFallback>CNs</AvatarFallback>
           </Avatar>
@@ -37,10 +37,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
       </NavigationMenu>
       <SidebarProvider>
         <AppSidebar />
-        <main>
-          {/* <SidebarTrigger /> */}
-          {children}
-        </main>
+        <main className="">{children}</main>
       </SidebarProvider>
     </>
   )

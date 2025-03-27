@@ -63,7 +63,6 @@
 
 // src/pages/dashboard/index.tsx
 import {useEffect, useState} from 'react'
-import DashboardWelcome from '@/components/dashboard/DashboardWelcome'
 import DashboardGrid from '@/components/dashboard/DashboardGrid'
 import {fetchCurrentUser} from '@/services/auth'
 import {getToken} from '@/utils/auth'
@@ -91,7 +90,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white p-10">
-      <DashboardWelcome username={username} />
       <DashboardGrid />
     </div>
   )
