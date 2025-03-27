@@ -1,22 +1,48 @@
-import React from 'react'
-import {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {DndProvider, useDrag, useDrop} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
+import axios from 'axios'
+import Chartpage from '../ui/charts/chartEx'
 
 const ItemType = {
   BOX: 'box'
 }
+
+const apiUrl = 'https://localhost:4000/api/columns' // 백엔드 API URL
 
 export default function Environment() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState('')
   const [gridItems, setGridItems] = useState([])
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
+  const [selectedItemId, setSelectedItemId] = useState(null)
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    const fetchGridItems = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/get`) // 백엔드에서 컬럼 데이터를 가져오는 API 호출
+        setGridItems(response.data)
+      } catch (error) {
+        console.error('컬럼 데이터 로드 실패:', error)
+      }
+    }
+    fetchGridItems()
+  }, [])
+
+  const sendColumnsToBackend = async updatedItems => {
+    try {
+      await axios.post(`${apiUrl}/update`, {
+        columns: updatedItems
+      })
+    } catch (error) {
+      console.error('컬럼 업데이트 실패:', error)
+    }
+  }
 
   const handleClick = item => {
     if (item.id) {
-      setSelectedItemId(item.id) // 선택된 칼럼 ID 설정
+      setSelectedItemId(item.id)
       setIsEditModalOpen(true)
     } else {
       setModalContent(`당신이 클릭한 항목: ${item}`)
@@ -33,8 +59,10 @@ export default function Environment() {
   }
 
   const handleDeleteItem = () => {
-    setGridItems(prevItems => prevItems.filter(item => item.id !== selectedItemId)) // 선택된 아이템 삭제
-    closeEditModal() // 모달 닫기
+    const updatedItems = gridItems.filter(item => item.id !== selectedItemId)
+    setGridItems(updatedItems)
+    sendColumnsToBackend(updatedItems) // 삭제 후 백엔드로 컬럼 순서 전송
+    closeEditModal()
   }
 
   const getRandomColor = () => {
@@ -49,7 +77,10 @@ export default function Environment() {
   }
 
   const handleAddItem = () => {
-    setGridItems(prevItems => [...prevItems, {id: Date.now(), color: getRandomColor()}])
+    const newItem = {id: Date.now(), color: getRandomColor()}
+    const updatedItems = [...gridItems, newItem]
+    setGridItems(updatedItems)
+    sendColumnsToBackend(updatedItems) // 추가 후 백엔드로 컬럼 순서 전송
     setIsModalOpen(false)
   }
 
@@ -58,6 +89,7 @@ export default function Environment() {
     const [removed] = updatedItems.splice(dragIndex, 1)
     updatedItems.splice(hoverIndex, 0, removed)
     setGridItems(updatedItems)
+    sendColumnsToBackend(updatedItems) // 순서 변경 후 백엔드로 컬럼 순서 전송
   }
 
   const GridItem = ({
@@ -94,14 +126,16 @@ export default function Environment() {
 
     return (
       <div
-        ref={ref} // 병합된 ref를 연결
+        ref={ref}
         className={`p-6 rounded-xl shadow flex items-center justify-center cursor-pointer ${
           isLast ? 'bg-blue-100' : item.color
         }`}
         style={{opacity: isDragging ? 0.5 : 1}}
         onClick={() => handleClick(isLast ? '+' : item)}>
         <span className={`text-9xl ${isLast ? 'text-gray-500' : 'text-black'}`}>
-          {isLast ? '+' : '텍스트'}
+          {
+            isLast ? '+' : <Chartpage /> // Component에서 차트를 정상적으로 렌더링하도록 수정
+          }
         </span>
       </div>
     )
@@ -118,9 +152,9 @@ export default function Environment() {
             gridAutoRows: '300px'
           }}>
           {gridItems.map((item, index) => (
-            <GridItem key={item.id} item={item} index={index} isLast={undefined} />
+            <GridItem key={item.id} item={item} index={index} isLast={false} /> // isLast를 false로 설정하여 차트 렌더링
           ))}
-          <GridItem key="add-button" isLast item={undefined} index={undefined} />
+          <GridItem key="add-button" isLast={true} item={undefined} index={undefined} />
         </div>
 
         {/* 일반 모달 팝업 */}
