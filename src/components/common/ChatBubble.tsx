@@ -13,7 +13,13 @@ const ChatBubble = ({direction, text, avatar}: Props) => {
 
   return (
     <div className={`${styles.container} ${isLeft ? styles.left : styles.right}`}>
-      <Image src={avatar} alt="avatar" width={60} height={60} className={styles.avatar} />
+      <Image
+        src={avatar}
+        alt="avatar"
+        width={120}
+        height={120}
+        className={styles.avatar}
+      />
       <div className={styles.bubbleWrapper}>
         <div
           className={`${styles.bubble} ${
