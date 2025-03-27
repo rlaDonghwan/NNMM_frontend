@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
-import AuthFormWrapper from '@/components/auth/AuthFormWrapper'
 import {register} from '@/services/auth'
 import {toast} from 'react-hot-toast'
 import {Card, CardTitle} from '../ui/card'
@@ -15,8 +14,6 @@ export default function SignUpForm() {
   const [companyName, setCompanyName] = useState('') // 직책 상태를 관리합니다.
   const [password, setPassword] = useState('') // 비밀번호 상태를 관리합니다.
   const [confirmPassword, setConfirmPassword] = useState('') // 비밀번호 확인 상태를 관리합니다.
-  const [error, setError] = useState('') // 에러 메시지 상태를 관리합니다.
-  const [success, setSuccess] = useState('') // 성공 메시지 상태를 관리합니다.
 
   // 입력 필드의 값을 변경하는 핸들러 함수입니다.
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,87 +86,73 @@ export default function SignUpForm() {
         <br />
         시작입니다.
       </div>
-      <AuthFormWrapper title="Sign Up">
-        {/* 에러 메시지가 있을 경우 화면에 표시합니다. */}
-        {error && (
-          <p className="text-sm text-red-500 text-center bg-red-100 p-2 rounded">
-            {error}
-          </p>
-        )}
-        {/* 성공 메시지가 있을 경우 화면에 표시합니다. */}
-        {success && (
-          <p className="text-sm text-green-600 text-center bg-green-100 p-2 rounded">
-            {success}
-          </p>
-        )}
 
-        {/* 회원가입 폼입니다. */}
-        <div className="flex items-center justify-center min-h-screen bg-[rgba(255,255,255,0.0)] translate-x-20">
-          <Card className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-5">
-            <CardTitle className="mb-6 text-3xl font-semibold text-center text-white-800">
-              지금 만드세요.
-            </CardTitle>
-            <form onSubmit={createAccount} className="space-y-5">
-              {/* 이메일 입력 필드 */}
-              <input
-                type="email"
-                className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="이메일"
-                value={email}
-                onChange={handleChange('email')}
-              />
-              {/* 이름 입력 필드 */}
-              <input
-                type="text"
-                className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="이름"
-                value={name}
-                onChange={handleChange('name')}
-              />
-              {/* 회사명 입력 필드 */}
-              <input
-                type="text"
-                className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="회사명"
-                value={companyName}
-                onChange={handleChange('companyName')}
-              />
-              {/* 비밀번호 입력 필드 */}
-              <input
-                type="password"
-                className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="비밀번호"
-                value={password}
-                onChange={handleChange('password')}
-              />
-              {/* 비밀번호 확인 입력 필드 */}
-              <input
-                type="password"
-                className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="비밀번호 확인"
-                value={confirmPassword}
-                onChange={handleChange('confirmPassword')}
-              />
-              {/* 계정 생성 버튼 */}
-              <button
-                type="submit"
-                className="w-full py-2 font-semibold text-white bg-black rounded-md hover:bg-blue-600 transition">
-                계정 생성
-              </button>
-            </form>
+      {/* 회원가입 폼입니다. */}
+      <div className="flex items-center justify-center min-h-screen bg-[rgba(255,255,255,0.0)] translate-x-20">
+        <Card className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-5">
+          <CardTitle className="mb-6 text-3xl font-semibold text-center text-white-800">
+            지금 만드세요.
+          </CardTitle>
+          <form onSubmit={createAccount} className="space-y-5">
+            {/* 이메일 입력 필드 */}
+            <input
+              type="email"
+              className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="이메일"
+              value={email}
+              onChange={handleChange('email')}
+            />
+            {/* 이름 입력 필드 */}
+            <input
+              type="text"
+              className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="이름"
+              value={name}
+              onChange={handleChange('name')}
+            />
+            {/* 회사명 입력 필드 */}
+            <input
+              type="text"
+              className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="회사명"
+              value={companyName}
+              onChange={handleChange('companyName')}
+            />
+            {/* 비밀번호 입력 필드 */}
+            <input
+              type="password"
+              className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="비밀번호"
+              value={password}
+              onChange={handleChange('password')}
+            />
+            {/* 비밀번호 확인 입력 필드 */}
+            <input
+              type="password"
+              className="w-full px-4 py-2 border-b border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="비밀번호 확인"
+              value={confirmPassword}
+              onChange={handleChange('confirmPassword')}
+            />
+            {/* 계정 생성 버튼 */}
+            <button
+              type="submit"
+              className="w-full py-2 font-semibold text-white bg-black rounded-md hover:bg-blue-600 transition">
+              계정 생성
+            </button>
+          </form>
 
-            {/* 로그인 페이지로 이동하는 링크 */}
-            <div className="mt-6 text-sm text-gray-600 text-center">
-              이미 계정이 있으신가요?{' '}
-              <Link
-                href="/auth/signin"
-                className="text-blue-500 underline hover:text-blue-700">
-                로그인
-              </Link>
-            </div>
-          </Card>
-        </div>
-      </AuthFormWrapper>
+          {/* 로그인 페이지로 이동하는 링크 */}
+          <div className="mt-6 text-sm text-gray-600 text-center">
+            이미 계정이 있으신가요?{' '}
+            <Link
+              href="/auth/signin"
+              className="text-blue-500 underline hover:text-blue-700">
+              로그인
+            </Link>
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }

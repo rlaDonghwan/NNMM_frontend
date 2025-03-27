@@ -1,20 +1,14 @@
 import {useEffect, useState} from 'react'
-import {fetchCurrentUser} from '@/services/auth'
-import {getToken} from '@/utils/auth'
-import Governance from '@/components/dashboard/G'
+import {loadUserAndChartData} from '@/utils/user'
+import Governance from '@/components/dashboard/governance'
 
-export default function G() {
+export default function governance() {
   const [username, setUsername] = useState('')
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const token = getToken()
-        if (!token) {
-          console.warn('토큰이 없습니다. 로그인 필요')
-          return
-        }
-        const user = await fetchCurrentUser(token)
+        const {user} = await loadUserAndChartData()
         setUsername(user.email || '사용자')
       } catch (err) {
         console.error('인증 실패:', err)

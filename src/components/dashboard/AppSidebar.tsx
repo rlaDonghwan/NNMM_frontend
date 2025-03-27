@@ -12,9 +12,9 @@ import {useRouter} from 'next/router'
 export function AppSidebar() {
   const router = useRouter()
   const isD = router.pathname === '/dashboard'
-  const isE = router.pathname === '/dashboard/E'
-  const isS = router.pathname === '/dashboard/S'
-  const isG = router.pathname === '/dashboard/G'
+  const isE = router.pathname === '/dashboard/environmental'
+  const isS = router.pathname === '/dashboard/social'
+  const isG = router.pathname === '/dashboard/governance'
   return (
     <SidebarInset
       className="flex min-h-full"
@@ -38,7 +38,7 @@ export function AppSidebar() {
               </span>
             </button>
           </Link>
-          <Link href="/dashboard/E" legacyBehavior passHref>
+          <Link href="/dashboard/environmental" legacyBehavior passHref>
             <button
               type="submit"
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
@@ -51,7 +51,7 @@ export function AppSidebar() {
               </span>
             </button>
           </Link>
-          <Link href="/dashboard/S" legacyBehavior passHref>
+          <Link href="/dashboard/social" legacyBehavior passHref>
             <button
               type="submit"
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
@@ -64,7 +64,7 @@ export function AppSidebar() {
               </span>
             </button>
           </Link>
-          <Link href="/dashboard/G" legacyBehavior passHref>
+          <Link href="/dashboard/governance" legacyBehavior passHref>
             <button
               type="submit"
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">

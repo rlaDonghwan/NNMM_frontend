@@ -10,7 +10,7 @@ const ItemType = {
 
 const apiUrl = 'https://localhost:4000/api/columns' // 백엔드 API URL
 
-export default function Environment() {
+export default function Environmental() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState('')
   const [gridItems, setGridItems] = useState([])

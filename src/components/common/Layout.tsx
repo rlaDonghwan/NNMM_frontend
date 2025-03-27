@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import {Button} from '@/components/ui/button'
 import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -11,9 +11,27 @@ import {
   NavigationMenuLink
 } from '../ui/navigation-menu'
 import {SidebarProvider, SidebarTrigger} from '@/components/ui/sidebar'
-import {AppSidebar} from '@/components/dashboard/app-sidebar'
+import {AppSidebar} from '@/components/dashboard/Appsidebar'
+import {getCookie, deleteCookie} from 'cookies-next'
+import {useRouter} from 'next/router'
 
 export default function Layout({children}: {children: React.ReactNode}) {
+  const [username, setUsername] = useState('')
+  const router = useRouter()
+
+  useEffect(() => {
+    const storedUsername = getCookie('username')
+    if (storedUsername && typeof storedUsername === 'string') {
+      setUsername(storedUsername)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    deleteCookie('token')
+    deleteCookie('username')
+    router.push('/auth/signin')
+  }
+
   return (
     <>
       <NavigationMenu className="flex justify-between min-w-full p-4 bg-white shadow">
@@ -25,10 +43,11 @@ export default function Layout({children}: {children: React.ReactNode}) {
           />
           NNMM
         </NavigationMenuList>
-        <NavigationMenuList>
-          <Link href="/auth/signin" legacyBehavior passHref>
-            <Button className="mr-4">로그아웃</Button>
-          </Link>
+        <NavigationMenuList className="flex items-center space-x-4">
+          <span className="text-sm text-gray-700">{username}</span>
+          <Button className="mr-4" onClick={handleLogout}>
+            로그아웃
+          </Button>
           <Avatar>
             <AvatarImage src="https://avatars.githubusercontent.com/u/118759932?v=4&size=64" />
             <AvatarFallback>CNs</AvatarFallback>

@@ -1,7 +1,7 @@
 // src/components/auth/SignInForm.tsx
 import {useState} from 'react'
 import Link from 'next/link'
-import AuthFormWrapper from '@/components/auth/AuthFormWrapper'
+import {setCookie} from 'cookies-next'
 import {login} from '@/services/auth'
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
 import {Input} from '@/components/ui/input'
@@ -44,7 +44,12 @@ export default function SignInForm() {
       const token = res.data.token
 
       if (token) {
-        localStorage.setItem('token', token)
+        setCookie('token', token, {
+          maxAge: 60 * 60 * 24,
+          path: '/',
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict'
+        })
         toast.success('로그인 성공')
         router.push('/dashboard')
       } else {

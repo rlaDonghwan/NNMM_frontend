@@ -1,20 +1,14 @@
 import {useEffect, useState} from 'react'
-import {fetchCurrentUser} from '@/services/auth'
-import {getToken} from '@/utils/auth'
-import Social from '@/components/dashboard/S'
+import Environment from '@/components/dashboard/environmental'
+import {loadUserAndChartData} from '@/utils/user'
 
-export default function S() {
+export default function environmental() {
   const [username, setUsername] = useState('')
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const token = getToken()
-        if (!token) {
-          console.warn('토큰이 없습니다. 로그인 필요')
-          return
-        }
-        const user = await fetchCurrentUser(token)
+        const {user} = await loadUserAndChartData()
         setUsername(user.email || '사용자')
       } catch (err) {
         console.error('인증 실패:', err)
@@ -26,7 +20,7 @@ export default function S() {
 
   return (
     <div className="min-h-screen bg-white p-10">
-      <Social />
+      <Environment />
     </div>
   )
 }
