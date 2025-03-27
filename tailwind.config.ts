@@ -1,4 +1,6 @@
-const config = {
+import type {Config} from 'tailwindcss'
+
+const config: Config = {
   darkMode: ['class'],
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx}',
@@ -11,7 +13,7 @@ const config = {
         '13': 'repeat(13, minmax(0, 1fr))'
       },
       colors: {
-        customBlue: '#2B59FF', // 커스텀 색상 추가
+        customBlue: '#2B59FF',
         blue: {
           '400': '#2589FE',
           '500': '#0070F3',
@@ -68,6 +70,9 @@ const config = {
           ring: 'hsl(var(--sidebar-ring))'
         }
       },
+      fontFamily: {
+        apple: ['AppleSDGothicNeoB00', 'sans-serif']
+      },
       animation: {
         shimmer: 'shimmer 1.5s infinite'
       },
@@ -91,11 +96,14 @@ const config = {
   },
   variants: {
     extend: {
-      fill: ['hover', 'focus'] // fill 클래스에 hover와 focus 변형 추가
+      fill: ['hover', 'focus']
     }
   },
-  plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')]
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('tailwindcss-animate'),
+    require('@tailwindcss/aspect-ratio') // ✅ 추가
+  ]
 }
 
-// 타입 없이 export
 export default config

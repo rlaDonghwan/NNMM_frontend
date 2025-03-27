@@ -8,7 +8,7 @@ interface Props {
   avatar: string
 }
 
-const ChatBubble = ({direction, text, avatar}: Props) => {
+export const ChatBubble = ({direction, text, avatar}: Props) => {
   const isLeft = direction === 'left'
 
   return (
