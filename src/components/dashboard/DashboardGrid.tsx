@@ -1,23 +1,29 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import Modal from '../modal/Modal'
 import ModalContent from '../modal/ModalContent'
 
 export default function DashboardGrid() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+
   const indicators = [
     {key: 'scope1', label: 'Scope 1', unit: 'tCO₂-eq'},
     {key: 'scope2', label: 'Scope 2', unit: 'tCO₂-eq'},
     {key: 'energyUse.electricity', label: '전기 사용량', unit: 'TJ'}
   ]
-  const [years, setYears] = useState([2021, 2022, 2023])
-  const [rows, setRows] = useState([
-    {
-      indicatorKey: 'scope1',
-      values: {2021: '', 2022: '', 2023: ''},
-      color: '#FF6384'
-    }
-  ])
+  const [selectedIndicator, setSelectedIndicator] = useState(indicators[0].key)
 
+  const [years, setYears] = useState([2021, 2022, 2023])
+  const [rows, setRows] = useState([])
+
+  const addRowWithIndicator = () => {
+    const newRow = {
+      indicatorKey: selectedIndicator,
+      values: years.reduce((acc, y) => ({...acc, [y]: ''}), {}),
+      color: '#cccccc'
+    }
+
+    setRows([...rows, newRow])
+  }
   const handleYearChange = (index: number, value: string) => {
     const updatedYears = [...years]
     updatedYears[index] = Number(value)
@@ -111,6 +117,7 @@ export default function DashboardGrid() {
         <ModalContent
           years={years}
           rows={rows}
+          setRows={setRows}
           indicators={indicators}
           onAddYear={addYear}
           onRemoveYear={removeYear}
@@ -121,6 +128,7 @@ export default function DashboardGrid() {
           onColorChange={handleColorChange}
           getUnit={getUnit}
           onSubmit={handleSubmit}
+          onAddRowWithIndicator={addRowWithIndicator}
         />
       </Modal>
     </div>
