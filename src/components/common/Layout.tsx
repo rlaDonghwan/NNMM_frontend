@@ -11,7 +11,7 @@ import {
   NavigationMenuLink
 } from '../ui/navigation-menu'
 import {SidebarProvider, SidebarTrigger} from '@/components/ui/sidebar'
-import {AppSidebar} from '@/components/dashboard/Appsidebar'
+import {AppSidebar} from '@/components/dashboard/AppSidebar'
 import {getCookie, deleteCookie} from 'cookies-next'
 import {useRouter} from 'next/router'
 

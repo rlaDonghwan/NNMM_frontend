@@ -1,60 +1,43 @@
 .container {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
+  @apply flex items-start mb-6;
 }
 
 .left {
-  flex-direction: row;
+  @apply flex-row;
 }
 
 .right {
-  flex-direction: row-reverse;
+  @apply flex-row-reverse;
 }
 
 .avatar {
-  border-radius: 50%;
+  @apply rounded-full;
 }
 
 .bubbleWrapper {
-  max-width: 70%;
-  margin: 0 1rem;
+  @apply max-w-[70%] mx-4;
 }
 
 .bubble {
-  position: relative;
-  padding: 0.75rem 1rem;
-  border-radius: 16px;
-  font-size: 24px;
-  color: #fff;
-  line-height: 1.4;
-  word-break: keep-all;
+  @apply relative px-4 py-3 rounded-xl text-white text-2xl leading-snug break-keep;
 }
 
 .bubbleLeft {
-  background-color: #2f4f6f;
+  @apply bg-[#2f4f6f];
 }
 
 .bubbleRight {
-  background-color: #3c5b45;
+  @apply bg-[#3c5b45];
 }
 
 .tail {
-  position: absolute;
-  top: 12px;
-  width: 0;
-  height: 0;
-  border-style: solid;
+  @apply absolute;
 }
 
 .tailLeft {
-  left: -8px;
-  border-width: 8px 8px 8px 0;
-  border-color: transparent #2f4f6f transparent transparent;
+  @apply left-[-8px] border-y-[8px] border-r-[8px] border-l-0 border-solid border-transparent border-r-[#2f4f6f];
 }
 
 .tailRight {
-  right: -8px;
-  border-width: 8px 0 8px 8px;
-  border-color: transparent transparent transparent #3c5b45;
+  @apply right-[-8px] border-y-[8px] border-l-[8px] border-r-0 border-solid border-transparent border-l-[#3c5b45];
 }
