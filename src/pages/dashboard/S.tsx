@@ -1,8 +1,7 @@
 import {useEffect, useState} from 'react'
-import DashboardWelcome from '@/components/dashboard/DashboardWelcome'
-import DashboardGrid from '@/components/dashboard/DashboardGrid'
 import {fetchCurrentUser} from '@/services/auth'
 import {getToken} from '@/utils/auth'
+import Social from '@/components/dashboard/S'
 
 export default function S() {
   const [username, setUsername] = useState('')
@@ -27,8 +26,7 @@ export default function S() {
 
   return (
     <div className="min-h-screen bg-white p-10">
-      <DashboardWelcome username={username} />
-      <DashboardGrid />
+      <Social />
     </div>
   )
 }

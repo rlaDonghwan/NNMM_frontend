@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react'
-import DashboardWelcome from '@/components/dashboard/DashboardWelcome'
-import DashboardGrid from '@/components/dashboard/DashboardGrid'
+import Environment from '@/components/dashboard/E'
 import {fetchCurrentUser} from '@/services/auth'
 import {getToken} from '@/utils/auth'
 
@@ -27,8 +26,7 @@ export default function E() {
 
   return (
     <div className="min-h-screen bg-white p-10">
-      <DashboardWelcome username={username} />
-      <DashboardGrid />
+      <Environment />
     </div>
   )
 }

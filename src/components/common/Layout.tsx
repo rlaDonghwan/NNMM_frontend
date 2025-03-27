@@ -37,8 +37,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
       </NavigationMenu>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarTrigger />
-        <main>{children}</main>
+        <main className="">{children}</main>
       </SidebarProvider>
     </>
   )
