@@ -3,16 +3,18 @@ import Modal from '../modal/Modal'
 import ModalContent from '../modal/ModalContent'
 
 export default function DashboardGrid() {
+  //지표 comboboxwithcreate부분 열려있는지 닫혀있는지 상태
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const indicators = [
-    {key: 'scope1', label: 'Scope 1', unit: 'tCO₂-eq'},
-    {key: 'scope2', label: 'Scope 2', unit: 'tCO₂-eq'},
+  //지표 데이터를 배열로 상태 관리
+  const [indicators, setIndicators] = useState([
+    {key: 'scope1', label: 'Scope1', unit: 'tCO₂-eq'},
+    {key: 'scope2', label: 'Scope2', unit: 'tCO₂-eq'},
     {key: 'energyUse.electricity', label: '전기 사용량', unit: 'TJ'}
-  ]
-  //const [selectedIndicator, setSelectedIndicator] = useState(indicators[0].key)
-
+  ])
+  //현재 사용중인 연도
   const [years, setYears] = useState([2021, 2022, 2023])
+  //각 지표별 입력 데이터
   const [rows, setRows] = useState([])
 
   const handleYearChange = (index: number, value: string) => {
@@ -20,7 +22,7 @@ export default function DashboardGrid() {
     updatedYears[index] = Number(value)
     setYears(updatedYears)
   }
-
+  //가장 최근 연도 +1 값을 추가하고, 각 row에도 빈 칸을 추가함
   const addYear = () => {
     const newYear = Math.max(...years) + 1
     setYears([...years, newYear])
@@ -31,7 +33,7 @@ export default function DashboardGrid() {
       }))
     )
   }
-
+  //가장 큰 연도(최근 연도)를 제거하고 각 row에서도 삭제
   const removeYear = () => {
     if (years.length === 0) return
 
@@ -50,7 +52,7 @@ export default function DashboardGrid() {
       })
     )
   }
-
+  //특정 연도, 특정 row의 입력값을 수정
   const handleValueChange = (rowIndex: number, year: number, value: string) => {
     const updated = [...rows]
     updated[rowIndex].values[year] = value
@@ -68,6 +70,7 @@ export default function DashboardGrid() {
     updated[rowIndex].color = color
     setRows(updated)
   }
+  //새 row추가, 기본값으론 첫 번째 indicator
   const addRow = () => {
     const newRow = {
       id: crypto.randomUUID(),
@@ -76,14 +79,8 @@ export default function DashboardGrid() {
       color: '#cccccc'
     }
     setRows([...rows, newRow])
-    // const newRow = {
-    //   indicatorKey: indicators[0].key,
-    //   values: years.reduce((acc, y) => ({...acc, [y]: ''}), {}),
-    //   color: '#cccccc'
-    // }
-    // setRows([...rows, newRow])
   }
-
+  //특정 row를 index기준으로 삭제
   const removeRow = (rowIndex: number) => {
     const updated = [...rows]
     updated.splice(rowIndex, 1)
@@ -119,6 +116,7 @@ export default function DashboardGrid() {
           rows={rows}
           setRows={setRows}
           indicators={indicators}
+          setIndicators={setIndicators}
           onAddYear={addYear}
           onRemoveYear={removeYear}
           onRemoveRow={removeRow}
