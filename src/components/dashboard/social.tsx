@@ -52,13 +52,6 @@ export default function Social() {
     setRows(updated) // 업데이트된 행 데이터 저장
   }
 
-  const handleColorChange = (rowIndex, color) => {
-    // 색상 변경 핸들러
-    const updated = [...rows] // 기존 행 데이터 복사
-    updated[rowIndex].color = color // 특정 행의 색상 업데이트
-    setRows(updated) // 업데이트된 행 데이터 저장
-  }
-
   const addRowWithIndicator = indicatorKey => {
     // 지표를 포함한 행 추가 함수
     const newRow = {
@@ -86,11 +79,17 @@ export default function Social() {
   const handleSubmit = async () => {
     // 제출 핸들러
     try {
-      await syncIndicators(indicators) // 지표 동기화
-      await submitESGReport({category: 'social', years, rows}) // ESG 보고서 제출
-      setIsModalOpen(false) // 모달 닫기
+      await syncIndicators(indicators)
+      // color 필드 제거한 rows 가공
+      const sanitizedRows = rows.map(({color, ...rest}) => rest)
+      await submitESGReport({
+        category: 'social',
+        years,
+        rows: sanitizedRows
+      })
+      setIsModalOpen(false)
     } catch (error) {
-      console.error('ESG 저장 오류:', error) // 에러 로그 출력
+      console.error('ESG 저장 오류:', error)
     }
   }
 
@@ -135,27 +134,32 @@ export default function Social() {
     setGridItems(updated) // 업데이트된 그리드 아이템 저장
   }
 
+  // -----------------
+
+  interface DragItem {
+    id: string
+    index: number
+  }
+
   const GridItem = ({item, index, isLast}) => {
     // 그리드 아이템 컴포넌트
     const ref = React.useRef(null) // 참조 생성
 
-    const [{isDragging}, dragRef] = useDrag({
-      // 드래그 훅 설정
-      type: ItemType.BOX, // 아이템 타입 설정
-      item: {index, id: item?.id}, // 드래그 아이템 데이터 설정
-      canDrag: !isLast, // 마지막 아이템은 드래그 불가
-      collect: monitor => ({isDragging: monitor.isDragging()}) // 드래그 상태 수집
+    const [{isDragging}, dragRef] = useDrag<DragItem, unknown, {isDragging: boolean}>({
+      type: ItemType.BOX,
+      item: {index, id: item?.id},
+      canDrag: !isLast,
+      collect: monitor => ({
+        isDragging: monitor.isDragging()
+      })
     })
 
-    const [, dropRef] = useDrop({
-      // 드롭 훅 설정
-      accept: ItemType.BOX, // 허용되는 아이템 타입 설정
-      hover: draggedItem => {
-        // 드롭 영역에 들어왔을 때
+    const [, dropRef] = useDrop<DragItem>({
+      accept: ItemType.BOX,
+      hover: (draggedItem: DragItem) => {
         if (!isLast && draggedItem.index !== index) {
-          // 마지막 아이템이 아니고 인덱스가 다를 경우
-          moveItem(draggedItem.index, index) // 아이템 이동
-          draggedItem.index = index // 드래그된 아이템의 인덱스 업데이트
+          moveItem(draggedItem.index, index)
+          draggedItem.index = index
         }
       }
     })
@@ -170,10 +174,8 @@ export default function Social() {
         }`}
         style={{opacity: isDragging ? 0.5 : 1}} // 드래그 중일 때 투명도 설정
         onClick={() => handleClick(isLast ? {} : item)}>
-        {' '}
-        // 클릭 핸들러 연결
         <span className={`text-9xl ${isLast ? 'text-gray-500' : 'text-black'}`}>
-          {isLast ? '+' : '텍스트'} // 마지막 아이템일 경우 '+' 표시
+          {isLast ? '+' : '텍스트'}
         </span>
       </div>
     )
@@ -218,16 +220,13 @@ export default function Social() {
             onSubmit={handleSubmit} // 제출 함수 전달
             onAddRowWithIndicator={addRowWithIndicator} // 지표를 포함한 행 추가 함수 전달
             onIndicatorChange={handleIndicatorChange} // 지표 변경 함수 전달
-            onColorChange={handleColorChange} // 색상 변경 함수 전달
           />
         </Modal>
 
         {isEditModalOpen && ( // 수정 모달이 열려 있을 경우
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
-            {' '}
             {/* 모달 배경 */}
             <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-              {' '}
               {/* 모달 내용 */}
               <h2 className="text-xl font-semibold mb-4">삭제 팝업</h2> {/* 제목 */}
               <p>이 칼럼을 삭제하시겠습니까?</p> {/* 메시지 */}

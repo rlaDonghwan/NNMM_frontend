@@ -20,7 +20,6 @@ type ModalContentProps = {
   onRemoveRow: (index: number) => void
   onValueChange: (rowIndex: number, year: number, value: string) => void
   onIndicatorChange: (rowIndex: number, indicatorKey: string) => void
-  onColorChange: (rowIndex: number, color: string) => void
   getUnit: (key: string) => string
   onAddRowWithIndicator: (indicatorKey: string) => void // Added property
 
@@ -39,8 +38,6 @@ export default function ModalContent({
   onValueChange,
   getUnit,
   onSubmit,
-  onIndicatorChange,
-  onColorChange,
   onAddRowWithIndicator
 }: ModalContentProps) {
   const [selectedIndicator, setSelectedIndicator] = useState(indicators[0]?.key || '')
