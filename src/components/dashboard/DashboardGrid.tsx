@@ -14,8 +14,8 @@ export default function DashboardGrid() {
   useEffect(() => {
     const loadIndicators = async () => {
       try {
-        const data = await fetchIndicators()
-        setIndicators(data)
+        // const data = await fetchIndicators()
+        // setIndicators(data)
       } catch (err) {
         console.error('인디케이터 불러오기 실패:', err)
       }
@@ -157,7 +157,12 @@ export default function DashboardGrid() {
           onValueChange={handleValueChange}
           getUnit={getUnit}
           onSubmit={handleSubmit}
-          onAddRowWithIndicator={addRowWithIndicator} // ✅ 추가
+          onIndicatorChange={function (rowIndex: number, indicatorKey: string): void {
+            throw new Error('Function not implemented.')
+          }}
+          onColorChange={function (rowIndex: number, color: string): void {
+            throw new Error('Function not implemented.')
+          }}
         />
       </Modal>
     </div>

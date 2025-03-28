@@ -20,6 +20,7 @@ type ModalContentProps = {
   onRemoveRow: (index: number) => void
   onValueChange: (rowIndex: number, year: number, value: string) => void
   getUnit: (key: string) => string
+
   onSubmit: () => void
   onAddRowWithIndicator: (indicatorKey: string) => void
 }
