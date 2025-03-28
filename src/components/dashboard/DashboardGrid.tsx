@@ -157,6 +157,7 @@ export default function DashboardGrid() {
           onValueChange={handleValueChange}
           getUnit={getUnit}
           onSubmit={handleSubmit}
+          onAddRowWithIndicator={addRowWithIndicator} // ✅ 추가
           onIndicatorChange={function (rowIndex: number, indicatorKey: string): void {
             throw new Error('Function not implemented.')
           }}
