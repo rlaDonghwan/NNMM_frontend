@@ -25,20 +25,16 @@ export function AppSidebar() {
       }}>
       <SidebarHeader /> {/* Sidebar 상단 헤더 */}
       <SidebarContent>
-        {' '}
         {/* Sidebar 내용 */}
         <div className="flex flex-col items-center space-y-4">
-          {' '}
           {/* 버튼들을 세로로 정렬 */}
           <Link href="/dashboard" legacyBehavior passHref>
-            {' '}
             {/* '/dashboard'로 이동하는 링크 */}
             <button
               type="submit" // 버튼 타입 설정
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
-              {' '}
               {/* 버튼 스타일 */}
-              <img src="/images/dsvg.svg" alt="Main" className="ml-8 w-8 h-8" />{' '}
+              <img src="/images/dsvg.svg" alt="Main" className="ml-8 w-8 h-8" />
               {/* 버튼 아이콘 */}
               <span
                 className={`transition-colors duration-300 ${
@@ -49,12 +45,11 @@ export function AppSidebar() {
             </button>
           </Link>
           <Link href="/dashboard/environmental" legacyBehavior passHref>
-            {' '}
             {/* '/dashboard/environmental'로 이동하는 링크 */}
             <button
               type="submit"
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
-              <img src="/images/E.png" alt="E" className="ml-8 w-8 h-8" />{' '}
+              <img src="/images/E.png" alt="E" className="ml-8 w-8 h-8" />
               {/* 버튼 아이콘 */}
               <span
                 className={`transition-colors duration-300 ${
@@ -65,12 +60,11 @@ export function AppSidebar() {
             </button>
           </Link>
           <Link href="/dashboard/social" legacyBehavior passHref>
-            {' '}
             {/* '/dashboard/social'로 이동하는 링크 */}
             <button
               type="submit"
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
-              <img src="/images/S.png" alt="S" className="ml-8 w-8 h-8" />{' '}
+              <img src="/images/S.png" alt="S" className="ml-8 w-8 h-8" />
               {/* 버튼 아이콘 */}
               <span
                 className={`transition-colors duration-300 ${
@@ -81,12 +75,11 @@ export function AppSidebar() {
             </button>
           </Link>
           <Link href="/dashboard/governance" legacyBehavior passHref>
-            {' '}
             {/* '/dashboard/governance'로 이동하는 링크 */}
             <button
               type="submit"
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
-              <img src="/images/G.png" alt="G" className="ml-8 w-8 h-8" />{' '}
+              <img src="/images/G.png" alt="G" className="ml-8 w-8 h-8" />
               {/* 버튼 아이콘 */}
               <span
                 className={`transition-colors duration-300 ${

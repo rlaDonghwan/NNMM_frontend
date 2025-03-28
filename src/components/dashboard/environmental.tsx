@@ -132,7 +132,6 @@ export default function Environmental() {
         }`}
         style={{opacity: isDragging ? 0.5 : 1}} // 드래그 중일 때 투명도 조정
         onClick={() => handleClick(isLast ? '+' : item)}>
-        {' '}
         {/* 클릭 이벤트 처리 */}
         <span className={`text-9xl ${isLast ? 'text-gray-500' : 'text-black'}`}>
           {
@@ -145,7 +144,6 @@ export default function Environmental() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {' '}
       {/* DnDProvider로 드래그 앤 드롭 기능 활성화 */}
       <div>
         {/* 그리드 레이아웃 */}
@@ -158,7 +156,7 @@ export default function Environmental() {
           {gridItems.map((item, index) => (
             <GridItem key={item.id} item={item} index={index} isLast={false} /> // 그리드 아이템 렌더링
           ))}
-          <GridItem key="add-button" isLast={true} item={undefined} index={undefined} />{' '}
+          <GridItem key="add-button" isLast={true} item={undefined} index={undefined} />
           {/* 추가 버튼 렌더링 */}
         </div>
 
@@ -186,7 +184,7 @@ export default function Environmental() {
         {isEditModalOpen && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-              <h2 className="text-xl font-semibold mb-4">삭제 팝업</h2>{' '}
+              <h2 className="text-xl font-semibold mb-4">삭제 팝업</h2>
               {/* 수정 모달 제목 */}
               <p>이 칼럼을 삭제하시겠습니까?</p> {/* 삭제 확인 메시지 */}
               <button

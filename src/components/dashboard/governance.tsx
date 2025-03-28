@@ -115,12 +115,10 @@ export default function Governance() {
         }`}
         style={{opacity: isDragging ? 0.5 : 1}} // 드래그 중이면 투명도 조정
         onClick={() => handleClick(isLast ? '+' : item)}>
-        {' '}
         {/* 클릭 시 동작 */}
         <span className={`text-9xl ${isLast ? 'text-gray-500' : 'text-black'}`}>
-          {' '}
           {/* 텍스트 스타일 */}
-          {isLast ? '+' : '텍스트'}{' '}
+          {isLast ? '+' : '텍스트'}
           {/* 마지막 아이템이면 '+' 표시, 아니면 '텍스트' 표시 */}
         </span>
       </div>
@@ -129,7 +127,6 @@ export default function Governance() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {' '}
       {/* DnDProvider로 드래그 앤 드롭 컨텍스트 제공 */}
       <div>
         {/* 그리드 레이아웃 */}
@@ -147,17 +144,15 @@ export default function Governance() {
               <GridItem key={item.id} item={item} index={index} isLast={undefined} />
             )
           )}
-          <GridItem key="add-button" isLast item={undefined} index={undefined} />{' '}
+          <GridItem key="add-button" isLast item={undefined} index={undefined} />
           {/* 추가 버튼 */}
         </div>
 
         {/* 일반 모달 팝업 */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
-            {' '}
             {/* 모달 배경 */}
             <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-              {' '}
               {/* 모달 내용 */}
               <h2 className="text-xl font-semibold mb-4">팝업</h2> {/* 모달 제목 */}
               <p>{modalContent}</p> {/* 모달 내용 */}
@@ -178,10 +173,8 @@ export default function Governance() {
         {/* 수정 모달 팝업 */}
         {isEditModalOpen && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
-            {' '}
             {/* 모달 배경 */}
             <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-              {' '}
               {/* 모달 내용 */}
               <h2 className="text-xl font-semibold mb-4">삭제 팝업</h2> {/* 모달 제목 */}
               <p>이 칼럼을 삭제하시겠습니까?</p> {/* 삭제 확인 메시지 */}
