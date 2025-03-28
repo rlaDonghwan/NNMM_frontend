@@ -5,7 +5,7 @@ import Footer from '@/components/main/Footer'
 
 export default function Home() {
   return (
-    <div className="w-full max-w-screen-2xl mx-auto bg-white overflow-hidden">
+    <div className="w-full mx-auto bg-white overflow-hidden">
       <Header />
 
       <DescriptionBlock />
