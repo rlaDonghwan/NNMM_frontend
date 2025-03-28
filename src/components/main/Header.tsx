@@ -4,12 +4,18 @@ export default function HeroSection() {
   return (
     <div className="w-full relative overflow-hidden bg-white px-4 py-12">
       {/* 배너 이미지 */}
-      <div className="relative w-full h-auto min-h-[300px]">
-        <img
-          className="w-full h-auto object-cover"
-          src="/main/banner.svg"
-          alt="bannerImage"
+      <div className="relative w-full min-h-[300px] md:min-h-[480px] rounded-2xl overflow-hidden bg-gradient-to-b from-sky-300 to-gray-50">
+        <div
+          className="absolute inset-0"
+          style={{
+            clipPath:
+              'polygon(0 0, calc(100% - 120px) 0, 100% 50%, calc(100% - 120px) 100%, 0 100%)',
+            background: 'linear-gradient(to bottom, #87CEFA, #f9f9f9)'
+          }}
         />
+
+        {/* 내부 콘텐츠 예시 (텍스트나 버튼 추가 가능) */}
+        <div className="absolute inset-0 flex flex-col justify-center items-start px-8 md:px-16 text-left z-10"></div>
 
         {/* 차트 이미지 */}
         <div className="absolute right-4 top-20 w-[40%] max-w-lg hidden md:block">
