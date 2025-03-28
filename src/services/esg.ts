@@ -34,7 +34,7 @@ export const syncIndicators = async (
 
 // ESG 보고서를 제출하는 함수
 export const submitESGReport = async (report: any) => {
-  const res = await axios.post(`${BASE_URL}/esg-report`, report) // POST 요청으로 보고서 저장
+  const res = await axios.post(`${BASE_URL}/esg`, report) // POST 요청으로 보고서 저장
   return res.data // 응답 데이터를 반환
 }
 //----------------------------------------------------------------------------------------------------
