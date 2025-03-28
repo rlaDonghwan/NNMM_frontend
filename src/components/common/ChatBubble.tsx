@@ -7,7 +7,7 @@ interface Props {
   text: string
   avatar: string
 }
-
+//메인페이지에서 씀
 export const ChatBubble = ({direction, text, avatar}: Props) => {
   const isLeft = direction === 'left'
 
