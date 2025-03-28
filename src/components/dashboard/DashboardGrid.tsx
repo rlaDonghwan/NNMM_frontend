@@ -1,18 +1,28 @@
 import {useEffect, useState} from 'react'
 import Modal from '../modal/Modal'
 import ModalContent from '../modal/ModalContent'
+import {fetchIndicators, createIndicators, submitESGReport} from '@/services/esg'
 
 export default function DashboardGrid() {
   //지표 comboboxwithcreate부분 열려있는지 닫혀있는지 상태
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  //지표 데이터를 배열로 상태 관리
-  const [indicators, setIndicators] = useState([
-    {key: 'scope1', label: 'Scope1', unit: 'tCO₂-eq'},
-    {key: 'scope2', label: 'Scope2', unit: 'tCO₂-eq'},
-    {key: 'energyUse.electricity', label: '전기 사용량', unit: 'TJ'}
-  ])
-  //현재 사용중인 연도
+  const [indicators, setIndicators] = useState<
+    {key: string; label: string; unit: string}[]
+  >([])
+
+  useEffect(() => {
+    const loadIndicators = async () => {
+      try {
+        const data = await fetchIndicators()
+        setIndicators(data)
+      } catch (err) {
+        console.error('인디케이터 불러오기 실패:', err)
+      }
+    }
+    loadIndicators()
+  }, [])
+
   const [years, setYears] = useState([2021, 2022, 2023])
   //각 지표별 입력 데이터
   const [rows, setRows] = useState([])
@@ -87,13 +97,37 @@ export default function DashboardGrid() {
     setRows(updated)
   }
 
-  const handleSubmit = () => {
-    console.log('제출된 데이터:', {years, rows})
+  const handleSubmit = async () => {
+    const uniqueIndicators = rows
+      .map(row => row.indicatorKey)
+      .filter(key => !indicators.some(i => i.key === key))
+
+    if (uniqueIndicators.length > 0) {
+      await createIndicators(
+        uniqueIndicators.map(k => ({
+          key: k,
+          label: k,
+          unit: '단위 입력 필요'
+        }))
+      )
+    }
+
+    await submitESGReport({years, rows})
     setIsModalOpen(false)
   }
 
   const getUnit = (key: string) => {
     return indicators.find(i => i.key === key)?.unit || ''
+  }
+
+  const addRowWithIndicator = (indicatorKey: string) => {
+    const newRow = {
+      id: crypto.randomUUID(),
+      indicatorKey,
+      values: years.reduce((acc, y) => ({...acc, [y]: ''}), {}),
+      color: '#cccccc'
+    }
+    setRows(prev => [...prev, newRow])
   }
 
   return (
@@ -121,10 +155,9 @@ export default function DashboardGrid() {
           onRemoveYear={removeYear}
           onRemoveRow={removeRow}
           onValueChange={handleValueChange}
-          onIndicatorChange={handleIndicatorChange}
-          onColorChange={handleColorChange}
           getUnit={getUnit}
           onSubmit={handleSubmit}
+          onAddRowWithIndicator={addRowWithIndicator} // ✅ 추가
         />
       </Modal>
     </div>
