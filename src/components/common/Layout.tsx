@@ -14,7 +14,7 @@ import {SidebarProvider, SidebarTrigger} from '@/components/ui/sidebar' // 사�
 import {AppSidebar} from '@/components/dashboard/AppSidebar' // 대시보드의 사이드바 컴포넌트를 가져옴
 import {getCookie, deleteCookie} from 'cookies-next' // 쿠키를 가져오거나 삭제하는 유틸리티를 가져옴
 import {useRouter} from 'next/router' // Next.js의 useRouter 훅을 가져옴 (라우팅에 사용)
-import {fetchCurrentUser} from '@/services/auth' // 현재 사용자 정보를 가져오는 서비스 함수 가져옴
+import {fetchCurrentUser} from '@/services/auth' // 현재 사용자 정보를 가져오는 서비스 함수 가져옴..
 
 export default function Layout({children}: {children: React.ReactNode}) {
   // Layout 컴포넌트 정의

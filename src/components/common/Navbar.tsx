@@ -2,7 +2,7 @@ import Image from 'next/image' // Next.js의 Image 컴포넌트를 가져옴 (�
 import {useEffect, useState} from 'react' // React의 useEffect와 useState 훅을 가져옴
 import {getCookie} from 'cookies-next' // cookies-next 라이브러리에서 getCookie 함수 가져옴
 import {fetchCurrentUser} from '@/services/auth' // 사용자 정보를 가져오는 서비스 함수 가져옴
-import {useRouter} from 'next/router' // Next.js의 useRouter 훅을 가져옴 (라우팅에 사용)
+import {useRouter} from 'next/router' // Next.js의 useRouter 훅을 가져옴 (라우팅에 사용)...
 
 const Navbar = () => {
   const [username, setUsername] = useState<string | null>(null) // 사용자 이름 상태 관리
