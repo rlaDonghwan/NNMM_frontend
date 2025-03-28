@@ -1,16 +1,26 @@
 import {useEffect, useState} from 'react'
 import Modal from '../modal/Modal'
 import ModalContent from '../modal/ModalContent'
+import {fetchIndicators, createIndicators, submitESGReport} from '@/services/esg'
 
 export default function DashboardGrid() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const indicators = [
-    {key: 'scope1', label: 'Scope 1', unit: 'tCO₂-eq'},
-    {key: 'scope2', label: 'Scope 2', unit: 'tCO₂-eq'},
-    {key: 'energyUse.electricity', label: '전기 사용량', unit: 'TJ'}
-  ]
-  //const [selectedIndicator, setSelectedIndicator] = useState(indicators[0].key)
+  const [indicators, setIndicators] = useState<
+    {key: string; label: string; unit: string}[]
+  >([])
+
+  useEffect(() => {
+    const loadIndicators = async () => {
+      try {
+        const data = await fetchIndicators()
+        setIndicators(data)
+      } catch (err) {
+        console.error('인디케이터 불러오기 실패:', err)
+      }
+    }
+    loadIndicators()
+  }, [])
 
   const [years, setYears] = useState([2021, 2022, 2023])
   const [rows, setRows] = useState([])
@@ -76,12 +86,6 @@ export default function DashboardGrid() {
       color: '#cccccc'
     }
     setRows([...rows, newRow])
-    // const newRow = {
-    //   indicatorKey: indicators[0].key,
-    //   values: years.reduce((acc, y) => ({...acc, [y]: ''}), {}),
-    //   color: '#cccccc'
-    // }
-    // setRows([...rows, newRow])
   }
 
   const removeRow = (rowIndex: number) => {
@@ -90,13 +94,37 @@ export default function DashboardGrid() {
     setRows(updated)
   }
 
-  const handleSubmit = () => {
-    console.log('제출된 데이터:', {years, rows})
+  const handleSubmit = async () => {
+    const uniqueIndicators = rows
+      .map(row => row.indicatorKey)
+      .filter(key => !indicators.some(i => i.key === key))
+
+    if (uniqueIndicators.length > 0) {
+      await createIndicators(
+        uniqueIndicators.map(k => ({
+          key: k,
+          label: k,
+          unit: '단위 입력 필요'
+        }))
+      )
+    }
+
+    await submitESGReport({years, rows})
     setIsModalOpen(false)
   }
 
   const getUnit = (key: string) => {
     return indicators.find(i => i.key === key)?.unit || ''
+  }
+
+  const addRowWithIndicator = (indicatorKey: string) => {
+    const newRow = {
+      id: crypto.randomUUID(),
+      indicatorKey,
+      values: years.reduce((acc, y) => ({...acc, [y]: ''}), {}),
+      color: '#cccccc'
+    }
+    setRows(prev => [...prev, newRow])
   }
 
   return (
@@ -123,10 +151,9 @@ export default function DashboardGrid() {
           onRemoveYear={removeYear}
           onRemoveRow={removeRow}
           onValueChange={handleValueChange}
-          onIndicatorChange={handleIndicatorChange}
-          onColorChange={handleColorChange}
           getUnit={getUnit}
           onSubmit={handleSubmit}
+          onAddRowWithIndicator={addRowWithIndicator} // ✅ 추가
         />
       </Modal>
     </div>
