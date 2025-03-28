@@ -10,20 +10,11 @@ export default function DashboardGrid() {
     {key: 'scope2', label: 'Scope 2', unit: 'tCO₂-eq'},
     {key: 'energyUse.electricity', label: '전기 사용량', unit: 'TJ'}
   ]
-  const [selectedIndicator, setSelectedIndicator] = useState(indicators[0].key)
+  //const [selectedIndicator, setSelectedIndicator] = useState(indicators[0].key)
 
   const [years, setYears] = useState([2021, 2022, 2023])
   const [rows, setRows] = useState([])
 
-  const addRowWithIndicator = () => {
-    const newRow = {
-      indicatorKey: selectedIndicator,
-      values: years.reduce((acc, y) => ({...acc, [y]: ''}), {}),
-      color: '#cccccc'
-    }
-
-    setRows([...rows, newRow])
-  }
   const handleYearChange = (index: number, value: string) => {
     const updatedYears = [...years]
     updatedYears[index] = Number(value)
@@ -77,14 +68,20 @@ export default function DashboardGrid() {
     updated[rowIndex].color = color
     setRows(updated)
   }
-
   const addRow = () => {
     const newRow = {
+      id: crypto.randomUUID(),
       indicatorKey: indicators[0].key,
       values: years.reduce((acc, y) => ({...acc, [y]: ''}), {}),
       color: '#cccccc'
     }
     setRows([...rows, newRow])
+    // const newRow = {
+    //   indicatorKey: indicators[0].key,
+    //   values: years.reduce((acc, y) => ({...acc, [y]: ''}), {}),
+    //   color: '#cccccc'
+    // }
+    // setRows([...rows, newRow])
   }
 
   const removeRow = (rowIndex: number) => {
@@ -124,14 +121,12 @@ export default function DashboardGrid() {
           indicators={indicators}
           onAddYear={addYear}
           onRemoveYear={removeYear}
-          onAddRow={addRow}
           onRemoveRow={removeRow}
           onValueChange={handleValueChange}
           onIndicatorChange={handleIndicatorChange}
           onColorChange={handleColorChange}
           getUnit={getUnit}
           onSubmit={handleSubmit}
-          onAddRowWithIndicator={addRowWithIndicator}
         />
       </Modal>
     </div>
