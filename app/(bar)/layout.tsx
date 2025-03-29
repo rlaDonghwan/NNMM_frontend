@@ -1,6 +1,8 @@
 // app/(bar)/layout.tsx
 import '@/app/global.css'
 import DashboardHeader from '@/components/layout/DashboardHeader'
+import DashboardSidebar from '@/components/layout/DashboardSidebar'
+import {SidebarProvider} from '@/components/ui/sidebar'
 
 export const metadata = {
   title: 'NNMM Dashboard',
@@ -12,8 +14,18 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
   return (
     <html lang="ko">
       <body className="w-full h-full">
-        <DashboardHeader />
-        <main>{children}</main>
+        {/* <SidebarProvider> */}
+        <div className="flex">
+          {/* ✅ 좌측 사이드바 */}
+          {/* <DashboardSidebar /> */}
+
+          {/* ✅ 우측 콘텐츠 영역 */}
+          <div className="flex flex-col flex-1">
+            <DashboardHeader />
+            <main>{children}</main>
+          </div>
+        </div>
+        {/* </SidebarProvider> */}
       </body>
     </html>
   )

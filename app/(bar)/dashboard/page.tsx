@@ -1,4 +1,4 @@
-import DashboardGrid from '@/components/dashboard/dashboard'
+import DashboardGrid from '@/components/dashboard/TotalDashboard'
 import {fetchCurrentUser} from 'services/auth'
 import {toast} from 'react-hot-toast'
 import {GetServerSideProps} from 'next'
