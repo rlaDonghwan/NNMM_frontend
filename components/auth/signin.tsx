@@ -73,18 +73,18 @@ export default function SignInForm() {
   // }
 
   return (
-    <div className="flex h-full w-full overflow-hidden">
-      <div className="relative w-[50vw] z-0">
+    <div className="flex h-screen w-full overflow-hidden">
+      <div className="relative w-[50%] z-0">
         <div
           className="absolute inset-0"
           style={{
             clipPath: 'polygon(0% -100%, 100% 5%, 80% 100%, 0% 90%)',
             background: 'linear-gradient(to bottom, #88CCE6, #E5E5E5 95%)',
-            zIndex: 0
+            zIndex: -10
           }}
         />
         <div
-          className="absolute top-64 left-40 text-7xl font-bold  text-center"
+          className="flex w-full h-full font-apple text-7xl font-bold justify-center items-center"
           style={{
             background: 'linear-gradient(to bottom, #466AB7, #000000 95%)',
             WebkitBackgroundClip: 'text', // Safari 및 WebKit 기반 브라우저에 적용
@@ -102,35 +102,37 @@ export default function SignInForm() {
         </div>
       </div>
       {/* shadcn에서 다운받은 card component를 활용하여 로그인 폼 생성---------------------------------------- */}
-      <div className="flex items-center justify-center min-h-screen bg-[rgba(255,255,255,0.0)] ml-20">
-        <Card className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-10">
-          <CardTitle className="mb-6 text-3xl font-semibold text-center text-gray-800">
+      <div className="flex w-[50%] items-center justify-center bg-[rgba(255,255,255,0.0)]">
+        <Card className="flex flex-col max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-10">
+          <CardTitle className="mb-6 text-3xl font-semibold font-apple text-center text-gray-800">
             NNMM에 로그인하세요
           </CardTitle>
           <form className="space-y-4">
             <input
               type="email"
-              className="w-full px-4 py-2 border-b-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 border-b-2 font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="이메일"
               // value={email}
               // onChange={e => setEmail(e.target.value)}
             />
             <input
               type="password"
-              className="w-full px-4 py-2 border-b-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 font-apple border-b-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="비밀번호"
               // value={password}
               // onChange={e => setPassword(e.target.value)}
             />
             <button
               type="submit"
-              className="w-full py-2 font-semibold text-white bg-black rounded-md hover:bg-blue-600 transition">
+              className="w-full py-2 font-apple font-semibold text-white bg-black rounded-md hover:bg-blue-600 transition">
               로그인
             </button>
           </form>
-          <div className="mt-6 text-sm text-gray-600 text-center">
+          <div className="mt-6 text-sm text-gray-600 font-apple text-center">
             계정이 없으신가요?{' '}
-            <Link href="signup" className="text-blue-500 underline hover:text-blue-700">
+            <Link
+              href="signup"
+              className="text-blue-500 font-apple underline hover:text-blue-700">
               지금 만드세요.
             </Link>
           </div>

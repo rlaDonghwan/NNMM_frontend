@@ -1,3 +1,5 @@
+'use client'
+
 import React, {useState, useEffect} from 'react' // React와 훅(useState, useEffect) 가져오기
 import {DndProvider, useDrag, useDrop} from 'react-dnd' // react-dnd의 DnD 관련 훅 가져오기
 import {HTML5Backend} from 'react-dnd-html5-backend' // HTML5Backend 가져오기
