@@ -73,7 +73,7 @@ export default function SignInForm() {
   // }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-full w-full overflow-hidden">
       <div className="relative w-[50vw] z-0">
         <div
           className="absolute inset-0"
@@ -83,24 +83,23 @@ export default function SignInForm() {
             zIndex: 0
           }}
         />
-      </div>
-      {/* 배경 이미지에 들어갈 타이틀 텍스트 ---------------------------------------------------------------*/}
-      <div
-        className="absolute top-64 left-40 text-7xl font-bold  text-center"
-        style={{
-          background: 'linear-gradient(to bottom, #466AB7, #000000 95%)',
-          WebkitBackgroundClip: 'text', // Safari 및 WebKit 기반 브라우저에 적용
-          backgroundClip: 'text', // 다른 브라우저 지원
-          color: 'transparent', // 텍스트 색을 투명하게 설정
-          zIndex: 10
-        }}>
-        나만의 ESG
-        <br />
-        대시보드를
-        <br />
-        무한히
-        <br />
-        생성하세요.
+        <div
+          className="absolute top-64 left-40 text-7xl font-bold  text-center"
+          style={{
+            background: 'linear-gradient(to bottom, #466AB7, #000000 95%)',
+            WebkitBackgroundClip: 'text', // Safari 및 WebKit 기반 브라우저에 적용
+            backgroundClip: 'text', // 다른 브라우저 지원
+            color: 'transparent', // 텍스트 색을 투명하게 설정
+            zIndex: 10
+          }}>
+          나만의 ESG
+          <br />
+          대시보드를
+          <br />
+          무한히
+          <br />
+          생성하세요.
+        </div>
       </div>
       {/* shadcn에서 다운받은 card component를 활용하여 로그인 폼 생성---------------------------------------- */}
       <div className="flex items-center justify-center min-h-screen bg-[rgba(255,255,255,0.0)] ml-20">
