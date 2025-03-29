@@ -9,7 +9,7 @@ export default function CTASection() {
         <br />
         지속 가능성을 실현하세요!
       </div>
-      <Link href="/auth/signin">
+      <Link href="signin">
         <button className="w-64 h-16 md:w-80 md:h-20 bg-black rounded-full flex items-center justify-center text-white text-2xl md:text-4xl font-normal font-apple">
           대시보드 생성하기
         </button>
