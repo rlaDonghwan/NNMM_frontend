@@ -26,7 +26,7 @@ export default function HeroSection() {
           </p>
 
           {/* 버튼 */}
-          <Link href="/auth/signin">
+          <Link href="signin">
             <button className="mt-6 w-52 h-14 md:w-64 md:h-16 bg-black rounded-full text-white text-lg md:text-xl font-semibold">
               대시보드 생성하기
             </button>

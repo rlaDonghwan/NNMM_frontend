@@ -1,12 +1,8 @@
 import type {NextPage} from 'next'
-import Image from 'next/image'
-import ChatBubble from '@/components/common/ChatBubble'
-import styles from '@/styles/Home.module.css'
 import Link from 'next/link'
 
 const Frame: NextPage = () => {
   //변수선언 로직
-
   return (
     <div className="w-full h-[5258px] relative bg-white">
       <div className="w-full h-[1080px] left-0 top-0 absolute inline-flex flex-col justify-start items-start gap-0.5">
