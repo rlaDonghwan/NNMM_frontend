@@ -19,7 +19,6 @@ export const createIndicators = async (
   const res = await axios.post(`${BASE_URL}/indicators`, newIndicators)
   return res.data
 }
-
 //----------------------------------------------------------------------------------------------------
 
 // 단위와 함께 모든 지표들을 백엔드에 저장 (있으면 무시 or 업데이트, 없으면 생성)
@@ -35,8 +34,10 @@ export const syncIndicators = async (
 // ESG 보고서를 제출하는 함수
 export const submitESGReport = async (report: any) => {
   try {
-    const res = await axios.post(`${BASE_URL}/esg`, report) // POST 요청으로 보고서 저장
-    return res.data // 응답 데이터를 반환
+    const res = await axios.post(`${BASE_URL}/esg`, report, {
+      withCredentials: true // ✅ 쿠키 포함 요청
+    })
+    return res.data
   } catch (error: any) {
     console.error('ESG 저장 실패:', error.response?.data || error.message)
     throw error
