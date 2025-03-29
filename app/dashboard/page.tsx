@@ -1,16 +1,56 @@
-import {useEffect, useState} from 'react'
-import Modal from '@/components/modal/Modal'
-import ModalContent from '@/components/modal/ModalContent'
+// import {useEffect, useState} from 'react'
+// import {useRouter} from 'next/router'
+import DashboardGrid from '@/components/dashboard/dashboard'
+import {fetchCurrentUser} from 'services/auth'
+import {toast} from 'react-hot-toast'
+import {GetServerSideProps} from 'next'
 
-export default function DashboardGrid() {
+// interface DashboardProps {
+//   token?: string
+// }
+
+// export const getServerSideProps: GetServerSideProps = async ({req}) => {
+//   const token = req.cookies?.token || null
+
+//   return {
+//     props: {
+//       token
+//     }
+//   }
+// }
+
+// {token}: DashboardProps
+export default function Dashboard() {
+  // const [username, setUsername] = useState('')
+  // const router = useRouter()
+
+  // useEffect(() => {
+  //   if (!router.isReady) return
+
+  //   const loadUser = async () => {
+  //     if (!token) {
+  //       toast.error('로그인이 필요합니다.')
+  //       router.replace('/auth/signin')
+
+  //       return
+  //     }
+
+  //     try {
+  //       const user = await fetchCurrentUser(token)
+  //       setUsername(user.email || '사용자')
+  //     } catch (err) {
+  //       toast.error('인증 실패. 다시 로그인해주세요.')
+  //       router.replace('/auth/signin')
+  //       console.error('인증 실패:', err)
+  //     }
+  //   }
+
+  //   loadUser()
+  // }, [router.isReady, token])
+
   return (
-    <div className="grid grid-cols-[400px,400px,400px] grid-rows-[300px,300px] gap-4">
-      <div className="bg-blue-100 p-6 rounded-xl shadow">첫 번째 칸</div>
-      <div className="bg-green-100 p-6 rounded-xl shadow">두 번째 칸</div>
-      <div className="bg-yellow-100 p-6 rounded-xl shadow">세 번째 칸</div>
-      <div className="bg-red-100 p-6 rounded-xl shadow">네 번째 칸</div>
-      <div className="bg-purple-100 p-6 rounded-xl shadow">다섯 번째 칸</div>
-      <div className="bg-pink-100 p-6 rounded-xl shadow">여섯 번째 칸</div>
+    <div className="min-h-screen bg-white p-10">
+      <DashboardGrid />
     </div>
   )
 }

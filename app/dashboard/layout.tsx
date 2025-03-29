@@ -7,15 +7,15 @@ import {
 } from '@/components/ui/sidebar' // Sidebar 관련 UI 컴포넌트 임포트
 import Link from 'next/link' // Next.js의 Link 컴포넌트 임포트 (페이지 이동용)
 import {Button} from '@/components/ui/button' // 버튼 UI 컴포넌트 임포트
-import {useRouter} from 'next/router' // Next.js의 useRouter 훅 임포트 (라우터 정보 접근용)
+// import {useRouter} from 'next/router' // Next.js의 useRouter 훅 임포트 (라우터 정보 접근용)
 
 export function AppSidebar() {
   // AppSidebar 컴포넌트 정의
-  const router = useRouter() // 현재 라우터 정보를 가져옴
-  const isD = router.pathname === '/dashboard' // 현재 경로가 '/dashboard'인지 확인
-  const isE = router.pathname === '/dashboard/environmental' // 현재 경로가 '/dashboard/environmental'인지 확인
-  const isS = router.pathname === '/dashboard/social' // 현재 경로가 '/dashboard/social'인지 확인
-  const isG = router.pathname === '/dashboard/governance' // 현재 경로가 '/dashboard/governance'인지 확인
+  // const router = useRouter() // 현재 라우터 정보를 가져옴
+  // const isD = router.pathname === '/dashboard' // 현재 경로가 '/dashboard'인지 확인
+  // const isE = router.pathname === '/dashboard/environmental' // 현재 경로가 '/dashboard/environmental'인지 확인
+  // const isS = router.pathname === '/dashboard/social' // 현재 경로가 '/dashboard/social'인지 확인
+  // const isG = router.pathname === '/dashboard/governance' // 현재 경로가 '/dashboard/governance'인지 확인
   return (
     <SidebarInset
       className="flex min-h-full" // SidebarInset 컴포넌트에 클래스와 스타일 적용
@@ -36,12 +36,7 @@ export function AppSidebar() {
               {/* 버튼 스타일 */}
               <img src="/images/dsvg.svg" alt="Main" className="ml-8 w-8 h-8" />
               {/* 버튼 아이콘 */}
-              <span
-                className={`transition-colors duration-300 ${
-                  isD ? 'font-bold text-customBlue' : '' // 현재 경로가 '/dashboard'이면 강조 스타일 적용
-                }`}>
-                Dashboard {/* 버튼 텍스트 */}
-              </span>
+              <span>Dashboard {/* 버튼 텍스트 */}</span>
             </button>
           </Link>
           <Link href="/dashboard/environmental" legacyBehavior passHref>
@@ -51,12 +46,7 @@ export function AppSidebar() {
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
               <img src="/images/E.png" alt="E" className="ml-8 w-8 h-8" />
               {/* 버튼 아이콘 */}
-              <span
-                className={`transition-colors duration-300 ${
-                  isE ? 'font-bold text-customBlue' : '' // 현재 경로가 '/dashboard/environmental'이면 강조 스타일 적용
-                }`}>
-                Environment {/* 버튼 텍스트 */}
-              </span>
+              <span>Environment {/* 버튼 텍스트 */}</span>
             </button>
           </Link>
           <Link href="/dashboard/social" legacyBehavior passHref>
@@ -66,12 +56,7 @@ export function AppSidebar() {
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
               <img src="/images/S.png" alt="S" className="ml-8 w-8 h-8" />
               {/* 버튼 아이콘 */}
-              <span
-                className={`transition-colors duration-300 ${
-                  isS ? 'font-bold text-customBlue' : '' // 현재 경로가 '/dashboard/social'이면 강조 스타일 적용
-                }`}>
-                Social {/* 버튼 텍스트 */}
-              </span>
+              <span>Social {/* 버튼 텍스트 */}</span>
             </button>
           </Link>
           <Link href="/dashboard/governance" legacyBehavior passHref>
@@ -81,12 +66,7 @@ export function AppSidebar() {
               className="hover:bg-gray-500 hover:bg-opacity-30 w-full rounded-md flex items-center space-x-2">
               <img src="/images/G.png" alt="G" className="ml-8 w-8 h-8" />
               {/* 버튼 아이콘 */}
-              <span
-                className={`transition-colors duration-300 ${
-                  isG ? 'font-bold text-customBlue' : '' // 현재 경로가 '/dashboard/governance'이면 강조 스타일 적용
-                }`}>
-                Governance {/* 버튼 텍스트 */}
-              </span>
+              <span>Governance {/* 버튼 텍스트 */}</span>
             </button>
           </Link>
         </div>
