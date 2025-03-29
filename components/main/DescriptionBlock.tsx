@@ -1,4 +1,4 @@
-import ChatBubble from '@/components/common/ChatBubble'
+import ChatBubble from '@/components/main/ChatBubble'
 
 export default function DescriptionBlock() {
   return (

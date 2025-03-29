@@ -13,21 +13,21 @@ export default function HeroSection() {
       />
 
       {/* 컨텐츠 래퍼 */}
-      <div className="relative flex w-full max-w-8xl mx-auto px-6 md:px-12">
+      <div className="relative flex w-full max-w-8xl mx-auto px-6 md:px-40">
         {/* 왼쪽 텍스트 */}
-        <div className="flex flex-col justify-center w-full md:w-1/2 text-left">
-          <h2 className="text-indigo-700 text-2xl md:text-5xl font-apple leading-snug">
+        <div className="flex flex-col justify-center w-full md:w-1/ text-left">
+          <h2 className="text-indigo-700 text-2xl md:text-6xl font-apple leading-snug">
             사용자가 선택한 지표를 기반으로 <br />
             자동 생성되는 그래프와 차트
           </h2>
-          <p className="text-neutral-800 text-md md:text-2xl mt-4">
+          <p className="text-neutral-800 text-md md:text-3xl mt-4 font-apple">
             환경, 사회, 거버넌스 지표를 자유롭게 구성하고 <br />
             맞춤형 대시보드를 만들어보세요.
           </p>
 
           {/* 버튼 */}
           <Link href="signin">
-            <button className="mt-6 w-52 h-14 md:w-64 md:h-16 bg-black rounded-full text-white text-lg md:text-xl font-semibold">
+            <button className="mt-6 self-end md:self-start md:ml-[64%] w-52 h-11 bg-black rounded-full text-white text-lg md:text-xl font-apple transition">
               대시보드 생성하기
             </button>
           </Link>
@@ -42,12 +42,6 @@ export default function HeroSection() {
           />
         </div>
       </div>
-
-      {/* 로고 */}
-      {/* <div className="absolute top-6 left-6 flex items-center">
-        <img className="w-12 h-12" src="/main/logo.png" alt="NnmmLogo" />
-        <span className="ml-2 text-neutral-800 text-2xl font-bold">NNMM</span>
-      </div> */}
     </div>
   )
 }
