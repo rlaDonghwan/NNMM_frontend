@@ -23,7 +23,7 @@ export default function Social() {
   const [gridItems, setGridItems] = useState([]) // 그리드 아이템 상태 저장
   const [isEditModalOpen, setIsEditModalOpen] = useState(false) // 수정 모달 열림 상태 저장
   const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID 저장
-  const [years, setYears] = useState([2021, 2022, 2023]) // 연도 리스트 저장
+  const [years, setYears] = useState([2022, 2023, 2024]) // 연도 리스트 저장
   const [rows, setRows] = useState([]) // 행 데이터 저장
   const [indicators, setIndicators] = useState([]) // 지표 데이터 저장
   const [step, setStep] = useState(1)
@@ -214,29 +214,28 @@ export default function Social() {
           {/* 모달 컴포넌트 */}
           {step === 1 && (
             <ModalContent
-              years={years} // 연도 데이터 전달
-              rows={rows} // 행 데이터 전달
-              setRows={setRows} // 행 데이터 업데이트 함수 전달
-              indicators={indicators} // 지표 데이터 전달
-              setIndicators={setIndicators} // 지표 데이터 업데이트 함수 전달
-              onAddYear={() => setYears([...years, Math.max(...years) + 1])} // 연도 추가 함수 전달
-              onRemoveYear={() => setYears(prev => prev.slice(0, -1))} // 연도 제거 함수 전달
-              onRemoveRow={removeRow} // 행 제거 함수 전달
-              onValueChange={handleValueChange} // 값 변경 함수 전달
-              getUnit={getUnit} // 단위 가져오기 함수 전달
-              onSubmit={handleSubmit} // 제출 함수 전달
-              onAddRowWithIndicator={addRowWithIndicator} // 지표를 포함한 행 추가 함수 전달
-              onIndicatorChange={handleIndicatorChange} // 지표 변경 함수 전달
+              years={years}
+              setYears={setYears}
+              rows={rows}
+              setRows={setRows}
+              indicators={indicators}
+              setIndicators={setIndicators}
+              onRemoveYear={() => setYears(prev => prev.slice(0, -1))}
+              onRemoveRow={removeRow}
+              onValueChange={handleValueChange}
+              getUnit={getUnit}
+              onSubmit={handleSubmit}
+              onAddRowWithIndicator={addRowWithIndicator}
               onSubmitPage={() => {
                 console.log('[setStep 실행됨]')
                 setStep(2)
               }}
-              
             />
           )}
           {step === 2 && (
             <SecondModalContent
               years={years} // 연도 데이터 전달
+              setYears={setYears}
               rows={rows} // 행 데이터 전달
               setRows={setRows} // 행 데이터 업데이트 함수 전달
               indicators={indicators} // 지표 데이터 전달

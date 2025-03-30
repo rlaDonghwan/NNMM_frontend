@@ -48,7 +48,7 @@ export default function SignInForm() {
       const token = res.data.token
 
       if (token) {
-        setCookie('token', token, {
+        setCookie('accessToken', token, {
           maxAge: 60 * 60 * 24,
           path: '/',
           secure: process.env.NODE_ENV === 'production',

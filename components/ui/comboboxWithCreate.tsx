@@ -1,5 +1,3 @@
-// ComboboxWithCreate.tsx — 사용자 정의 항목 추가 가능한 Combobox
-
 import {useState} from 'react'
 import {Popover, PopoverTrigger, PopoverContent} from '@/components/ui/popover'
 import {Button} from '@/components/ui/button'
@@ -16,23 +14,22 @@ export type ComboboxWithCreateProps = {
   selected?: string
   onAdd: (newLabel: string) => void
   onSelect: (label: string) => void
+  placeholder?: string
 }
 
 export default function ComboboxWithCreate({
   items,
   selected,
   onAdd,
-  onSelect
+  onSelect,
+  placeholder
 }: ComboboxWithCreateProps) {
-  // const [items, setItems] = useState(['Scope 1', 'Scope 2', '전기 사용량'])
   const [inputValue, setInputValue] = useState('')
-  // const [selected, setSelected] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
+
   const handleAddNew = () => {
     if (!inputValue.trim()) return
     onAdd(inputValue)
-    // setItems(prev => [...prev, inputValue])
-    // setSelected(inputValue)
     setInputValue('')
     setOpen(false)
   }
@@ -40,14 +37,14 @@ export default function ComboboxWithCreate({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-[200px] justify-start">
-          {selected || '선택하세요'}
+        <Button variant="outline" className="w-[110px] justify-start font-apple">
+          {selected || placeholder || '선택하세요'}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[170px] p-0 font-apple">
         <Command>
           <CommandInput
-            placeholder="지표를 검색하거나 추가"
+            placeholder="검색 또는 추가"
             value={inputValue}
             onValueChange={setInputValue}
           />
@@ -58,8 +55,8 @@ export default function ComboboxWithCreate({
               ➕ "{inputValue}" 추가하기
             </button>
           </CommandEmpty>
-          <CommandGroup>
-            {items.map((item, idx) => (
+          <CommandGroup className="max-h-[200px] overflow-y-auto">
+            {items.slice(0, 200).map((item, idx) => (
               <CommandItem
                 key={idx}
                 value={item}

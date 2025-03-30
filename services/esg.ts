@@ -44,3 +44,36 @@ export const submitESGReport = async (report: any) => {
   }
 }
 //----------------------------------------------------------------------------------------------------
+
+// services/esg.ts 안에 이 함수가 있어야 함
+export function transformRowsToEsgFormat(
+  rows: {
+    indicatorKey: string
+    values: Record<number, string>
+    color: string
+    field1?: string
+    field2?: string
+  }[],
+  indicators: {key: string; label: string; unit: string}[],
+  years: number[],
+  companyName: string,
+  category: 'social' | 'environmental' | 'governance'
+) {
+  return {
+    companyName,
+    category,
+    indicators: rows.map(row => {
+      const unit = indicators.find(i => i.key === row.indicatorKey)?.unit || ''
+      return {
+        indicatorKey: row.indicatorKey,
+        unit,
+        values: years.map(year => ({
+          year,
+          value: Number(row.values[year]) || 0,
+          field1: row.field1 || '',
+          field2: row.field2 || ''
+        }))
+      }
+    })
+  }
+}

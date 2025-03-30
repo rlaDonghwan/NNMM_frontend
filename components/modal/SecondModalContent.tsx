@@ -4,6 +4,7 @@ import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
 
 type SecondModalContentProps = {
   years: number[]
+  setYears: React.Dispatch<React.SetStateAction<number[]>>
   rows: {
     indicatorKey: string
     values: Record<number, string>
