@@ -5,6 +5,7 @@ import {DndProvider, useDrag, useDrop} from 'react-dnd' // react-dnd의 DnD 관�
 import {HTML5Backend} from 'react-dnd-html5-backend' // HTML5Backend 가져오기
 import Modal from '@/components/modal/Modal' // Modal 컴포넌트 가져오기
 import ModalContent from '@/components/modal/ModalContent' // ModalContent 컴포넌트 가져오기
+import SecondModalContent from '@/components/modal/SecondModalContent' // ModalContent 컴포넌트 가져오기
 import {
   fetchIndicators,
   createIndicators,
@@ -25,7 +26,7 @@ export default function Social() {
   const [years, setYears] = useState([2021, 2022, 2023]) // 연도 리스트 저장
   const [rows, setRows] = useState([]) // 행 데이터 저장
   const [indicators, setIndicators] = useState([]) // 지표 데이터 저장
-
+  const [step, setStep] = useState(1)
   useEffect(() => {
     // 컴포넌트 마운트 시 실행
     const loadIndicators = async () => {
@@ -39,6 +40,9 @@ export default function Social() {
     }
     loadIndicators() // 함수 호출
   }, [])
+  useEffect(() => {
+    console.log('[현재 step 상태]', step)
+  }, [step])
 
   const handleValueChange = (rowIndex, year, value) => {
     // 값 변경 핸들러
@@ -208,21 +212,51 @@ export default function Social() {
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           {' '}
           {/* 모달 컴포넌트 */}
-          <ModalContent
-            years={years} // 연도 데이터 전달
-            rows={rows} // 행 데이터 전달
-            setRows={setRows} // 행 데이터 업데이트 함수 전달
-            indicators={indicators} // 지표 데이터 전달
-            setIndicators={setIndicators} // 지표 데이터 업데이트 함수 전달
-            onAddYear={() => setYears([...years, Math.max(...years) + 1])} // 연도 추가 함수 전달
-            onRemoveYear={() => setYears(prev => prev.slice(0, -1))} // 연도 제거 함수 전달
-            onRemoveRow={removeRow} // 행 제거 함수 전달
-            onValueChange={handleValueChange} // 값 변경 함수 전달
-            getUnit={getUnit} // 단위 가져오기 함수 전달
-            onSubmit={handleSubmit} // 제출 함수 전달
-            onAddRowWithIndicator={addRowWithIndicator} // 지표를 포함한 행 추가 함수 전달
-            onIndicatorChange={handleIndicatorChange} // 지표 변경 함수 전달
-          />
+          {step === 1 && (
+            <ModalContent
+              years={years} // 연도 데이터 전달
+              rows={rows} // 행 데이터 전달
+              setRows={setRows} // 행 데이터 업데이트 함수 전달
+              indicators={indicators} // 지표 데이터 전달
+              setIndicators={setIndicators} // 지표 데이터 업데이트 함수 전달
+              onAddYear={() => setYears([...years, Math.max(...years) + 1])} // 연도 추가 함수 전달
+              onRemoveYear={() => setYears(prev => prev.slice(0, -1))} // 연도 제거 함수 전달
+              onRemoveRow={removeRow} // 행 제거 함수 전달
+              onValueChange={handleValueChange} // 값 변경 함수 전달
+              getUnit={getUnit} // 단위 가져오기 함수 전달
+              onSubmit={handleSubmit} // 제출 함수 전달
+              onAddRowWithIndicator={addRowWithIndicator} // 지표를 포함한 행 추가 함수 전달
+              onIndicatorChange={handleIndicatorChange} // 지표 변경 함수 전달
+              onSubmitPage={() => {
+                console.log('[setStep 실행됨]')
+                setStep(2)
+              }}
+              
+            />
+          )}
+          {step === 2 && (
+            <SecondModalContent
+              years={years} // 연도 데이터 전달
+              rows={rows} // 행 데이터 전달
+              setRows={setRows} // 행 데이터 업데이트 함수 전달
+              indicators={indicators} // 지표 데이터 전달
+              setIndicators={setIndicators} // 지표 데이터 업데이트 함수 전달
+              onAddYear={() => setYears([...years, Math.max(...years) + 1])} // 연도 추가 함수 전달
+              onRemoveYear={() => setYears(prev => prev.slice(0, -1))} // 연도 제거 함수 전달
+              onRemoveRow={removeRow} // 행 제거 함수 전달
+              onValueChange={handleValueChange} // 값 변경 함수 전달
+              getUnit={getUnit} // 단위 가져오기 함수 전달
+              onSubmit={handleSubmit} // 제출 함수 전달
+              onAddRowWithIndicator={addRowWithIndicator} // 지표를 포함한 행 추가 함수 전달
+              onIndicatorChange={handleIndicatorChange} // 지표 변경 함수 전달
+              onBack={() => setStep(1)}
+              onSubmitPage={async () => {
+                await handleSubmit() // 실제 저장
+                setIsModalOpen(false) // 모달 닫기
+                setStep(1) // 초기화 (선택사항)
+              }}
+            />
+          )}
         </Modal>
 
         {isEditModalOpen && ( // 수정 모달이 열려 있을 경우
