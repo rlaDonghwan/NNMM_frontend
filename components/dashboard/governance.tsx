@@ -1,3 +1,6 @@
+'use client'
+//.
+
 import React from 'react' // React 라이브러리 임포트
 import {useState} from 'react' // useState 훅 임포트
 import {DndProvider, useDrag, useDrop} from 'react-dnd' // react-dnd의 DnD 관련 훅 임포트

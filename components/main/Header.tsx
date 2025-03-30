@@ -2,13 +2,12 @@ import Link from 'next/link'
 
 export default function HeroSection() {
   return (
-    <div className="relative flex items-center justify-center h-[90vh] w-full bg-white">
+    <div className="relative flex items-center justify-center h-[100vh] w-full bg-white">
       {/* 배경 스타일 */}
       <div
         className="absolute inset-0"
         style={{
-          clipPath: 'polygon(0 0, 100% 0, 100% 3%, 70% 50%, 100% 97%, 100% 100%, 0 100%)',
-          background: 'linear-gradient(to bottom, #87CEFA, #f9f9f9)'
+          background: 'url(/main/banner.svg) no-repeat center center/cover'
         }}
       />
 
