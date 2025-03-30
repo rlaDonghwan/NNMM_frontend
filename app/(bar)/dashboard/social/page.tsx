@@ -1,4 +1,4 @@
-import Social from '@/components/dashboard/social'
+import Social from '@/components/dashboard/Social'
 
 export default function social() {
   return (

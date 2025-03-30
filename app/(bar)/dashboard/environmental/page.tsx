@@ -1,4 +1,4 @@
-import Environment from '@/components/dashboard/environmental'
+import Environment from '@/components/dashboard/Environmental'
 
 export default function environmental() {
   return (
