@@ -188,7 +188,7 @@ export default function ModalContent({
         </table>
       </div>
 
-      {/* 저장 버튼 */}
+      {/* 저장 버튼 zzzz*/}
       <div className="flex justify-end mt-6">
         <Button
           onClick={() => {
