@@ -6,11 +6,11 @@ import Footer from '@/components/main/Footer'
 // 메인 페이지
 export default function MainPage() {
   return (
-    <main>
+    <div className="flex flex-col w-full h-full">
       <Header />
       <DescriptionBlock />
       <FeatureBlock />
       <Footer />
-    </main>
+    </div>
   )
 }

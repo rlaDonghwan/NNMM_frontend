@@ -6,7 +6,7 @@ import {GetServerSideProps} from 'next'
 // 대시보드 페이지
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-white p-10">
+    <div className="flex h-full w-full bg-white px-4 py-8">
       <DashboardGrid />
     </div>
   )
