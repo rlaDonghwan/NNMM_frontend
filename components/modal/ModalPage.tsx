@@ -1,5 +1,5 @@
-import {useState} from 'react'
-import {Button} from '@/components/ui/button'
+// import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
 
 type ModalContentProps = {
@@ -10,10 +10,8 @@ type ModalContentProps = {
     color: string
   }[]
   setRows: React.Dispatch<React.SetStateAction<any[]>>
-  indicators: {key: string; label: string; unit: string}[]
-  setIndicators: React.Dispatch<
-    React.SetStateAction<{key: string; label: string; unit: string}[]>
-  >
+  indicators: { key: string; label: string; unit: string }[]
+  setIndicators: React.Dispatch<React.SetStateAction<{ key: string; label: string; unit: string }[]>>
   onAddYear: () => void
   onRemoveYear: () => void
   onRemoveRow: (index: number) => void
@@ -36,36 +34,34 @@ export default function ModalContent({
   onValueChange,
   getUnit,
   onAddRowWithIndicator,
-  onSubmit
+  onSubmit,
 }: ModalContentProps) {
   const [selectedIndicator, setSelectedIndicator] = useState(indicators[0]?.key || '')
 
   return (
-    <div className="w-auto bg-white rounded-xl shadow p-6">
+    <div className="w-[1280px] bg-white rounded-xl shadow p-6">
       {/* Header */}
       <div className="flex items-center justify-between border-b pb-4 mb-6">
         <h2 className="text-2xl font-semibold">데이터 입력</h2>
-        <button className="text-gray-400 hover:text-black font-apple text-xl">
-          &times;
-        </button>
+        <button className="text-gray-400 hover:text-black font-apple text-xl">&times;</button>
       </div>
 
       {/* 아이콘 + 지표 콤보박스 */}
       <div className="flex items-center gap-4 mb-4">
         <div className="w-10 h-10 bg-blue-100 rounded-md flex items-center justify-center">
-          {/* <img src="/icon/esg-icon.svg" alt="icon" className="w-6 h-6" /> */}
+          <img src="/icon/esg-icon.svg" alt="icon" className="w-6 h-6" />
         </div>
 
         <ComboboxWithCreate
-          items={indicators.map(ind => ind.label)}
-          onAdd={newLabel => {
+          items={indicators.map((ind) => ind.label)}
+          onAdd={(newLabel) => {
             const newKey = newLabel.toLowerCase().replace(/\s+/g, '-')
-            setIndicators(prev => [...prev, {key: newKey, label: newLabel, unit: ''}])
+            setIndicators((prev) => [...prev, { key: newKey, label: newLabel, unit: '' }])
             onAddRowWithIndicator(newKey)
             setSelectedIndicator(newKey)
           }}
-          onSelect={label => {
-            const indicator = indicators.find(ind => ind.label === label)
+          onSelect={(label) => {
+            const indicator = indicators.find((ind) => ind.label === label)
             if (indicator) {
               setSelectedIndicator(indicator.key)
               onAddRowWithIndicator(indicator.key)
@@ -75,8 +71,8 @@ export default function ModalContent({
 
         <button
           onClick={() => onAddRowWithIndicator(selectedIndicator)}
-          className="w-6 h-6 bg-green-600 text-white rounded-full text-sm">
-          +
+          className="bg-green-600 text-white px-4 py-2 rounded text-sm">
+          + 행 추가
         </button>
       </div>
 
@@ -104,14 +100,14 @@ export default function ModalContent({
                   </button>
                 </div>
               </th>
-              <th className="py-1">단위</th>
+              <th className="py-2">단위</th>
             </tr>
             <tr className="text-center text-gray-500">
               <th></th>
               <th></th>
               <th></th>
               <th></th>
-              {years.map(year => (
+              {years.map((year) => (
                 <th key={year}>{year}</th>
               ))}
               <th></th>
@@ -120,39 +116,30 @@ export default function ModalContent({
 
           <tbody>
             {rows.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className="bg-[#F8FAFC] text-center text-sm text-gray-700 rounded overflow-hidden">
+              <tr key={rowIndex} className="bg-[#F8FAFC] text-center text-sm text-gray-700 rounded overflow-hidden">
                 <td className="py-2">
                   <button
                     onClick={() => onRemoveRow(rowIndex)}
-                    className="w-6 h-6 bg-red-400 text-white rounded-full">
+                    className="w-6 h-6 bg-blue-400 text-white rounded-full">
                     -
                   </button>
                 </td>
                 <td className="px-2 text-left whitespace-nowrap">
-                  {indicators.find(i => i.key === row.indicatorKey)?.label ||
-                    row.indicatorKey}
+                  {indicators.find((i) => i.key === row.indicatorKey)?.label || row.indicatorKey}
                 </td>
                 <td className="px-2">
-                  <input
-                    type="text"
-                    className="w-full px-2 py-1 rounded bg-white border"
-                  />
+                  <input type="text" className="w-full px-2 py-1 rounded bg-white border" />
                 </td>
                 <td className="px-2">
-                  <input
-                    type="text"
-                    className="w-full px-2 py-1 rounded bg-white border"
-                  />
+                  <input type="text" className="w-full px-2 py-1 rounded bg-white border" />
                 </td>
 
-                {years.map(year => (
+                {years.map((year) => (
                   <td key={year} className="px-2">
                     <input
                       type="text"
                       value={row.values[year] || ''}
-                      onChange={e => onValueChange(rowIndex, year, e.target.value)}
+                      onChange={(e) => onValueChange(rowIndex, year, e.target.value)}
                       className="w-full px-2 py-1 rounded bg-white border"
                     />
                   </td>
@@ -160,18 +147,18 @@ export default function ModalContent({
 
                 <td className="px-2">
                   <ComboboxWithCreate
-                    selected={indicators.find(i => i.key === row.indicatorKey)?.unit}
-                    items={[...new Set(indicators.map(i => i.unit).filter(Boolean))]}
-                    onAdd={newUnit => {
+                    selected={indicators.find((i) => i.key === row.indicatorKey)?.unit}
+                    items={[...new Set(indicators.map((i) => i.unit).filter(Boolean))]}
+                    onAdd={(newUnit) => {
                       const key = row.indicatorKey
-                      setIndicators(prev =>
-                        prev.map(ind => (ind.key === key ? {...ind, unit: newUnit} : ind))
+                      setIndicators((prev) =>
+                        prev.map((ind) => (ind.key === key ? { ...ind, unit: newUnit } : ind))
                       )
                     }}
-                    onSelect={unit => {
+                    onSelect={(unit) => {
                       const key = row.indicatorKey
-                      setIndicators(prev =>
-                        prev.map(ind => (ind.key === key ? {...ind, unit} : ind))
+                      setIndicators((prev) =>
+                        prev.map((ind) => (ind.key === key ? { ...ind, unit } : ind))
                       )
                     }}
                   />
