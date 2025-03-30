@@ -1,11 +1,12 @@
 'use client'
-
+import {RiSidebarFoldFill} from 'react-icons/ri'
 import * as React from 'react'
 import {Slot} from '@radix-ui/react-slot'
 import {VariantProps, cva} from 'class-variance-authority'
 import {PanelLeft} from 'lucide-react'
 
-import {cn} from 'lib/utils'
+import {useIsMobile} from '@/components/hooks/use-mobile'
+import {cn} from '@/lib/utils'
 import {Button} from '@/components/ui/button'
 import {Input} from '@/components/ui/input'
 import {Separator} from '@/components/ui/separator'
@@ -26,7 +27,7 @@ import {
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = '16rem'
+const SIDEBAR_WIDTH = '192px'
 const SIDEBAR_WIDTH_MOBILE = '18rem'
 const SIDEBAR_WIDTH_ICON = '3rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
@@ -72,7 +73,7 @@ const SidebarProvider = React.forwardRef<
     },
     ref
   ) => {
-    // const isMobile = useIsMobile()
+    const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
 
     // This is the internal state of the sidebar.
@@ -95,62 +96,61 @@ const SidebarProvider = React.forwardRef<
     )
 
     // Helper to toggle the sidebar.
-    // const toggleSidebar = React.useCallback(() => {
-    //   return isMobile ? setOpenMobile(open => !open) : setOpen(open => !open)
-    // }, [isMobile, setOpen, setOpenMobile])
+    const toggleSidebar = React.useCallback(() => {
+      return isMobile ? setOpenMobile(open => !open) : setOpen(open => !open)
+    }, [isMobile, setOpen, setOpenMobile])
 
     // Adds a keyboard shortcut to toggle the sidebar.
-    // React.useEffect(() => {
-    //   const handleKeyDown = (event: KeyboardEvent) => {
-    //     if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
-    //       event.preventDefault()
-    //       toggleSidebar()
-    //     }
-    //   }
+    React.useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
+          event.preventDefault()
+          toggleSidebar()
+        }
+      }
 
-    //   window.addEventListener('keydown', handleKeyDown)
-    //   return () => window.removeEventListener('keydown', handleKeyDown)
-    // }, [toggleSidebar])
+      window.addEventListener('keydown', handleKeyDown)
+      return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [toggleSidebar])
 
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? 'expanded' : 'collapsed'
 
-    // const contextValue = React.useMemo<SidebarContextProps>(
-    //   () => ({
-    //     state,
-    //     open,
-    //     setOpen,
-    //     isMobile,
-    //     openMobile,
-    //     setOpenMobile,
-    //     toggleSidebar
-    //   }),
-    //   [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
-    // )
+    const contextValue = React.useMemo<SidebarContextProps>(
+      () => ({
+        state,
+        open,
+        setOpen,
+        isMobile,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar
+      }),
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    )
 
     return (
-      // <SidebarContext.Provider value={contextValue}>
-      //   <TooltipProvider delayDuration={0}>
-      //     <div
-      //       style={
-      //         {
-      //           '--sidebar-width': SIDEBAR_WIDTH,
-      //           '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
-      //           ...style
-      //         } as React.CSSProperties
-      //       }
-      //       className={cn(
-      //         'group/sidebar-wrapper flex min-h-svh has-[[data-variant=inset]]:bg-sidebar',
-      //         className
-      //       )}
-      //       ref={ref}
-      //       {...props}>
-      //       {children}
-      //     </div>
-      //   </TooltipProvider>
-      // </SidebarContext.Provider>
-      <></>
+      <SidebarContext.Provider value={contextValue}>
+        <TooltipProvider delayDuration={0}>
+          <div
+            style={
+              {
+                '--sidebar-width': SIDEBAR_WIDTH,
+                '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
+                ...style
+              } as React.CSSProperties
+            }
+            className={cn(
+              'group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar',
+              className
+            )}
+            ref={ref}
+            {...props}>
+            {children}
+          </div>
+        </TooltipProvider>
+      </SidebarContext.Provider>
     )
   }
 )
@@ -235,7 +235,7 @@ const Sidebar = React.forwardRef<
         />
         <div
           className={cn(
-            'fixed bottom-0 z-10 hidden h-[90vh] w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex',
+            'absolute inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex',
             side === 'left'
               ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
               : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
@@ -246,11 +246,7 @@ const Sidebar = React.forwardRef<
             className
           )}
           {...props}>
-          <div
-            data-sidebar="sidebar"
-            className="flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow">
-            {children}
-          </div>
+          <div data-sidebar="sidebar">{children}</div>
         </div>
       </div>
     )
@@ -276,7 +272,7 @@ const SidebarTrigger = React.forwardRef<
         toggleSidebar()
       }}
       {...props}>
-      <PanelLeft />
+      <img src="/images/side.png" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
