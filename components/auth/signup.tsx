@@ -1,65 +1,73 @@
-// import {useState} from 'react'
+'use client'
+
+import {useState} from 'react'
 import Link from 'next/link'
-// import {useRouter} from 'next/router'
-import {register} from 'services/auth'
+import {useRouter} from 'next/navigation'
+import {register} from '@/services/auth'
 import {toast} from 'react-hot-toast'
 import {Card, CardTitle} from '@/components/ui/card'
 
-// SignUpForm 컴포넌트를 기본 내보내기로 정의합니다.
 export default function SignUpForm() {
-  // // 이 코드들은 유지가 되어야 백엔드와 통신이 가능합니다.-----------------------------------------------------------------------
-  // const router = useRouter() // useRouter 훅을 초기화합니다.
-  // const [email, setEmail] = useState('') // 이메일 상태를 관리합니다.
-  // const [name, setName] = useState('') // 이름 상태를 관리합니다.
-  // const [companyName, setCompanyName] = useState('') // 직책 상태를 관리합니다.
-  // const [password, setPassword] = useState('') // 비밀번호 상태를 관리합니다.
-  // const [confirmPassword, setConfirmPassword] = useState('') // 비밀번호 확인 상태를 관리합니다.
+  const router = useRouter()
 
-  // 입력 필드의 값을 변경하는 핸들러 함수입니다.
-  // const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const value = e.target.value
-  //   // 필드에 따라 상태를 업데이트합니다.
-  //   if (field === 'email') setEmail(value)
-  //   if (field === 'name') setName(value)
-  //   if (field === 'companyName') setCompanyName(value)
-  //   if (field === 'password') setPassword(value)
-  //   if (field === 'confirmPassword') setConfirmPassword(value)
-  // }
-  // ------------------------------------------------------------------------------------
+  // 입력값 상태 관리
+  const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  // 계정을 생성하는 함수입니다.
-  // const createAccount = async (e: React.FormEvent) => {
-  //   e.preventDefault() // 기본 폼 제출 동작을 막습니다.
+  // 입력값 검증 함수
+  const validate = () => {
+    if (!email || !name || !companyName || !password || !confirmPassword) {
+      toast.error('모든 항목을 입력해주세요.')
+      return false
+    }
 
-  //   // 비밀번호와 비밀번호 확인이 일치하지 않을 경우 에러 메시지를 설정합니다.
-  //   if (password !== confirmPassword) {
-  //     toast.error('비밀번호가 일치하지 않습니다.')
-  //     return
-  //   }
+    // 이메일 형식 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast.error('유효한 이메일 형식을 입력해주세요.')
+      return false
+    }
 
-  //   // 이메일 형식 검사 정규식
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  //   if (!emailRegex.test(email)) {
-  //     toast.error('유효한 이메일 형식을 입력해주세요.')
-  //     return
-  //   }
+    // 비밀번호 일치 여부 검사
+    if (password !== confirmPassword) {
+      toast.error('비밀번호가 일치하지 않습니다.')
+      return false
+    }
 
-  //   try {
-  //     await register({email, name, companyName, password}) // 회원가입 API를 호출합니다.
-  //     toast.success('회원가입 성공!') // 성공 메시지를 설정합니다.
+    return true
+  }
 
-  //     setTimeout(() => {
-  //       router.push('/auth/signin') // 로그인 페이지로 이동합니다.
-  //     }, 1000) // 2초 후에 이동합니다.
-  //   } catch (err: any) {
-  //     const msg = err?.response.data?.message || '회원가입에 실패했습니다.'
-  //     toast.error(msg) // 에러 메시지를 설정합니다.
-  //   }
-  // }
-  // ------------------------------------------------------------------------------------
+  // 회원가입 처리 함수
+  const createAccount = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!validate()) return
+
+    setLoading(true)
+
+    try {
+      // 회원가입 API 호출
+      await register({email, name, companyName, password})
+      toast.success('회원가입 성공!')
+
+      // 로그인 페이지로 이동
+      setTimeout(() => {
+        router.push('/signin')
+      }, 1000)
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || '회원가입에 실패했습니다.'
+      toast.error(msg)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
+      {/* 왼쪽 문구 영역 */}
       <div className="relative w-[50%] z-0">
         <div
           className="absolute inset-0"
@@ -73,10 +81,9 @@ export default function SignUpForm() {
           className="flex w-full h-full text-7xl font-apple font-bold justify-center items-center"
           style={{
             background: 'linear-gradient(to bottom, #466AB7, #000000 95%)',
-            WebkitBackgroundClip: 'text', // Safari 및 WebKit 기반 브라우저에 적용
-            backgroundClip: 'text', // 다른 브라우저 지원
-            color: 'transparent', // 텍스트 색을 투명하게 설정
-            zIndex: 10
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent'
           }}>
           회원 가입,
           <br />
@@ -86,66 +93,63 @@ export default function SignUpForm() {
         </div>
       </div>
 
-      {/* 회원가입 폼입니다. */}
+      {/* 오른쪽 회원가입 폼 */}
       <div className="flex w-[50%] items-center justify-center bg-[rgba(255,255,255,0.0)]">
         <Card className="flex flex-col max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-10">
-          <CardTitle className="mb-6 text-3xl font-semibold font-apple text-center text-gray-800">
+          <CardTitle className="mb-6 text-3xl font-apple text-center text-gray-800">
             지금 만드세요.
           </CardTitle>
-          <form className="space-y-5">
-            {/* 이메일 입력 필드 */}
+
+          {/* 회원가입 폼 */}
+          <form onSubmit={createAccount} className="space-y-5">
             <input
               type="email"
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="이메일"
-              // value={email}
-              // onChange={handleChange('email')}
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            {/* 이름 입력 필드 */}
             <input
               type="text"
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="이름"
-              // value={name}
-              // onChange={handleChange('name')}
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            {/* 회사명 입력 필드 */}
             <input
               type="text"
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="회사명"
-              // value={companyName}
-              // onChange={handleChange('companyName')}
+              value={companyName}
+              onChange={e => setCompanyName(e.target.value)}
+              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            {/* 비밀번호 입력 필드 */}
             <input
               type="password"
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="비밀번호"
-              // value={password}
-              // onChange={handleChange('password')}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            {/* 비밀번호 확인 입력 필드 */}
             <input
               type="password"
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="비밀번호 확인"
-              // value={confirmPassword}
-              // onChange={handleChange('confirmPassword')}
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            {/* 계정 생성 버튼 */}
             <button
               type="submit"
-              className="w-full py-2 font-semibold font-apple text-white bg-black rounded-md hover:bg-blue-600 transition">
-              계정 생성
+              disabled={loading}
+              className="w-full py-2 font-apple text-white bg-black rounded-md hover:bg-blue-400 transition">
+              {loading ? '계정 생성 중...' : '계정 생성'}
             </button>
           </form>
 
-          {/* 로그인 페이지로 이동하는 링크 */}
+          {/* 로그인 페이지로 이동 링크 */}
           <div className="mt-6 text-sm font-apple text-gray-600 text-center">
             이미 계정이 있으신가요?{' '}
             <Link
-              href="signin"
+              href="/signin"
               className="text-blue-500 underline font-apple hover:text-blue-700">
               로그인
             </Link>
