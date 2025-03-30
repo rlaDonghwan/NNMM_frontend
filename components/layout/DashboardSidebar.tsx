@@ -1,5 +1,6 @@
 // 'use client'
 import {Sidebar, SidebarContent, SidebarTrigger} from '@/components/ui/sidebar'
+
 import Link from 'next/link'
 import {RiDashboardFill} from 'react-icons/ri'
 // import {useRouter} from 'next/router' // Next.js의 useRouter 훅 임포트 (라우터 정보 접근용)
@@ -33,49 +34,33 @@ export default function DashboardSidebar() {
   // const isS = router.pathname === '/dashboard/social' // 현재 경로가 '/dashboard/social'인지 확인
   // const isG = router.pathname === '/dashboard/governance' // 현재 경로가 '/dashboard/governance'인지 확인
   return (
-    <Sidebar className="flex w-48 h-full bg-gradient-to-b from-[#88CCE6] to-[#E5E5E5] z-[-10]">
+    <Sidebar className="flex w-48 h-full bg-gradient-to-b from-[#88CCE6] to-[#E5E5E5] z-[10]">
       <SidebarContent className="flex flex-col space-y-2 p-4">
-        <NavItem
-          href="/dashboard"
-          icon={<RiDashboardFill className="w-6 h-6" />}
-          text="Dashboard"
-        />
-        <NavItem
-          href="/dashboard/environmental"
-          icon={<img src="/images/E.png" alt="E" className="w-6 h-6" />}
-          text="Environment"
-        />
-        <NavItem
-          href="/dashboard/social"
-          icon={<img src="/images/S.png" alt="S" className="w-6 h-6" />}
-          text="Social"
-        />
-        <NavItem
-          href="/dashboard/governance"
-          icon={<img src="/images/G.png" alt="G" className="w-6 h-6" />}
-          text="Governance"
-        />
+        <Link href="/dashboard">
+          <button className="flex items-center gap-x-3 px-4 py-2 rounded-md hover:bg-gray-500/30">
+            <RiDashboardFill className="w-6 h-6" />
+            Dashboard
+          </button>
+        </Link>
+        <Link href="/dashboard/environmental">
+          <button className="flex items-center gap-x-3 px-4 py-2 rounded-md hover:bg-gray-500/30">
+            <img src="/images/E.png" alt="E" className="w-6 h-6" />
+            Environment
+          </button>
+        </Link>
+        <Link href="/dashboard/social">
+          <button className="flex items-center gap-x-3 px-4 py-2 rounded-md hover:bg-gray-500/30">
+            <img src="/images/S.png" alt="E" className="w-6 h-6" />
+            Social
+          </button>
+        </Link>
+        <Link href="/dashboard/governance">
+          <button className="flex items-center gap-x-3 px-4 py-2 rounded-md hover:bg-gray-500/30">
+            <img src="/images/G.png" alt="E" className="w-6 h-6" />
+            Governance
+          </button>
+        </Link>
       </SidebarContent>
     </Sidebar>
-  )
-}
-
-// ✅ 네비게이션 아이템을 재사용할 수 있도록 컴포넌트로 분리
-function NavItem({
-  href,
-  icon,
-  text
-}: {
-  href: string
-  icon: React.ReactNode
-  text: string
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-x-3 px-4 py-2 rounded-md hover:bg-gray-500/30">
-      {icon}
-      <span>{text}</span>
-    </Link>
   )
 }
