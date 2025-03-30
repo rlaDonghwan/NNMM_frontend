@@ -1,32 +1,29 @@
-// app/(bar)/layout.tsx
-import '@/app/global.css'
-import DashboardHeader from '@/components/layout/DashboardHeader'
-import DashboardSidebar from '@/components/layout/DashboardSidebar'
-import {SidebarProvider} from '@/components/ui/sidebar'
+import '@/app/global.css' // 글로벌 스타일 시트 임포트
+import DashboardHeader from '@/components/layout/DashboardHeader' // 대시보드 헤더 컴포넌트 임포트
+import DashboardSidebar from '@/components/layout/DashboardSidebar' // 대시보드 사이드바 컴포넌트 임포트
+import {SidebarProvider, SidebarTrigger} from '@/components/ui/sidebar' // 사이드바 관련 컴포넌트 임포트
 
 export const metadata = {
-  title: 'NNMM Dashboard',
-  description: 'ESG 입력 및 마이페이지'
+  title: 'NNMM Dashboard', // 페이지 제목
+  description: 'ESG 입력 및 마이페이지' // 페이지 설명
 }
-//대시보드 레이아웃
-// 대시보드 레이아웃은 대시보드 페이지에만 사용됩니다.
+
+// 대시보드 레이아웃 컴포넌트
+// 대시보드 페이지에서만 사용됩니다.
 export default function DashboardLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="ko">
-      <body className="w-full h-full">
-        {/* <SidebarProvider> */}
-        <div className="flex">
-          {/* ✅ 좌측 사이드바 */}
-          {/* <DashboardSidebar /> */}
-
-          {/* ✅ 우측 콘텐츠 영역 */}
-          <div className="flex flex-col flex-1">
-            <DashboardHeader />
-            <main>{children}</main>
-          </div>
-        </div>
-        {/* </SidebarProvider> */}
-      </body>
-    </html>
+    <div className="flex flex-col min-h-screen">
+      {/* ✅ 최상단 네비게이션 바 */}
+      <DashboardHeader />
+      <div className="relative flex flex-1">
+        {/* ✅ 좌측 사이드바 */}
+        <SidebarProvider>
+          <DashboardSidebar />
+          <SidebarTrigger className="mt-5 ml-2" /> {/* 사이드바 열기/닫기 트리거 */}
+        </SidebarProvider>
+        {/* ✅ 메인 콘텐츠 영역 */}
+        <main className="flex flex-1">{children}</main>
+      </div>
+    </div>
   )
 }
