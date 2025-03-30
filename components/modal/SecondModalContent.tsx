@@ -44,7 +44,8 @@ export default function SecondModalContent({
 }: SecondModalContentProps) {
   const [selectedIndicator, setSelectedIndicator] = useState(indicators[0]?.key || '')
   const [selectedChart, setSelectedChart] = useState(null)
-  const [selectedColor, setSelectedColor] = useState(null)
+  // const [selectedColor, setSelectedColor] = useState(null)
+  const [selectedColor, setSelectedColor] = useState<string[]>(['#60A5FA', '#F472B6'])
   const [dataSelections, setDataSelections] = useState(Array(9).fill(''))
 
   const chartIcons = [
@@ -58,27 +59,14 @@ export default function SecondModalContent({
     'bubble',
     'pie'
   ]
-
-  const colors = [
-    '#F87171',
-    '#EF4444',
-    '#FB7185',
-    '#B91C1C',
-    '#F97316',
-    '#FACC15',
-    '#FBBF24',
-    '#D97706',
-    '#4ADE80',
-    '#22C55E',
-    '#10B981',
-    '#14B8A6',
-    '#38BDF8',
-    '#3B82F6',
-    '#8B5CF6',
-    '#A855F7',
-    '#6B7280',
-    '#374151'
-  ]
+  // 색바꾸기용 함수
+  const handleColorChange = (index: number, newColor: string) => {
+    setSelectedColor(prev => {
+      const updated = [...prev]
+      updated[index] = newColor
+      return updated
+    })
+  }
 
   const handleDataChange = (index, value) => {
     const updated = [...dataSelections]
@@ -87,12 +75,14 @@ export default function SecondModalContent({
   }
   return (
     <div className="p-6 rounded-xl bg-white w-full max-w-6xl mx-auto">
-      <h2 className="text-2xl font-semibold">그래프 선택</h2>
+      <div className="flex items-center justify-between border-b pb-4 mb-6">
+        <h2 className="text-2xl font-semibold">그래프 선택</h2>
+      </div>
 
       <div className="grid grid-cols-4 gap-6">
         {/* 그래프 종류 선택 */}
         <div className="col-span-1 space-y-2">
-          <h3 className="font-medium">그래프 종류 선택</h3>
+          <h3 className="font-apple">그래프 종류 선택</h3>
           <div className="grid grid-cols-3 gap-2">
             {chartIcons.map((type, i) => (
               <button
@@ -107,38 +97,32 @@ export default function SecondModalContent({
           </div>
         </div>
 
-        {/* 색상 선택 */}
-        <div className="col-span-1 space-y-2">
-          <h3 className="font-medium">색상 선택</h3>
-          <div className="grid grid-cols-6 gap-2">
-            {colors.map((color, i) => (
-              <div
-                key={i}
-                onClick={() => setSelectedColor(color)}
-                className={`w-6 h-6 rounded cursor-pointer border-2 ${
-                  selectedColor === color ? 'border-black' : 'border-transparent'
-                }`}
-                style={{backgroundColor: color}}
-              />
-            ))}
-          </div>
-        </div>
-
         {/* 데이터 선택 */}
         <div className="col-span-1 space-y-2">
-          <h3 className="font-medium">데이터 선택</h3>
-          <div className="grid grid-cols-3 gap-2">
-            <select>
-              <option value="value1">value1</option>
-              <option value="value2">value2</option>
-            </select>
+          <h3 className="font-apple">데이터 선택</h3>
+          {/* 색상 선택 */}
+          <div className="flex flex-col gap-2">
+            {[0, 1].map(index => (
+              <div key={index} className="flex items-center gap-2">
+                <select className="flex-1 border rounded px-2 py-1">
+                  <option value="value1">value1</option>
+                  <option value="value2">value2</option>
+                </select>
+                <input
+                  type="color"
+                  className="w-6 h-6 border rounded"
+                  value={selectedColor[index]}
+                  onChange={e => handleColorChange(index, e.target.value)}
+                />
+              </div>
+            ))}
           </div>
         </div>
 
         {/* 그래프 미리보기 ,,,*/}
         <div className="col-span-1 space-y-2">
-          <h3 className="font-medium">그래프 미리보기</h3>
-          <div className="bg-gray-100 rounded-xl h-64 flex items-center justify-center">
+          <h3 className="font-apple">그래프 미리보기</h3>
+          <div className="bg-gray-100 w-[28.5vw] rounded-xl h-64 flex items-center justify-center">
             <svg className="w-40 h-40" viewBox="0 0 100 100">
               <path d="M10,90 L10,10 L90,90" stroke="black" strokeWidth="2" fill="none" />
             </svg>
@@ -149,7 +133,7 @@ export default function SecondModalContent({
       {/* 하단 버튼 */}
       <div className="w-auto bg-white rounded-xl shadow p-6">
         {/* 저장 버튼 */}
-        <div className="flex justify-end mt-6">
+        <div className="flex justify-end mt-6 gap-3">
           <Button
             onClick={onBack}
             className="bg-gray-200 text-black text-lg px-8 py-2 rounded-full hover:bg-gray-300">
