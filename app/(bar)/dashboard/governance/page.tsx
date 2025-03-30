@@ -1,4 +1,4 @@
-import Governance from '@/components/dashboard/governance'
+import Governance from '@/components/dashboard/governance' // Governance 컴포넌트 가져오기
 
 export default function governance() {
   return (

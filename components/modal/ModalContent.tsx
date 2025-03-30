@@ -3,8 +3,9 @@ import {Button} from '@/components/ui/button'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
 import {transformRowsToEsgFormat, submitESGReport} from '@/services/esg'
 import {usePathname} from 'next/navigation'
-import {fetchCurrentUser} from '@/services/auth' // 경로에 맞게 수정 필요
-import toast from 'react-hot-toast'
+import {fetchCurrentUser} from '@/services/auth'
+import {showWarning, showSuccess, showError} from '@/utils/toast'
+import {createIndicatorIfNotExists} from '@/services/indicator'
 
 interface Row {
   indicatorKey: string
@@ -16,7 +17,7 @@ interface Row {
 
 interface ModalContentProps {
   years: number[]
-  setYears: React.Dispatch<React.SetStateAction<number[]>> // 이 타입도 맞게 선언되어 있어야 함
+  setYears: React.Dispatch<React.SetStateAction<number[]>>
   rows: Row[]
   setRows: React.Dispatch<React.SetStateAction<Row[]>>
   indicators: {key: string; label: string; unit: string}[]
@@ -59,9 +60,8 @@ export default function ModalContent({
 
   const yearOptions = useMemo(() => {
     const startYear = 2025
-    const minYear = 1900
     const options: string[] = []
-    for (let y = startYear; y >= minYear; y--) {
+    for (let y = startYear; y >= 1900; y--) {
       options.push(`${y}`)
     }
     return options
@@ -70,72 +70,52 @@ export default function ModalContent({
   useEffect(() => {
     const getUserInfo = async () => {
       try {
-        const user = await fetchCurrentUser() // ✅ 쿠키 기반 요청
+        const user = await fetchCurrentUser()
         setCompanyName(user.companyName)
       } catch (err) {
         console.error('사용자 정보 불러오기 실패:', err)
       }
     }
-
     getUserInfo()
   }, [])
 
-  useEffect(() => {
-    if (!Array.isArray(years)) {
-      console.error('❌ [props 오류] years가 배열이 아닙니다:', years)
-    }
-    if (typeof setYears !== 'function') {
-      console.error('❌ [props 오류] setYears가 함수가 아닙니다:', setYears)
-    }
-  }, [])
-
-  const handleAddYear = () => {
-    if (!selectedYear) return
-    const parsed = parseInt(selectedYear)
-
+  const handleYearSelect = (year: string) => {
+    const parsed = parseInt(year)
     if (!isNaN(parsed)) {
       if (years.includes(parsed)) {
-        toast.error('이미 추가된 연도입니다!', {
-          position: 'top-center',
-          style: {
-            color: '#000',
-            fontWeight: 'bold',
-            fontFamily: 'font-apple'
-          },
-          icon: '⚠️'
-        })
+        showWarning('이미 추가된 연도입니다!')
       } else if (years.length >= 5) {
-        toast.error('최대 5개의 연도만 추가할 수 있습니다!', {
-          position: 'top-center',
-          style: {
-            color: '#000',
-            fontWeight: 'bold',
-            fontFamily: 'apple'
-          },
-          icon: '⚠️'
-        })
+        showWarning('최대 5개의 연도만 추가할 수 있습니다!')
       } else {
         setYears(prev => [...prev, parsed].sort((a, b) => a - b))
+        showSuccess('연도가 추가되었습니다!')
       }
     }
-    setSelectedYear('')
+  }
+
+  const removeYearByValue = (year: number) => {
+    setYears(prev => prev.filter(y => y !== year))
   }
 
   return (
     <div className="w-auto overflow-auto bg-white rounded-xl shadow p-5">
       <div className="flex items-center justify-between border-b pb-4 mb-6">
-        <h2 className="text-2xl font-apple">데이터 입력</h2> {/* ✅ font-apple 적용 */}
+        <h2 className="text-2xl font-apple">데이터 입력</h2>
       </div>
 
       <div className="flex items-center gap-4 mb-4">
         <ComboboxWithCreate
           items={indicators.map(ind => ind.label)}
           placeholder="항목 선택"
-          onAdd={newLabel => {
-            const newKey = newLabel.toLowerCase().replace(/\s+/g, '-')
-            setIndicators(prev => [...prev, {key: newKey, label: newLabel, unit: ''}])
-            onAddRowWithIndicator(newKey)
-            setSelectedIndicator(newKey)
+          onAdd={async newLabel => {
+            try {
+              const created = await createIndicatorIfNotExists(newLabel)
+              setIndicators(prev => [...prev, created])
+              onAddRowWithIndicator(created.key)
+              setSelectedIndicator(created.key)
+            } catch (err) {
+              console.error('인디케이터 생성 실패:', err)
+            }
           }}
           onSelect={label => {
             const indicator = indicators.find(ind => ind.label === label)
@@ -145,49 +125,38 @@ export default function ModalContent({
             }
           }}
         />
-        <button
-          onClick={() => onAddRowWithIndicator(selectedIndicator)}
-          className="w-6 h-6 bg-green-600 text-white rounded-full text-sm font-apple">
-          +
-        </button>
-      </div>
-
-      {/* 연도 추가 콤보박스 */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="min-w-[120px]">
-          <ComboboxWithCreate
-            items={yearOptions}
-            selected={selectedYear}
-            onSelect={year => setSelectedYear(year)}
-            onAdd={year => setSelectedYear(year)}
-            placeholder="연도 선택"
-          />
-        </div>
-        <Button variant="secondary" onClick={handleAddYear} className="font-apple">
-          연도 추가
-        </Button>
-        <Button variant="outline" onClick={onRemoveYear} className="font-apple">
-          마지막 연도 제거
-        </Button>
+        <ComboboxWithCreate
+          items={yearOptions}
+          placeholder="연도 선택"
+          onSelect={handleYearSelect}
+          onAdd={handleYearSelect}
+        />
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full border-separate border-spacing-y-1">
           <thead className="text-center text-gray-600 text-sm border-b font-apple">
             <tr>
-              <th className="py-2"></th>
-              <th className="py-2">항목</th>
-              <th className="py-2">대분류</th>
-              <th className="py-2">중분류</th>
-              <th className="py-2">단위</th>
+              <th></th>
+              <th>항목</th>
+              <th>대분류</th>
+              <th>중분류</th>
+              <th>단위</th>
+
               {years.map(year => (
                 <th key={year} className="py-2">
-                  {year}
+                  <div className="flex flex-col items-center relative">
+                    <button
+                      onClick={() => removeYearByValue(year)}
+                      className="w-5 h-5 bg-red-400 text-white rounded-full text-xs mb-1 font-apple">
+                      -
+                    </button>
+                    <span>{year}</span>
+                  </div>
                 </th>
               ))}
             </tr>
           </thead>
-
           <tbody>
             {rows.length === 0 ? (
               <tr className="bg-[#F8FAFC] text-center text-sm text-gray-400 font-apple">
@@ -277,20 +246,20 @@ export default function ModalContent({
       <div className="flex justify-end mt-6">
         <Button
           onClick={async () => {
-            const payload = transformRowsToEsgFormat(
-              rows,
-              indicators,
-              years,
-              companyName,
-              category
-            )
             try {
+              const payload = transformRowsToEsgFormat(
+                rows,
+                indicators,
+                years,
+                companyName,
+                category
+              )
               const response = await submitESGReport(payload)
-              const esgReportId = response._id
-              console.log('✅ ESG 저장 성공:', esgReportId)
-              if (onSubmitPage) onSubmitPage(esgReportId)
+              showSuccess('ESG 보고서가 성공적으로 저장되었습니다!')
+              onSubmitPage?.(response._id)
             } catch (error: any) {
               console.error('❌ ESG 저장 실패:', error.response?.data || error.message)
+              showError('저장 중 오류가 발생했습니다.')
             }
           }}
           className="bg-gray-200 text-black text-lg px-8 py-2 rounded-full hover:bg-gray-300 font-apple">

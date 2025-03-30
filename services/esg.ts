@@ -35,14 +35,20 @@ export const syncIndicators = async (
 export const submitESGReport = async (report: any) => {
   try {
     const res = await axios.post(`${BASE_URL}/esg`, report, {
-      withCredentials: true // ✅ 쿠키 포함 요청
+      withCredentials: true
     })
     return res.data
   } catch (error: any) {
-    console.error('ESG 저장 실패:', error.response?.data || error.message)
+    console.error('❌ ESG 저장 실패: ', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: `${BASE_URL}/esg`
+    })
     throw error
   }
 }
+
 //----------------------------------------------------------------------------------------------------
 
 // services/esg.ts 안에 이 함수가 있어야 함
