@@ -128,17 +128,10 @@ export default function SecondModalContent({
         <div className="col-span-1 space-y-2">
           <h3 className="font-medium">데이터 선택</h3>
           <div className="grid grid-cols-3 gap-2">
-            {dataSelections.map((sel, idx) => (
-              <select
-                key={idx}
-                className="bg-yellow-100 px-2 py-1 rounded text-sm"
-                value={sel}
-                onChange={e => handleDataChange(idx, e.target.value)}>
-                <option value="">구분</option>
-                <option value="value1">value1</option>
-                <option value="value2">value2</option>
-              </select>
-            ))}
+            <select>
+              <option value="value1">value1</option>
+              <option value="value2">value2</option>
+            </select>
           </div>
         </div>
 

@@ -44,7 +44,7 @@ export default function ModalContent({
   const [selectedIndicator, setSelectedIndicator] = useState(indicators[0]?.key || '')
 
   return (
-    <div className="w-auto bg-white rounded-xl shadow p-6">
+    <div className="w-auto overflow-auto bg-white rounded-xl shadow p-5">
       {/* Header */}
       <div className="flex items-center justify-between border-b pb-4 mb-6">
         <h2 className="text-2xl font-semibold">데이터 입력</h2>
@@ -52,10 +52,6 @@ export default function ModalContent({
 
       {/* 아이콘 + 지표 콤보박스 */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-10 h-10 bg-blue-100 rounded-md flex items-center justify-center">
-          {/* <img src="/icon/esg-icon.svg" alt="icon" className="w-6 h-6" /> */}
-        </div>
-
         <ComboboxWithCreate
           items={indicators.map(ind => ind.label)}
           onAdd={newLabel => {
@@ -86,9 +82,9 @@ export default function ModalContent({
           <thead className="text-left text-gray-600 text-sm border-b">
             <tr>
               <th className="py-2 pl-2">&nbsp;</th>
-              <th className="py-2">지표</th>
-              <th className="py-2">필드1</th>
-              <th className="py-2">필드2</th>
+              <th className="py-2"></th>
+              <th className="py-2"></th>
+              <th className="py-2"></th>
               <th className="py-2 text-center" colSpan={years.length}>
                 <div className="flex justify-center items-center gap-2">
                   <span>연도</span>
@@ -108,9 +104,9 @@ export default function ModalContent({
             </tr>
             <tr className="text-center text-gray-500">
               <th></th>
-              <th></th>
-              <th></th>
-              <th></th>
+              <th>지표</th>
+              <th>필드1</th>
+              <th>필드2</th>
               {years.map(year => (
                 <th key={year}>{year}</th>
               ))}
@@ -184,12 +180,6 @@ export default function ModalContent({
 
       {/* 저장 버튼 */}
       <div className="flex justify-end mt-6">
-        {/* <Button
-          onClick={onSubmit}
-          className="bg-gray-200 text-black text-lg px-8 py-2 rounded-full hover:bg-gray-300">
-          다음 &gt;
-        </Button>
-         */}
         <Button
           onClick={() => {
             console.log('[버튼 클릭됨]')
