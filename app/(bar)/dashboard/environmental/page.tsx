@@ -1,8 +1,8 @@
-import Environment from '@/components/dashboard/Environmental'
+import Environment from '@/components/dashboard/environmental'
 
 export default function environmental() {
   return (
-    <div className="min-h-screen bg-white p-10">
+    <div className="flex h-full w-full bg-white pl-4 pt-8">
       <Environment />
     </div>
   )

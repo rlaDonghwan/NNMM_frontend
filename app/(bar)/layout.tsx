@@ -12,7 +12,7 @@ export const metadata = {
 // 대시보드 페이지에서만 사용됩니다.
 export default function DashboardLayout({children}: {children: React.ReactNode}) {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col w-full h-full">
       {/* ✅ 최상단 네비게이션 바 */}
       <DashboardHeader />
       <div className="relative flex flex-1">
@@ -22,7 +22,7 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
           <SidebarTrigger className="mt-5 ml-2" /> {/* 사이드바 열기/닫기 트리거 */}
         </SidebarProvider>
         {/* ✅ 메인 콘텐츠 영역 */}
-        <main className="flex flex-1">{children}</main>
+        <main className=" relative flex flex-1 w-full h-full">{children}</main>
       </div>
     </div>
   )
