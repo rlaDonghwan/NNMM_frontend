@@ -100,7 +100,7 @@ export default function ModalContent({
                   </button>
                 </div>
               </th>
-              <th className="py-1">단위</th>
+              <th className="py-1"></th>
             </tr>
             <tr className="text-center text-gray-500">
               <th></th>
@@ -110,70 +110,80 @@ export default function ModalContent({
               {years.map(year => (
                 <th key={year}>{year}</th>
               ))}
-              <th></th>
+              <th>단위</th>
             </tr>
           </thead>
 
           <tbody>
-            {rows.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className="bg-[#F8FAFC] text-center text-sm text-gray-700 rounded overflow-hidden">
-                <td className="py-2">
-                  <button
-                    onClick={() => onRemoveRow(rowIndex)}
-                    className="w-6 h-6 bg-red-400 text-white rounded-full">
-                    -
-                  </button>
+            {rows.length === 0 ? (
+              <tr className="bg-[#F8FAFC] text-center text-sm text-gray-400">
+                <td className="py-4" colSpan={5 + years.length}>
+                  지표를 추가하면 여기에 데이터가 추가됩니다.
                 </td>
-                <td className="px-2 text-left whitespace-nowrap">
-                  {indicators.find(i => i.key === row.indicatorKey)?.label ||
-                    row.indicatorKey}
-                </td>
-                <td className="px-2">
-                  <input
-                    type="text"
-                    className="w-full px-2 py-1 rounded bg-white border"
-                  />
-                </td>
-                <td className="px-2">
-                  <input
-                    type="text"
-                    className="w-full px-2 py-1 rounded bg-white border"
-                  />
-                </td>
-
-                {years.map(year => (
-                  <td key={year} className="px-2">
+              </tr>
+            ) : (
+              rows.map((row, rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  className="bg-[#F8FAFC] text-center text-sm text-gray-700 rounded overflow-hidden">
+                  <td className="py-2">
+                    <button
+                      onClick={() => onRemoveRow(rowIndex)}
+                      className="w-6 h-6 bg-red-400 text-white rounded-full">
+                      -
+                    </button>
+                  </td>
+                  <td className="px-2 text-left whitespace-nowrap">
+                    {indicators.find(i => i.key === row.indicatorKey)?.label ||
+                      row.indicatorKey}
+                  </td>
+                  <td className="px-2">
                     <input
                       type="text"
-                      value={row.values[year] || ''}
-                      onChange={e => onValueChange(rowIndex, year, e.target.value)}
                       className="w-full px-2 py-1 rounded bg-white border"
                     />
                   </td>
-                ))}
+                  <td className="px-2">
+                    <input
+                      type="text"
+                      className="w-full px-2 py-1 rounded bg-white border"
+                    />
+                  </td>
 
-                <td className="px-2">
-                  <ComboboxWithCreate
-                    selected={indicators.find(i => i.key === row.indicatorKey)?.unit}
-                    items={[...new Set(indicators.map(i => i.unit).filter(Boolean))]}
-                    onAdd={newUnit => {
-                      const key = row.indicatorKey
-                      setIndicators(prev =>
-                        prev.map(ind => (ind.key === key ? {...ind, unit: newUnit} : ind))
-                      )
-                    }}
-                    onSelect={unit => {
-                      const key = row.indicatorKey
-                      setIndicators(prev =>
-                        prev.map(ind => (ind.key === key ? {...ind, unit} : ind))
-                      )
-                    }}
-                  />
-                </td>
-              </tr>
-            ))}
+                  {years.map(year => (
+                    <td key={year} className="px-2">
+                      <input
+                        type="text"
+                        value={row.values[year] || ''}
+                        onChange={e => onValueChange(rowIndex, year, e.target.value)}
+                        className="w-[100px] px-2 py-1 rounded bg-white border"
+                      />
+                    </td>
+                  ))}
+
+                  <td className="px-2">
+                    <ComboboxWithCreate
+                      selected={indicators.find(i => i.key === row.indicatorKey)?.unit}
+                      items={[...new Set(indicators.map(i => i.unit).filter(Boolean))]}
+                      onAdd={newUnit => {
+                        const key = row.indicatorKey
+                        setIndicators(prev =>
+                          prev.map(ind =>
+                            ind.key === key ? {...ind, unit: newUnit} : ind
+                          )
+                        )
+                      }}
+                      onSelect={unit => {
+                        const key = row.indicatorKey
+                        setIndicators(prev =>
+                          prev.map(ind => (ind.key === key ? {...ind, unit} : ind))
+                        )
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
