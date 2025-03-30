@@ -135,7 +135,7 @@ export default function SecondModalContent({
           </div>
         </div>
 
-        {/* 그래프 미리보기 */}
+        {/* 그래프 미리보기 ,,,*/}
         <div className="col-span-1 space-y-2">
           <h3 className="font-medium">그래프 미리보기</h3>
           <div className="bg-gray-100 rounded-xl h-64 flex items-center justify-center">
