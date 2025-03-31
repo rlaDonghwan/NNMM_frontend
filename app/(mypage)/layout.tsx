@@ -15,16 +15,8 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
     <div className="flex flex-col w-full h-full">
       {/* ✅ 최상단 네비게이션 바 */}
       <DashboardHeader />
-      <div className="relative flex flex-1">
-        {/* ✅ 좌측 사이드바 */}
-        <SidebarProvider>
-          <DashboardSidebar />
-          <SidebarTrigger className="relative mt-20 ml-2" />{' '}
-          {/* 사이드바 열기/닫기 트리거 ..*/}
-        </SidebarProvider>
-        {/* ✅ 메인 콘텐츠 영역 */}
-        <main className="relative flex flex-1 w-full h-full mt-14">{children}</main>
-      </div>
+      {/* ✅ 메인 콘텐츠 영역 */}
+      <main className=" relative flex flex-1 w-full h-full">{children}</main>
     </div>
   )
 }

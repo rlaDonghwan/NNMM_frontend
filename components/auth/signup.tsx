@@ -66,19 +66,19 @@ export default function SignUpForm() {
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-full w-full">
       {/* 왼쪽 문구 영역 */}
-      <div className="relative w-[50%] z-0">
+      <div
+        className="absolute w-full h-full"
+        style={{
+          height: '100%',
+          background: 'url(/images/sign.svg) no-repeat',
+          zIndex: '-10'
+        }}
+      />
+      <div className="flex flex-col md:flex-row w-full h-screen justify-center md:justify-between items-center">
         <div
-          className="absolute inset-0"
-          style={{
-            clipPath: 'polygon(0% -100%, 100% 5%, 80% 100%, 0% 90%)',
-            background: 'linear-gradient(to bottom, #88CCE6, #E5E5E5 95%)',
-            zIndex: -10
-          }}
-        />
-        <div
-          className="flex w-full h-full text-7xl font-apple font-bold justify-center items-center"
+          className="flex md:min-w-[340px] md:text-7xl text-6xl md:text-start text-center font-bold font-apple md:ml-56 ml-0"
           style={{
             background: 'linear-gradient(to bottom, #466AB7, #000000 95%)',
             WebkitBackgroundClip: 'text',
@@ -91,70 +91,67 @@ export default function SignUpForm() {
           <br />
           시작입니다.
         </div>
-      </div>
-
-      {/* 오른쪽 회원가입 폼 */}
-      <div className="flex w-[50%] items-center justify-center bg-[rgba(255,255,255,0.0)]">
-        <Card className="flex flex-col max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-10">
-          <CardTitle className="mb-6 text-3xl font-apple text-center text-gray-800">
-            지금 만드세요.
-          </CardTitle>
-
-          {/* 회원가입 폼 */}
-          <form onSubmit={createAccount} className="space-y-5">
-            <input
-              type="email"
-              placeholder="이메일"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <input
-              type="text"
-              placeholder="이름"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <input
-              type="text"
-              placeholder="회사명"
-              value={companyName}
-              onChange={e => setCompanyName(e.target.value)}
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <input
-              type="password"
-              placeholder="비밀번호"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <input
-              type="password"
-              placeholder="비밀번호 확인"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 font-apple text-white bg-black rounded-md hover:bg-blue-400 transition">
-              {loading ? '계정 생성 중...' : '계정 생성'}
-            </button>
-          </form>
-
-          {/* 로그인 페이지로 이동 링크 */}
-          <div className="mt-6 text-sm font-apple text-gray-600 text-center">
-            이미 계정이 있으신가요?{' '}
-            <Link
-              href="/signin"
-              className="text-blue-500 underline font-apple hover:text-blue-700">
-              로그인
-            </Link>
-          </div>
-        </Card>
+        {/* 오른쪽 회원가입 폼 */}
+        <div className="flex md:mr-72 mr-0">
+          <Card className="flex flex-col min-w-[407px] max-w-md md:mt-0 mt-8 bg-white rounded-2xl shadow-lg p-8 sm:p-10">
+            <CardTitle className="mb-6 text-3xl font-apple text-center text-gray-800">
+              지금 만드세요.
+            </CardTitle>
+            {/* 회원가입 폼 */}
+            <form onSubmit={createAccount} className="space-y-5">
+              <input
+                type="email"
+                placeholder="이메일"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <input
+                type="text"
+                placeholder="이름"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <input
+                type="text"
+                placeholder="회사명"
+                value={companyName}
+                onChange={e => setCompanyName(e.target.value)}
+                className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <input
+                type="password"
+                placeholder="비밀번호"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <input
+                type="password"
+                placeholder="비밀번호 확인"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-2 font-apple text-white bg-black rounded-md hover:bg-blue-400 transition">
+                {loading ? '계정 생성 중...' : '계정 생성'}
+              </button>
+            </form>
+            {/* 로그인 페이지로 이동 링크 */}
+            <div className="mt-6 text-sm font-apple text-gray-600 text-center">
+              이미 계정이 있으신가요?{' '}
+              <Link
+                href="/signin"
+                className="text-blue-500 underline font-apple hover:text-blue-700">
+                로그인
+              </Link>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   )

@@ -8,7 +8,7 @@ export default function DashboardSidebar() {
   const pathname = usePathname()
 
   return (
-    <Sidebar className="flex w-48 h-full bg-gradient-to-b from-[#88CCE6] to-[#E5E5E5] z-[10]">
+    <Sidebar className="fixed mt-14 w-48 h-full bg-gradient-to-b from-[#88CCE6] to-[#E5E5E5] z-[10]">
       <SidebarContent className="flex flex-col space-y-2 p-4">
         <Link href="/dashboard">
           <button
