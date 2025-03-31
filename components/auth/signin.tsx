@@ -81,15 +81,15 @@ export default function SignInForm() {
       <div
         className="absolute w-full h-full"
         style={{
-          clipPath: 'polygon(0% -100%, 50% 5%, 40% 100%, 0% 90%)',
-          background: 'linear-gradient(to bottom, #88CCE6, #E5E5E5 95%)',
-          zIndex: -10
+          height: '100%',
+          background: 'url(/images/sign.svg) no-repeat',
+          zIndex: '-10'
         }}
       />
       {/* 텍스트 영역---------------------------------------------------------------------- */}
       <div className="flex flex-col md:flex-row w-full h-screen justify-center md:justify-between items-center">
         <div
-          className="flex md:min-w-[300px] md:text-7xl text-5xl md:text-start text-center font-apple md:ml-72 ml-0"
+          className="flex md:min-w-[330px] md:text-7xl text-6xl md:text-start text-center font-bold font-apple md:ml-56 ml-0"
           style={{
             background: 'linear-gradient(to bottom, #466AB7, #000000 95%)',
             WebkitBackgroundClip: 'text',
