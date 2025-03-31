@@ -2,9 +2,46 @@
 
 import React, {useRef} from 'react'
 import {useDrag, useDrop} from 'react-dnd'
+import {
+  Chart as ChartJS,
+  BarElement,
+  LineElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  PointElement,
+  RadialLinearScale,
+  Title
+} from 'chart.js'
+import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
+
+// Chart.js 컴포넌트 등록
+ChartJS.register(
+  BarElement,
+  LineElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  PointElement,
+  RadialLinearScale,
+  Title
+)
 
 const ItemType = {
   BOX: 'box'
+}
+
+const chartComponentMap = {
+  Bar,
+  Line,
+  Pie,
+  Doughnut,
+  PolarArea,
+  Radar
 }
 
 interface DragItem {
@@ -31,7 +68,7 @@ export default function GridItem({
 
   const [{isDragging}, dragRef] = useDrag<DragItem, unknown, {isDragging: boolean}>({
     type: ItemType.BOX,
-    item: {index, id: item?.id},
+    item: {index, id: item?._id},
     canDrag: !isLast,
     collect: monitor => ({
       isDragging: monitor.isDragging()
@@ -50,17 +87,63 @@ export default function GridItem({
 
   dragRef(dropRef(ref))
 
+  const ChartComponent = item.chartType && chartComponentMap[item.chartType]
+
+  // 차트 데이터 구성
+  const valuesArray = Array.isArray(item.values)
+    ? item.values
+    : item.values && typeof item.values === 'object'
+    ? Object.values(item.values)
+    : item.years?.map(() => 0) // fallback: 0값 배열
+
+  const chartData =
+    item?.labels?.length && valuesArray?.length
+      ? {
+          labels: item.labels,
+          datasets: [
+            {
+              label: item.title || '차트',
+              data: valuesArray,
+              backgroundColor: item.colorSet || ['#60A5FA'],
+              borderColor: item.colorSet || ['#60A5FA'],
+              borderWidth: 2
+            }
+          ]
+        }
+      : null
+
+  const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(item.chartType)
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {display: true, position: 'top'},
+      title: {
+        display: true,
+        text: item.title || '',
+        font: {size: 16, weight: 'bold'}
+      }
+    },
+    scales: isPieLike ? {} : {y: {beginAtZero: true}}
+  }
+
   return (
     <div
       ref={ref}
-      className={`p-6 rounded-xl shadow flex items-center justify-center cursor-pointer ${
-        isLast ? 'bg-blue-100' : item.color
-      }`}
+      className="p-6 rounded-xl shadow flex items-center justify-center cursor-pointer bg-white"
       style={{opacity: isDragging ? 0.5 : 1}}
       onClick={() => handleClick(isLast ? {} : item)}>
-      <span className={`text-9xl ${isLast ? 'text-gray-500' : 'text-black'}`}>
-        {isLast ? '+' : '텍스트'}
-      </span>
+      {isLast ? (
+        <span className="text-9xl text-gray-400">+</span>
+      ) : ChartComponent && chartData ? (
+        <ChartComponent data={chartData} options={chartOptions} />
+      ) : (
+        <div className="text-gray-400 text-sm text-center">
+          차트를 불러올 수 없습니다
+          <br />
+          데이터를 확인해 주세요
+        </div>
+      )}
     </div>
   )
 }
