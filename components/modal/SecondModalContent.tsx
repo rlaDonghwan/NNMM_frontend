@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import React from 'react'
 import {Button} from '@/components/ui/button'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
@@ -15,6 +16,16 @@ import {
   PointElement,
   RadialLinearScale
 } from 'chart.js'
+
+const chartComponentMap: Record<string, React.ElementType> = {
+  Bar,
+  Line,
+  Pie,
+  Doughnut,
+  PolarArea,
+  Radar
+}
+
 ChartJS.register(
   BarElement,
   LineElement,
@@ -113,17 +124,6 @@ export default function SecondModalContent({
   const [selectedColor, setSelectedColor] = useState<string[]>(['#60A5FA', '#F472B6'])
   const [dataSelections, setDataSelections] = useState(Array(9).fill(''))
 
-  // const chartIcons = [
-  //   'scatter',
-  //   'Bar',
-  //   'candlestick',
-  //   'area',
-  //   'stackedBar',
-  //   'horizontalBar',
-  //   'Line',
-  //   'bubble',
-  //   'Pie'
-  // ]
   // 색바꾸기용 함수
   const handleColorChange = (index: number, newColor: string) => {
     setSelectedColor(prev => {
@@ -139,7 +139,7 @@ export default function SecondModalContent({
     setDataSelections(updated)
   }
   return (
-    <div className="p-6 rounded-xl bg-white max-w-6xl mx-auto">
+    <div className="p-6 rounded-xl bg-white w-auto mx-auto">
       <div className="flex items-center justify-between border-b pb-4 mb-6">
         <h2 className="text-2xl font-semibold">그래프 선택</h2>
       </div>
@@ -187,26 +187,14 @@ export default function SecondModalContent({
         {/* 그래프 미리보기 ,*/}
         <div className="col-span-2 space-y-2">
           <h3 className="font-apple">그래프 미리보기</h3>
-          <div className="bg-gray-100 w-full rounded-xl h-64 flex items-center justify-center">
+          <div className="bg-white-100 w-full rounded-xl h-64 flex items-center justify-center">
             <div className="w-full h-full p-4">
-              {selectedChart === 'Bar' && (
-                <Bar data={dummyChartData} options={dummyChartOptions} />
-              )}
-              {selectedChart === 'Line' && (
-                <Line data={dummyChartData} options={dummyChartOptions} />
-              )}
-              {selectedChart === 'Pie' && (
-                <Pie data={dummyChartData} options={dummyChartOptions} />
-              )}
-              {selectedChart === 'Doughnut' && (
-                <Doughnut data={dummyChartData} options={dummyChartOptions} />
-              )}
-              {selectedChart === 'PolarArea' && (
-                <PolarArea data={dummyChartData} options={dummyChartOptions} />
-              )}
-              {selectedChart === 'Radar' && (
-                <Radar data={dummyChartData} options={dummyChartOptions} />
-              )}
+              {selectedChart &&
+                chartComponentMap[selectedChart] &&
+                React.createElement(chartComponentMap[selectedChart], {
+                  data: dummyChartData,
+                  options: dummyChartOptions
+                })}
             </div>
           </div>
         </div>
