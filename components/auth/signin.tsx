@@ -76,19 +76,20 @@ export default function SignInForm() {
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-screen w-full">
       {/* 왼쪽 소개 영역 */}
-      <div className="relative w-[50%] z-0">
+      <div
+        className="absolute w-full h-full"
+        style={{
+          clipPath: 'polygon(0% -100%, 50% 5%, 40% 100%, 0% 90%)',
+          background: 'linear-gradient(to bottom, #88CCE6, #E5E5E5 95%)',
+          zIndex: -10
+        }}
+      />
+      {/* 텍스트 영역---------------------------------------------------------------------- */}
+      <div className="flex flex-col md:flex-row w-full h-screen justify-center md:justify-between items-center">
         <div
-          className="absolute inset-0"
-          style={{
-            clipPath: 'polygon(0% -100%, 100% 5%, 80% 100%, 0% 90%)',
-            background: 'linear-gradient(to bottom, #88CCE6, #E5E5E5 95%)',
-            zIndex: -10
-          }}
-        />
-        <div
-          className="flex w-full h-full font-apple text-7xl font-bold justify-center items-center"
+          className="flex md:min-w-[300px] md:text-7xl text-5xl md:text-start text-center font-apple md:ml-72 ml-0"
           style={{
             background: 'linear-gradient(to bottom, #466AB7, #000000 95%)',
             WebkitBackgroundClip: 'text',
@@ -103,47 +104,48 @@ export default function SignInForm() {
           <br />
           생성하세요.
         </div>
-      </div>
+        {/* 로그인 폼 영역---------------------------------------------------------------------- */}
+        <div className="flex md:mr-72 mr-0">
+          <Card className="flex flex-col w-[448px] md:mt-0 mt-8 bg-white rounded-2xl shadow-lg p-8 sm:p-10">
+            <CardTitle className="mb-6 text-3xl font-apple text-center text-gray-800">
+              NNMM에 로그인하세요
+            </CardTitle>
 
-      {/* 오른쪽 로그인 폼 */}
-      <div className="flex w-[50%] items-center justify-center bg-[rgba(255,255,255,0.0)]">
-        <Card className="flex flex-col max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-10">
-          <CardTitle className="mb-6 text-3xl font-apple text-center text-gray-800">
-            NNMM에 로그인하세요
-          </CardTitle>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <input
+                type="email"
+                name="email"
+                placeholder="이메일"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="비밀번호"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-2 font-apple text-white bg-black rounded-md hover:bg-blue-400 transition">
+                {loading ? '로그인 중...' : '로그인'}
+              </button>
+            </form>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <input
-              type="email"
-              name="email"
-              placeholder="이메일"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="비밀번호"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border-b font-apple border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 font-apple text-white bg-black rounded-md hover:bg-blue-400 transition">
-              {loading ? '로그인 중...' : '로그인'}
-            </button>
-          </form>
-
-          <div className="mt-6 text-sm text-gray-600 font-apple text-center">
-            계정이 없으신가요?{' '}
-            <Link href="/signup" className="text-blue-500 underline hover:text-blue-700">
-              지금 만드세요.
-            </Link>
-          </div>
-        </Card>
+            <div className="mt-6 text-sm text-gray-600 font-apple text-center">
+              계정이 없으신가요?{' '}
+              <Link
+                href="/signup"
+                className="text-blue-500 underline hover:text-blue-700">
+                지금 만드세요.
+              </Link>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   )
