@@ -4,8 +4,7 @@ import Modal from './Modal'
 import ModalContent from './ModalContent'
 import SecondModalContent from './SecondModalContent'
 import {useESGModal} from './ESGModalContext'
-import {submitESGReport} from '@/services/esg-report'
-import {fetchIndicators, syncIndicators} from '@/services/indicator'
+import {fetchIndicators} from '@/services/indicator'
 import {useEffect} from 'react'
 
 export default function ESGModal({category}: {category: string}) {
@@ -42,9 +41,7 @@ export default function ESGModal({category}: {category: string}) {
 
   const handleSubmit = async () => {
     try {
-      await syncIndicators(indicators)
       const sanitized = rows.map(({color, ...rest}) => rest)
-      await submitESGReport({category, years, rows: sanitized})
       setIsModalOpen(false)
       reset()
     } catch (err) {

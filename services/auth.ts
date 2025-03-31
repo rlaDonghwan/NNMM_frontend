@@ -17,13 +17,6 @@ export const register = (data: {
 }) => axios.post(`${BASE_URL}/auth/signup`, data) // 회원가입 요청 함수, 이메일, 이름, 직책, 비밀번호를 서버로 전송
 //----------------------------------------------------------------------------------------------------
 
-// 현재 사용자 정보 요청 함수
-// export const fetchCurrentUser = async (token: string) => {
-//   const res = await axios.get(`${API}/users/me`, {
-//     headers: {Authorization: `Bearer ${token}`} // 인증 토큰을 헤더에 포함하여 현재 사용자 정보 요청
-//   })
-//   return res.data // 서버에서 반환된 사용자 데이터를 반환
-// }
 export const fetchCurrentUser = async () => {
   const res = await axios.get(`${BASE_URL}/users/me`, {
     withCredentials: true

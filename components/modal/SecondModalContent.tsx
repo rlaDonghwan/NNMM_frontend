@@ -1,9 +1,9 @@
-import {useState} from 'react'
-import React from 'react'
+'use client'
+
+import {useEffect, useState} from 'react'
 import {Button} from '@/components/ui/button'
-import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
+import {saveChartConfig} from '@/services/chart-config'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
-//차트 관련 함수
 import {
   Chart as ChartJS,
   BarElement,
@@ -16,15 +16,9 @@ import {
   PointElement,
   RadialLinearScale
 } from 'chart.js'
-
-const chartComponentMap: Record<string, React.ElementType> = {
-  Bar,
-  Line,
-  Pie,
-  Doughnut,
-  PolarArea,
-  Radar
-}
+import React from 'react'
+import toast from 'react-hot-toast'
+import {usePathname} from 'next/navigation'
 
 ChartJS.register(
   BarElement,
@@ -37,7 +31,8 @@ ChartJS.register(
   PointElement,
   RadialLinearScale
 )
-// const chartIcons = ['Bar', 'Line', 'Pie']
+
+const chartComponentMap = {Bar, Line, Pie, Doughnut, PolarArea, Radar}
 const chartIcons = [
   {type: 'Bar', image: '/images/bar-graph.png'},
   {type: 'Line', image: '/images/line-graph.png'},
@@ -46,163 +41,217 @@ const chartIcons = [
   {type: 'PolarArea', image: '/images/polar-area.png'},
   {type: 'Radar', image: '/images/radar-chart.png'}
 ]
-const dummyChartData = {
-  labels: ['항목A', '항목B', '항목C', '항목D'],
-  datasets: [
-    {
-      label: 'example data',
-      data: [12, 4, 9, 10],
-      backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#facc15'],
-      borderRadius: 6
-    },
-    {
-      label: 'example data2',
-      data: [4, 10, 7, 9],
-      backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#facc15'],
-      borderRadius: 6
-    }
-  ]
+
+function recommendChartTypes(rows, years) {
+  const indicatorsCount = rows.length
+  const yearsCount = years.length
+  const isTimeSeries = rows.every(row => {
+    const valueYears = Object.keys(row.values || {})
+    return years.every(y => valueYears.includes(y.toString()))
+  })
+
+  if (indicatorsCount === 1 && yearsCount > 1 && isTimeSeries) return ['Bar', 'Line']
+  if (indicatorsCount > 1 && yearsCount === 1)
+    return ['Pie', 'Doughnut', 'PolarArea', 'Radar']
+  if (indicatorsCount > 1 && yearsCount > 1) return ['Line']
+  return ['Bar']
 }
-const dummyChartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      display: true,
-      position: 'top' as const
-    }
-  },
-  scales: {
-    y: {
-      beginAtZero: true
-    }
-  }
-}
-type SecondModalContentProps = {
-  years: number[]
-  setYears: React.Dispatch<React.SetStateAction<number[]>>
-  rows: {
-    indicatorKey: string
-    values: Record<number, string>
-    color: string
-  }[]
-  setRows: React.Dispatch<React.SetStateAction<any[]>>
-  indicators: {key: string; label: string; unit: string}[]
-  setIndicators: React.Dispatch<
-    React.SetStateAction<{key: string; label: string; unit: string}[]>
-  >
-  onAddYear: () => void
-  onRemoveYear: () => void
-  onRemoveRow: (index: number) => void
-  onValueChange: (rowIndex: number, year: number, value: string) => void
-  onIndicatorChange: (rowIndex: number, indicatorKey: string) => void
-  getUnit: (key: string) => string
-  onAddRowWithIndicator: (indicatorKey: string) => void
-  onSubmit: () => void
-  onSubmitPage: () => void
-  onBack: () => void
+
+function generateLabel(row, indicators) {
+  const indicator = indicators.find(i => i.key === row.indicatorKey)
+  const baseLabel = indicator?.label || row.indicatorKey
+  const parts = [row.field1, row.field2].filter(Boolean).join(' / ')
+  const unit = row.unit || indicator?.unit || ''
+
+  return `${baseLabel}${parts ? ` (${parts}` : ''}${
+    parts && unit ? ` / ${unit})` : unit ? ` (${unit})` : parts ? ')' : ''
+  }`
 }
 
 export default function SecondModalContent({
   years,
   rows,
-  setRows,
   indicators,
-  setIndicators,
-  onAddYear,
-  onRemoveYear,
-  onRemoveRow,
-  onValueChange,
-  getUnit,
-  onAddRowWithIndicator,
-  onSubmit,
   onSubmitPage,
   onBack
-}: SecondModalContentProps) {
-  const [selectedIndicator, setSelectedIndicator] = useState(indicators[0]?.key || '')
+}) {
   const [selectedChart, setSelectedChart] = useState(null)
-  // const [selectedColor, setSelectedColor] = useState(null)
-  const [selectedColor, setSelectedColor] = useState<string[]>(['#60A5FA', '#F472B6'])
-  const [dataSelections, setDataSelections] = useState(Array(9).fill(''))
+  const [availableCharts, setAvailableCharts] = useState([])
+  const [selectedRows, setSelectedRows] = useState([0])
+  const [selectedColor, setSelectedColor] = useState(['#60A5FA'])
+  const [chartTitle, setChartTitle] = useState('')
+  const pathname = usePathname()
+  const category = pathname.includes('social')
+    ? 'social'
+    : pathname.includes('environmental')
+    ? 'environmental'
+    : 'governance'
 
-  // 색바꾸기용 함수
-  const handleColorChange = (index: number, newColor: string) => {
-    setSelectedColor(prev => {
-      const updated = [...prev]
-      updated[index] = newColor
-      return updated
-    })
+  useEffect(() => {
+    const recommended = recommendChartTypes(rows, years)
+    setAvailableCharts(recommended)
+    if (recommended.length > 0) setSelectedChart(recommended[0])
+  }, [rows, years])
+
+  const handleColorChange = (index, newColor) => {
+    const updated = [...selectedColor]
+    updated[index] = newColor
+    setSelectedColor(updated)
   }
 
-  const handleDataChange = (index, value) => {
-    const updated = [...dataSelections]
-    updated[index] = value
-    setDataSelections(updated)
+  const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(selectedChart)
+
+  const chartData = isPieLike
+    ? {
+        labels: selectedRows.map(i => generateLabel(rows[i], indicators)),
+        datasets: [
+          {
+            data: selectedRows.map(i => Number(rows[i].values[years[0]]) || 0),
+            backgroundColor: selectedColor
+          }
+        ]
+      }
+    : {
+        labels: years,
+        datasets: selectedRows.map((rowIndex, idx) => {
+          const row = rows[rowIndex]
+          return {
+            label: generateLabel(row, indicators),
+            data: years.map(y => Number(row.values[y]) || 0),
+            backgroundColor: selectedColor[idx % selectedColor.length],
+            borderColor: selectedColor[idx % selectedColor.length],
+            borderWidth: 2
+          }
+        })
+      }
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {display: true, position: 'top'},
+      title: {
+        display: true,
+        text: chartTitle || 'ESG 차트 미리보기',
+        font: {size: 18, weight: 'bold', fontFamily: 'font-apple'}
+      }
+    },
+    scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
+
   return (
-    <div className="p-6 rounded-xl bg-white w-auto mx-auto">
+    <div className="p-6 rounded-xl bg-white w-auto mx-auto font-apple">
       <div className="flex items-center justify-between border-b pb-4 mb-6">
         <h2 className="text-2xl font-semibold">그래프 선택</h2>
       </div>
 
       <div className="grid grid-cols-4 gap-6">
         {/* 그래프 종류 선택 */}
-        <div className="col-span-1 space-y-2">
+        <div className="col-span-1 space-y-4">
           <h3 className="font-apple">그래프 종류 선택</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {chartIcons.map(({type, image}) => (
-              <button
-                key={type}
-                className={`w-20 h-20 rounded-lg border flex items-center justify-center shadow-sm ${
-                  selectedChart === type ? 'border-black' : 'border-gray-300'
-                }`}
-                onClick={() => setSelectedChart(type)}>
-                <img src={image} alt={type} className="w-10 h-10 object-contain" />
-              </button>
-            ))}
+          <div className="grid grid-cols-2 gap-[2px]">
+            {chartIcons
+              .filter(({type}) => availableCharts.includes(type))
+              .map(({type, image}) => (
+                <button
+                  key={type}
+                  className={`w-20 h-20 rounded-lg border flex items-center justify-center shadow-sm ${
+                    selectedChart === type ? 'border-black' : 'border-gray-300'
+                  }`}
+                  onClick={() => setSelectedChart(type)}>
+                  <img src={image} alt={type} className="w-10 h-10 object-contain" />
+                </button>
+              ))}
           </div>
         </div>
 
         {/* 데이터 선택 */}
         <div className="col-span-1 space-y-2">
           <h3 className="font-apple">데이터 선택</h3>
-          {/* 색상 선택 */}
           <div className="flex flex-col gap-2">
-            {[0, 1].map(index => (
-              <div key={index} className="flex items-center gap-2">
-                <select className="flex-1 border rounded px-2 py-1">
-                  <option value="value1">value1</option>
-                  <option value="value2">value2</option>
+            {selectedRows.map((rowIndex, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <select
+                  className="flex-1 border rounded px-2 py-1"
+                  value={rowIndex}
+                  onChange={e => {
+                    const newSelected = [...selectedRows]
+                    newSelected[idx] = Number(e.target.value)
+                    setSelectedRows(newSelected)
+                  }}>
+                  {rows
+                    .filter((_, i) => !selectedRows.includes(i) || i === rowIndex)
+                    .map((row, i) => (
+                      <option key={i} value={i}>
+                        {generateLabel(row, indicators)}
+                      </option>
+                    ))}
                 </select>
                 <input
                   type="color"
                   className="w-6 h-6 border rounded"
-                  value={selectedColor[index]}
-                  onChange={e => handleColorChange(index, e.target.value)}
+                  value={selectedColor[idx]}
+                  onChange={e => handleColorChange(idx, e.target.value)}
                 />
               </div>
             ))}
           </div>
+
+          <div className="flex justify-between mt-2">
+            {selectedRows.length < rows.length && (
+              <Button
+                className="text-sm bg-green-200 hover:bg-green-300 px-3 py-1"
+                onClick={() => {
+                  const unusedIndex = rows.findIndex((_, i) => !selectedRows.includes(i))
+                  if (unusedIndex !== -1) {
+                    setSelectedRows([...selectedRows, unusedIndex])
+                    setSelectedColor([...selectedColor, '#A78BFA'])
+                  }
+                }}>
+                + 지표 추가
+              </Button>
+            )}
+            {selectedRows.length > 1 && (
+              <Button
+                className="text-sm bg-red-200 hover:bg-red-300 px-3 py-1"
+                onClick={() => {
+                  setSelectedRows(selectedRows.slice(0, -1))
+                  setSelectedColor(selectedColor.slice(0, -1))
+                }}>
+                - 삭제
+              </Button>
+            )}
+          </div>
         </div>
 
-        {/* 그래프 미리보기 ,*/}
-        <div className="col-span-2 space-y-2">
-          <h3 className="font-apple">그래프 미리보기</h3>
-          <div className="bg-white-100 w-full rounded-xl h-64 flex items-center justify-center">
-            <div className="w-full h-full p-4">
+        {/* 차트 제목 + 미리보기 */}
+        <div className="col-span-2 space-y-4">
+          <div>
+            <h3 className="font-apple">그래프 제목</h3>
+            <input
+              type="text"
+              value={chartTitle}
+              onChange={e => setChartTitle(e.target.value)}
+              placeholder="차트 제목을 입력하세요"
+              className="w-full px-4 py-2 border rounded font-apple"
+            />
+          </div>
+
+          <h3 className="font-apple mt-4">그래프 미리보기</h3>
+          <div className="bg-white-100 w-full max-w-full rounded-xl h-64 flex items-center justify-center overflow-x-auto">
+            <div className="w-[90%] h-full p-4">
               {selectedChart &&
                 chartComponentMap[selectedChart] &&
                 React.createElement(chartComponentMap[selectedChart], {
-                  data: dummyChartData,
-                  options: dummyChartOptions
+                  data: chartData,
+                  options: chartOptions
                 })}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 하단 버튼 */}
+      {/* 하단 저장 버튼 */}
       <div className="w-full bg-white rounded-xl shadow p-6">
-        {/* 저장 버튼 */}
         <div className="flex justify-end mt-6 gap-3">
           <Button
             onClick={onBack}
@@ -210,9 +259,36 @@ export default function SecondModalContent({
             &lt; 이전
           </Button>
           <Button
-            onClick={onSubmitPage}
+            onClick={async () => {
+              try {
+                const rowsWithUnit = rows.map(row => ({
+                  ...row,
+                  unit:
+                    indicators.find(ind => ind.key === row.indicatorKey)?.unit ||
+                    row.unit ||
+                    ''
+                }))
+                const res = await saveChartConfig({
+                  chartType: selectedChart,
+                  selectedRows,
+                  colorSet: selectedColor,
+                  rows: rowsWithUnit,
+                  indicators,
+                  years,
+                  title: chartTitle, // ⬅️ 저장 시 제목 포함
+                  category
+                })
+
+                const chartId = res.data._id
+                toast.success('차트 정보 저장 성공!')
+                onSubmitPage?.(chartId)
+              } catch (err) {
+                console.error('차트 저장 실패:', err)
+                toast.error('차트 저장 중 오류가 발생했습니다.')
+              }
+            }}
             className="bg-blue-300 text-black text-lg px-8 py-2 rounded-full hover:bg-blue-500">
-            저장&#9745;
+            저장✔
           </Button>
         </div>
       </div>
