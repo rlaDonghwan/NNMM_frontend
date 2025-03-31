@@ -4,7 +4,7 @@ export default function DescriptionBlock() {
   return (
     <div className="w-full px-4 py-12 bg-white">
       {/* 상단 텍스트 */}
-      <div className="max-w-6xl mx-auto text-center text-black text-3xl sm:text-4xl lg:text-5xl font-normal font-apple mb-12">
+      <div className="max-w-6xl mx-auto text-center text-black text-3xl sm:text-4xl lg:text-5xl font-apple mb-12">
         ESG 대시보드, 그동안 복잡하고 불편하지 않으셨나요?
       </div>
 

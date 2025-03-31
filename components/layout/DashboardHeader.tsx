@@ -23,7 +23,9 @@ export default function DashboardHeader() {
       </NavigationMenuList>
       <NavigationMenuList className="flex items-center space-x-4">
         <LogoutButton />
-        <UserAvatar />
+        <Link href="/mypage">
+          <UserAvatar />
+        </Link>
       </NavigationMenuList>
     </NavigationMenu>
   )
