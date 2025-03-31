@@ -1,7 +1,56 @@
 import {useState} from 'react'
 import {Button} from '@/components/ui/button'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
+import {Bar, Line, Pie} from 'react-chartjs-2'
+//차트 관련 함수
+import {
+  Chart as ChartJS,
+  BarElement,
+  LineElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  PointElement
+} from 'chart.js'
+ChartJS.register(
+  BarElement,
+  LineElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  PointElement
+)
+const chartIcons = ['Bar', 'Line', 'Pie']
 
+const dummyChartData = {
+  labels: ['항목A', '항목B', '항목C', '항목D'],
+  datasets: [
+    {
+      label: 'example data',
+      data: [12, 4, 9, 10],
+      backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#facc15'],
+      borderRadius: 6
+    }
+  ]
+}
+const dummyChartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'top' as const
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true
+    }
+  }
+}
 type SecondModalContentProps = {
   years: number[]
   setYears: React.Dispatch<React.SetStateAction<number[]>>
@@ -51,14 +100,14 @@ export default function SecondModalContent({
 
   const chartIcons = [
     'scatter',
-    'bar',
+    'Bar',
     'candlestick',
     'area',
     'stackedBar',
     'horizontalBar',
-    'line',
+    'Line',
     'bubble',
-    'pie'
+    'Pie'
   ]
   // 색바꾸기용 함수
   const handleColorChange = (index: number, newColor: string) => {
@@ -75,7 +124,7 @@ export default function SecondModalContent({
     setDataSelections(updated)
   }
   return (
-    <div className="p-6 rounded-xl bg-white w-full max-w-6xl mx-auto">
+    <div className="p-6 rounded-xl bg-white max-w-6xl mx-auto">
       <div className="flex items-center justify-between border-b pb-4 mb-6">
         <h2 className="text-2xl font-semibold">그래프 선택</h2>
       </div>
@@ -121,18 +170,26 @@ export default function SecondModalContent({
         </div>
 
         {/* 그래프 미리보기 ,*/}
-        <div className="col-span-1 space-y-2">
+        <div className="col-span-2 space-y-2">
           <h3 className="font-apple">그래프 미리보기</h3>
-          <div className="bg-gray-100 w-[28.5vw] rounded-xl h-64 flex items-center justify-center">
-            <svg className="w-40 h-40" viewBox="0 0 100 100">
-              <path d="M10,90 L10,10 L90,90" stroke="black" strokeWidth="2" fill="none" />
-            </svg>
+          <div className="bg-gray-100 w-full rounded-xl h-64 flex items-center justify-center">
+            <div className="w-full h-full p-4">
+              {selectedChart === 'Bar' && (
+                <Bar data={dummyChartData} options={dummyChartOptions} />
+              )}
+              {selectedChart === 'Line' && (
+                <Line data={dummyChartData} options={dummyChartOptions} />
+              )}
+              {selectedChart === 'Pie' && (
+                <Pie data={dummyChartData} options={dummyChartOptions} />
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* 하단 버튼 */}
-      <div className="w-auto bg-white rounded-xl shadow p-6">
+      <div className="w-full bg-white rounded-xl shadow p-6">
         {/* 저장 버튼 */}
         <div className="flex justify-end mt-6 gap-3">
           <Button

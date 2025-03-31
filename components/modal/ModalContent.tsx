@@ -245,22 +245,8 @@ export default function ModalContent({
 
       <div className="flex justify-end mt-6">
         <Button
-          onClick={async () => {
-            try {
-              const payload = transformRowsToEsgFormat(
-                rows,
-                indicators,
-                years,
-                companyName,
-                category
-              )
-              const response = await submitESGReport(payload)
-              showSuccess('ESG 보고서가 성공적으로 저장되었습니다!')
-              onSubmitPage?.(response._id)
-            } catch (error: any) {
-              console.error('❌ ESG 저장 실패:', error.response?.data || error.message)
-              showError('저장 중 오류가 발생했습니다.')
-            }
+          onClick={() => {
+            onSubmitPage?.() // 그냥 페이지 넘기기만
           }}
           className="bg-gray-200 text-black text-lg px-8 py-2 rounded-full hover:bg-gray-300 font-apple">
           다음 &gt;
