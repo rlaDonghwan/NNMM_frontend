@@ -1,11 +1,11 @@
 import {useState, useEffect, useMemo} from 'react'
 import {Button} from '@/components/ui/button'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
-import {transformRowsToEsgFormat, submitESGReport} from '@/services/esg'
+import {transformRowsToEsgFormat, submitESGReport} from '@/services/esg-report'
 import {usePathname} from 'next/navigation'
 import {fetchCurrentUser} from '@/services/auth'
 import {showWarning, showSuccess, showError} from '@/utils/toast'
-import {createIndicatorIfNotExists} from '@/services/indicator'
+import {createChartConfig} from '@/services/chart-config'
 
 interface Row {
   indicatorKey: string
@@ -57,6 +57,7 @@ export default function ModalContent({
   const [selectedIndicator, setSelectedIndicator] = useState(indicators[0]?.key || '')
   const [companyName, setCompanyName] = useState('')
   const [selectedYear, setSelectedYear] = useState('')
+  const [selectedUnits, setSelectedUnits] = useState<Record<string, string>>({})
 
   const yearOptions = useMemo(() => {
     const startYear = 2025
@@ -108,23 +109,20 @@ export default function ModalContent({
           items={indicators.map(ind => ind.label)}
           placeholder="항목 선택"
           onAdd={async newLabel => {
-            try {
-              const created = await createIndicatorIfNotExists(newLabel)
-              setIndicators(prev => [...prev, created])
-              onAddRowWithIndicator(created.key)
-              setSelectedIndicator(created.key)
-            } catch (err) {
-              console.error('인디케이터 생성 실패:', err)
-            }
+            // 기존 indicator 찾기
+            const indicator = indicators.find(ind => ind.label === newLabel)
+
+            const labelToUse = indicator ? indicator.label : newLabel
+
+            setSelectedIndicator(labelToUse)
+            onAddRowWithIndicator(labelToUse)
           }}
           onSelect={label => {
-            const indicator = indicators.find(ind => ind.label === label)
-            if (indicator) {
-              setSelectedIndicator(indicator.key)
-              onAddRowWithIndicator(indicator.key)
-            }
+            setSelectedIndicator(label)
+            onAddRowWithIndicator(label)
           }}
         />
+
         <ComboboxWithCreate
           items={yearOptions}
           placeholder="연도 선택"
@@ -208,21 +206,37 @@ export default function ModalContent({
                   </td>
                   <td className="px-2">
                     <ComboboxWithCreate
-                      selected={indicators.find(i => i.key === row.indicatorKey)?.unit}
-                      items={[...new Set(indicators.map(i => i.unit).filter(Boolean))]}
+                      selected={selectedUnits[row.indicatorKey] || ''}
+                      items={(() => {
+                        const currentUnit = indicators.find(
+                          i => i.label === row.indicatorKey
+                        )?.unit
+                        const units = [
+                          ...new Set(indicators.map(i => i.unit).filter(Boolean))
+                        ]
+                        return currentUnit && !units.includes(currentUnit)
+                          ? [...units, currentUnit]
+                          : units
+                      })()}
                       onAdd={newUnit => {
-                        const key = row.indicatorKey
+                        const label = row.indicatorKey
+
+                        // 1. indicators 배열 업데이트
                         setIndicators(prev =>
                           prev.map(ind =>
-                            ind.key === key ? {...ind, unit: newUnit} : ind
+                            ind.label === label ? {...ind, unit: newUnit} : ind
                           )
                         )
+
+                        // 2. 선택 상태도 명확히 업데이트
+                        setSelectedUnits(prev => ({...prev, [label]: newUnit}))
                       }}
                       onSelect={unit => {
-                        const key = row.indicatorKey
+                        const label = row.indicatorKey
                         setIndicators(prev =>
-                          prev.map(ind => (ind.key === key ? {...ind, unit} : ind))
+                          prev.map(ind => (ind.label === label ? {...ind, unit} : ind))
                         )
+                        setSelectedUnits(prev => ({...prev, [label]: unit}))
                       }}
                     />
                   </td>
@@ -246,23 +260,47 @@ export default function ModalContent({
       <div className="flex justify-end mt-6">
         <Button
           onClick={async () => {
+            if (rows.length === 0 || years.length === 0) {
+              showWarning('데이터를 입력해주세요.')
+              return
+            }
+
             try {
-              const payload = transformRowsToEsgFormat(
+              // 차트 설정용 정보
+              const targetDataKeys = rows.map(row => row.indicatorKey)
+              const labels = targetDataKeys.map(key => {
+                const label = indicators.find(i => i.key === key)?.label || key
+                return label
+              })
+
+              // ✅ ESG 저장
+              const esgPayload = transformRowsToEsgFormat(
                 rows,
                 indicators,
                 years,
                 companyName,
-                category
+                category,
+                'placeholder'
               )
-              const response = await submitESGReport(payload)
-              showSuccess('ESG 보고서가 성공적으로 저장되었습니다!')
-              onSubmitPage?.(response._id)
+              const esgReport = await submitESGReport(esgPayload)
+              const reportId = esgReport._id
+
+              // ✅ 차트 설정 저장
+              const chartConfig = await createChartConfig({
+                chartType: 'bar',
+                targetDataKeys,
+                labels,
+                colorSet: '#3BAFDA',
+                reportId
+              })
+
+              showSuccess('ESG 보고서와 차트가 성공적으로 저장되었습니다!')
+              onSubmitPage?.(chartConfig._id)
             } catch (error: any) {
-              console.error('❌ ESG 저장 실패:', error.response?.data || error.message)
+              console.error('❌ 저장 실패:', error.response?.data || error.message)
               showError('저장 중 오류가 발생했습니다.')
             }
-          }}
-          className="bg-gray-200 text-black text-lg px-8 py-2 rounded-full hover:bg-gray-300 font-apple">
+          }}>
           다음 &gt;
         </Button>
       </div>
