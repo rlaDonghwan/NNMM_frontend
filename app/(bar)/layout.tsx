@@ -19,10 +19,11 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
         {/* ✅ 좌측 사이드바 */}
         <SidebarProvider>
           <DashboardSidebar />
-          <SidebarTrigger className="mt-5 ml-2" /> {/* 사이드바 열기/닫기 트리거 */}
+          <SidebarTrigger className="relative mt-20 ml-2" />{' '}
+          {/* 사이드바 열기/닫기 트리거 */}
         </SidebarProvider>
         {/* ✅ 메인 콘텐츠 영역 */}
-        <main className=" relative flex flex-1 w-full h-full">{children}</main>
+        <main className="relative flex flex-1 w-full h-full mt-14">{children}</main>
       </div>
     </div>
   )
