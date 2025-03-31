@@ -4,7 +4,8 @@ import Modal from './Modal'
 import ModalContent from './ModalContent'
 import SecondModalContent from './SecondModalContent'
 import {useESGModal} from './ESGModalContext'
-import {fetchIndicators, submitESGReport, syncIndicators} from 'services/esg'
+import {submitESGReport} from '@/services/esg-report'
+import {fetchIndicators, syncIndicators} from '@/services/indicator'
 import {useEffect} from 'react'
 
 export default function ESGModal({category}: {category: string}) {
@@ -22,7 +23,6 @@ export default function ESGModal({category}: {category: string}) {
     reset
   } = useESGModal()
 
-  // ✅ 여기서 인디케이터 불러오기
   useEffect(() => {
     const loadIndicators = async () => {
       try {
