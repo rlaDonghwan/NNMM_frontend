@@ -266,7 +266,7 @@ export default function ModalContent({
             }
 
             try {
-              // ✅ 차트 설정용 정보
+              // 차트 설정용 정보
               const targetDataKeys = rows.map(row => row.indicatorKey)
               const labels = targetDataKeys.map(key => {
                 const label = indicators.find(i => i.key === key)?.label || key
