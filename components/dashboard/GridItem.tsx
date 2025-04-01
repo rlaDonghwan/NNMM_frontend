@@ -126,11 +126,12 @@ export default function GridItem({
     },
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
-
+  //아래 사이즈 수정----------------------------------------------------------
   return (
     <div
       ref={ref}
-      className="p-6 rounded-xl shadow flex items-center justify-center cursor-pointer bg-white"
+      className="p-6 rounded-xl shadow-lg border-2 flex items-center justify-center cursor-pointer bg-white"
+      // 그리드 shadow 및 border 추가
       style={{opacity: isDragging ? 0.5 : 1}}
       onClick={() => handleClick(isLast ? {} : item)}>
       {isLast ? (
