@@ -76,12 +76,31 @@ export const saveChartConfig = async ({
 }
 
 //----------------------------------------------------------------------------------------------------
+
 // 사용자 차트 호출 함수
-export const fetchUserCharts = async () => {
-  // 서버에서 사용자 차트 데이터 가져오기
-  const res = await axios.get(`${BASE_URL}/chart`, {withCredentials: true})
-  console.log('[fetchUserCharts] Response:', res.data) // 응답 데이터 로그 출력
-  return res.data // 응답 데이터 반환
+// export const fetchUserCharts = async () => {
+//   // 서버에서 사용자 차트 데이터 가져오기
+//   const res = await axios.get(`${BASE_URL}/chart`, {withCredentials: true})
+//   console.log('[fetchUserCharts] Response:', res.data) // 응답 데이터 로그 출력
+//   return res.data // 응답 데이터 반환
+
+//차트 호출
+export const fetchUserCharts = async (category: string) => {
+  const params = category ? {category} : {}
+
+  const res = await axios.get(`${BASE_URL}/chart`, {
+    withCredentials: true,
+    params
+  })
+
+  console.log('[fetchUserChart] Response:', res.data)
+  return res.data
 }
 
 //----------------------------------------------------------------------------------------------------
+
+//차트 순서 불러오기
+
+export const updateChartOrder = async (orderedIds: string[]) => {
+  return axios.post(`${BASE_URL}/chart/order`, {orderedIds}, {withCredentials: true})
+}

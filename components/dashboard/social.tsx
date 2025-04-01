@@ -21,16 +21,20 @@ export default function Social() {
   const [isLoading, setIsLoading] = useState(true)
   // ESG 입력 모달 컨트롤 함수를 가져옵니다.
   const {setIsModalOpen} = useESGModal()
+  //const [selectedItemId, setSelectedItemId] = useState<string | null>(null) // 선택된 아이템 ID
 
-  // 컴포넌트가 마운트될 때 실행되는 useEffect
+    
+    ]
   useEffect(() => {
     // 차트를 불러오는 비동기 함수
     const loadCharts = async () => {
       try {
-        // 사용자 차트 API 호출
         const data = await fetchUserCharts()
         // 상태 업데이트
         setGridItems(data)
+        const data = await fetchUserCharts('')
+        const filtered = data.filter(chart => chart.category === 'social')
+        setGridItems(filtered)
       } catch (err) {
         // 에러 발생 시 콘솔에 출력
         console.error('차트 불러오기 실패:', err)

@@ -103,7 +103,6 @@ export default function ModalContent({
       <div className="flex items-center justify-between border-b pb-4 mb-6">
         <h2 className="text-2xl font-apple">데이터 입력</h2>
       </div>
-
       {/* 지표 및 연도 선택 */}
       <div className="flex items-center gap-4 mb-4">
         <ComboboxWithCreate
