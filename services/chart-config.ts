@@ -67,11 +67,7 @@ export const saveChartConfig = async ({
 }
 //----------------------------------------------------------------------------------------------------
 //차트 호출
-// export const fetchUserCharts = async () => {
-//   const res = await axios.get(`${BASE_URL}/chart`, {withCredentials: true})
-//   console.log('[fetchUserCharts] Response:', res.data) // 이 로그 추가
-//   return res.data
-// }
+
 export const fetchUserCharts = async (category: string) => {
   const params = category ? {category} : {}
 
@@ -85,3 +81,9 @@ export const fetchUserCharts = async (category: string) => {
 }
 
 //----------------------------------------------------------------------------------------------------
+
+//차트 순서 불러오기
+
+export const updateChartOrder = async (orderedIds: string[]) => {
+  return axios.post(`${BASE_URL}/chart/order`, {orderedIds}, {withCredentials: true})
+}

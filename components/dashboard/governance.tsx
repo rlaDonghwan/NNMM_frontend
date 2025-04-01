@@ -3,7 +3,7 @@
 import {useEffect, useState} from 'react'
 import {useESGModal} from '@/components/modal/ESGModalContext'
 import GridItem from './GridItem'
-import {fetchUserCharts} from '@/services/chart-config'
+import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
 
 export default function Governance() {
   const [gridItems, setGridItems] = useState([]) // 대시보드에 표시될 아이템 리스트 상태
@@ -11,6 +11,7 @@ export default function Governance() {
   const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
   const {setIsModalOpen} = useESGModal() // ESG 입력 모달 컨트롤 함수
   const [isLoading, setIsLoading] = useState(true)
+  //카테고리별로 차트 불러오기!!
   useEffect(() => {
     const loadCharts = async () => {
       try {
@@ -38,11 +39,20 @@ export default function Governance() {
   }
 
   // 드래그 & 드롭으로 아이템 정렬
-  const moveItem = (dragIndex: number, hoverIndex: number) => {
+  const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems] // 기존 배열 복사
     const [removed] = updated.splice(dragIndex, 1) // 드래그한 항목 제거
     updated.splice(hoverIndex, 0, removed) // 새로운 위치에 삽입
     setGridItems(updated) // 상태 업데이트
+
+    //서버에 순서 저장하기
+    try {
+      const orderedIds = updated.map(item => item.id)
+      await updateChartOrder(orderedIds)
+      console.log('순서 저장 완료')
+    } catch (err) {
+      console.error('순서 저장 실패:', err)
+    }
   }
 
   return (
@@ -55,7 +65,7 @@ export default function Governance() {
           style={{gridTemplateColumns: 'repeat(3, 400px)', gridAutoRows: '300px'}}>
           {gridItems.map((item, index) => (
             <GridItem
-              key={item.id} // 고유 키
+              key={item.id ?? index} // 고유 키
               item={item} // 아이템 데이터
               index={index} // 인덱스
               isLast={false} // 마지막 그리드 여부 (항상 false)
