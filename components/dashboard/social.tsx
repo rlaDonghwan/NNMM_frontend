@@ -8,15 +8,16 @@ import {fetchUserCharts} from '@/services/chart-config'
 export default function Social() {
   const [gridItems, setGridItems] = useState([]) // 차트 리스트 상태
   const [isEditModalOpen, setIsEditModalOpen] = useState(false) // 삭제 모달 오픈 여부
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null) // 선택된 아이템 ID
+  //const [selectedItemId, setSelectedItemId] = useState<string | null>(null) // 선택된 아이템 ID
+  const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
   const [isLoading, setIsLoading] = useState(true) // 로딩 상태
   const {setIsModalOpen} = useESGModal() // ESG 입력 모달 컨트롤 함수
-
   useEffect(() => {
     const loadCharts = async () => {
       try {
-        const data = await fetchUserCharts() // 사용자 차트 API 호출
-        setGridItems(data) // 상태 업데이트
+        const data = await fetchUserCharts('')
+        const filtered = data.filter(chart => chart.category === 'social')
+        setGridItems(filtered)
       } catch (err) {
         console.error('차트 불러오기 실패:', err)
       } finally {
