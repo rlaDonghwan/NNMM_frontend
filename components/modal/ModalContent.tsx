@@ -80,13 +80,13 @@ export default function ModalContent({
   const removeYearByValue = (year: number) => {
     setYears(prev => prev.filter(y => y !== year))
   }
-
+  
   return (
     <div className="w-auto overflow-auto bg-white rounded-xl shadow p-5">
       <div className="flex items-center justify-between border-b pb-4 mb-6">
         <h2 className="text-2xl font-apple">데이터 입력</h2>
       </div>
-
+    
       <div className="flex items-center gap-4 mb-4">
         <ComboboxWithCreate
           items={indicators.map(ind => ind.label)}
