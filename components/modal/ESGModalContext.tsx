@@ -1,15 +1,16 @@
 'use client'
 
 import {createContext, useContext, useState} from 'react'
+import type {ESGModalContextType, Row, Indicator} from '@/interface/modal'
 
-const ESGModalContext = createContext(null)
+const ESGModalContext = createContext<ESGModalContextType | null>(null)
 
-export const ESGModalProvider = ({children}) => {
+export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [step, setStep] = useState(1)
-  const [rows, setRows] = useState([])
-  const [years, setYears] = useState([2022, 2023, 2024])
-  const [indicators, setIndicators] = useState([])
+  const [rows, setRows] = useState<Row[]>([])
+  const [years, setYears] = useState<number[]>([2022, 2023, 2024])
+  const [indicators, setIndicators] = useState<Indicator[]>([])
 
   const reset = () => {
     setStep(1)
@@ -37,4 +38,8 @@ export const ESGModalProvider = ({children}) => {
   )
 }
 
-export const useESGModal = () => useContext(ESGModalContext)
+export const useESGModal = () => {
+  const context = useContext(ESGModalContext)
+  if (!context) throw new Error('useESGModal must be used within ESGModalProvider')
+  return context
+}

@@ -19,7 +19,8 @@ import {
 import React from 'react'
 import toast from 'react-hot-toast'
 import {usePathname} from 'next/navigation'
-import {showWarning, showSuccess} from '@/utils/toast'
+import {showWarning} from '@/utils/toast'
+import {SecondModalContentProps} from '@/interface/modal'
 
 ChartJS.register(
   BarElement,
@@ -71,16 +72,32 @@ function generateLabel(row, indicators) {
 
 export default function SecondModalContent({
   years,
+  setYears,
   rows,
+  setRows,
   indicators,
+  setIndicators,
+  onAddYear,
+  onRemoveYear,
+  onRemoveRow,
+  onValueChange,
+  getUnit,
+  onSubmit,
+  onAddRowWithIndicator,
+  onIndicatorChange,
+  onBack,
   onSubmitPage,
-  onBack
-}) {
-  const [selectedChart, setSelectedChart] = useState(null)
-  const [availableCharts, setAvailableCharts] = useState([])
-  const [selectedRows, setSelectedRows] = useState([0])
-  const [selectedColor, setSelectedColor] = useState(['#60A5FA'])
-  const [chartTitle, setChartTitle] = useState('')
+  chartType,
+  setChartType,
+  title,
+  setTitle,
+  selectedRows,
+  setSelectedRows,
+  colorSet,
+  setColorSet
+}: SecondModalContentProps) {
+  const [selectedChart, setSelectedChart] = useState(chartType || null)
+  const [availableCharts, setAvailableCharts] = useState<string[]>([])
   const pathname = usePathname()
   const category = pathname.includes('social')
     ? 'social'
@@ -94,10 +111,10 @@ export default function SecondModalContent({
     if (recommended.length > 0) setSelectedChart(recommended[0])
   }, [rows, years])
 
-  const handleColorChange = (index, newColor) => {
-    const updated = [...selectedColor]
+  const handleColorChange = (index: number, newColor: string) => {
+    const updated = [...colorSet]
     updated[index] = newColor
-    setSelectedColor(updated)
+    setColorSet(updated)
   }
 
   const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(selectedChart)
@@ -108,7 +125,7 @@ export default function SecondModalContent({
         datasets: [
           {
             data: selectedRows.map(i => Number(rows[i].values[years[0]]) || 0),
-            backgroundColor: selectedColor
+            backgroundColor: colorSet
           }
         ]
       }
@@ -119,8 +136,8 @@ export default function SecondModalContent({
           return {
             label: generateLabel(row, indicators),
             data: years.map(y => Number(row.values[y]) || 0),
-            backgroundColor: selectedColor[idx % selectedColor.length],
-            borderColor: selectedColor[idx % selectedColor.length],
+            backgroundColor: colorSet[idx % colorSet.length],
+            borderColor: colorSet[idx % colorSet.length],
             borderWidth: 2
           }
         })
@@ -132,7 +149,7 @@ export default function SecondModalContent({
       legend: {display: true, position: 'top'},
       title: {
         display: true,
-        text: chartTitle || 'ESG 차트 미리보기',
+        text: title || 'ESG 차트 미리보기',
         font: {size: 18, weight: 'bold', fontFamily: 'font-apple'}
       }
     },
@@ -190,7 +207,7 @@ export default function SecondModalContent({
                 <input
                   type="color"
                   className="w-6 h-6 border rounded"
-                  value={selectedColor[idx]}
+                  value={colorSet[idx]}
                   onChange={e => handleColorChange(idx, e.target.value)}
                 />
               </div>
@@ -205,7 +222,7 @@ export default function SecondModalContent({
                   const unusedIndex = rows.findIndex((_, i) => !selectedRows.includes(i))
                   if (unusedIndex !== -1) {
                     setSelectedRows([...selectedRows, unusedIndex])
-                    setSelectedColor([...selectedColor, '#A78BFA'])
+                    setColorSet([...colorSet, '#A78BFA'])
                   }
                 }}>
                 + 지표 추가
@@ -216,7 +233,7 @@ export default function SecondModalContent({
                 className="text-sm bg-red-200 hover:bg-red-300 px-3 py-1"
                 onClick={() => {
                   setSelectedRows(selectedRows.slice(0, -1))
-                  setSelectedColor(selectedColor.slice(0, -1))
+                  setColorSet(colorSet.slice(0, -1))
                 }}>
                 - 삭제
               </Button>
@@ -230,8 +247,8 @@ export default function SecondModalContent({
             <h3 className="font-apple">그래프 제목</h3>
             <input
               type="text"
-              value={chartTitle}
-              onChange={e => setChartTitle(e.target.value)}
+              value={title}
+              onChange={e => setTitle(e.target.value)}
               placeholder="차트 제목을 입력하세요"
               className="w-full px-4 py-2 border rounded font-apple"
             />
@@ -261,70 +278,33 @@ export default function SecondModalContent({
           </Button>
           <Button
             onClick={async () => {
+              const isTitleValid = title.trim().length > 0
+              const isChartSelected = !!selectedChart
+              const isDataSelected = selectedRows.length > 0
+
+              if (!isChartSelected && !isDataSelected && !isTitleValid) {
+                showWarning('그래프 종류, 데이터, 제목을 모두 입력해주세요.')
+                return
+              } else if (!isChartSelected) {
+                showWarning('그래프 종류를 선택해주세요.')
+                return
+              } else if (!isDataSelected) {
+                showWarning('데이터를 1개 이상 선택해주세요.')
+                return
+              } else if (!isTitleValid) {
+                showWarning('차트 제목을 입력해주세요.')
+                return
+              }
+
               try {
-                if (!chartTitle.trim()) {
-                  showWarning('그래프 제목을 입력하세요!')
-                  return
-                }
-
-                const rowsWithUnit = rows.map(row => ({
-                  ...row,
-                  unit:
-                    indicators.find(ind => ind.key === row.indicatorKey)?.unit ||
-                    row.unit ||
-                    ''
-                }))
-
-                const chartData = {
-                  category,
-                  charts: [
-                    {
-                      chartType: selectedChart,
-                      title: chartTitle,
-                      order: 1,
-                      unit:
-                        indicators.find(
-                          ind => ind.key === rows[selectedRows[0]]?.indicatorKey
-                        )?.unit || '',
-                      years,
-                      fields: selectedRows.map((rowIndex, i) => {
-                        const row = rowsWithUnit[rowIndex]
-                        return {
-                          key: row.indicatorKey,
-                          label: generateLabel(row, indicators),
-                          field1: row.field1,
-                          field2: row.field2,
-                          unit: row.unit,
-                          color: selectedColor[i],
-                          data: Object.fromEntries(
-                            years.map(y => [y, Number(row.values[y] || 0)])
-                          )
-                        }
-                      })
-                    }
-                  ]
-                }
-
-                const res = await saveChartConfig({
-                  chartType: selectedChart,
-                  selectedRows,
-                  rows: rowsWithUnit,
-                  indicators,
-                  colorSet: selectedColor,
-                  years,
-                  title: chartTitle,
-                  category
-                })
-
-                const chartId = res.data._id
-                toast.success('차트 정보 저장 성공!')
-                onSubmitPage?.(chartId)
-              } catch (err) {
-                console.error('차트 저장 실패:', err)
+                setChartType(selectedChart) // ✅ 반영
+                console.log('selectedChart', selectedChart)
+                await onSubmit()
+                toast.success('차트 저장에 성공했습니다!')
+              } catch (error) {
                 toast.error('차트 저장 중 오류가 발생했습니다.')
               }
-            }}
-            className="bg-blue-300 text-black text-lg px-8 py-2 rounded-full hover:bg-blue-500">
+            }}>
             저장✔
           </Button>
         </div>
