@@ -17,7 +17,6 @@ import {
 } from 'chart.js'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
 
-// Chart.js 컴포넌트 등록
 ChartJS.register(
   BarElement,
   LineElement,
@@ -36,12 +35,12 @@ const ItemType = {
 }
 
 const chartComponentMap = {
-  Bar,
-  Line,
-  Pie,
-  Doughnut,
-  PolarArea,
-  Radar
+  bar: Bar,
+  line: Line,
+  pie: Pie,
+  doughnut: Doughnut,
+  polararea: PolarArea,
+  radar: Radar
 }
 
 interface DragItem {
@@ -87,32 +86,36 @@ export default function GridItem({
 
   dragRef(dropRef(ref))
 
-  const ChartComponent = item.chartType && chartComponentMap[item.chartType]
+  const chartTypeKey = item.chartType?.toLowerCase()
+  const ChartComponent = chartComponentMap[chartTypeKey]
 
-  // 차트 데이터 구성
-  const valuesArray = Array.isArray(item.values)
-    ? item.values
-    : item.values && typeof item.values === 'object'
-    ? Object.values(item.values)
-    : item.years?.map(() => 0) // fallback: 0값 배열
+  const isPieLike = ['pie', 'doughnut', 'polararea', 'radar'].includes(chartTypeKey || '')
 
-  const chartData =
-    item?.labels?.length && valuesArray?.length
+  const chartData = item?.fields?.length
+    ? isPieLike
       ? {
-          labels: item.labels,
+          labels: item.fields.map(f => f.label),
           datasets: [
             {
-              label: item.title || '차트',
-              data: valuesArray,
-              backgroundColor: item.colorSet || ['#60A5FA'],
-              borderColor: item.colorSet || ['#60A5FA'],
-              borderWidth: 2
+              data: item.fields.map(f => {
+                const firstYear = item.years?.[0]
+                return Number(f.data?.[firstYear]) || 0
+              }),
+              backgroundColor: item.fields.map(f => f.color || '#60A5FA')
             }
           ]
         }
-      : null
-
-  const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(item.chartType)
+      : {
+          labels: item.years || [],
+          datasets: item.fields.map(f => ({
+            label: f.label,
+            data: (item.years || []).map(y => Number(f.data?.[y]) || 0),
+            backgroundColor: f.color || '#60A5FA',
+            borderColor: f.color || '#60A5FA',
+            borderWidth: 2
+          }))
+        }
+    : null
 
   const chartOptions = {
     responsive: true,
@@ -126,12 +129,11 @@ export default function GridItem({
     },
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
-  //아래 사이즈 수정----------------------------------------------------------
+
   return (
     <div
       ref={ref}
       className="p-6 rounded-xl shadow-lg border-2 flex items-center justify-center cursor-pointer bg-white"
-      // 그리드 shadow 및 border 추가
       style={{opacity: isDragging ? 0.5 : 1}}
       onClick={() => handleClick(isLast ? {} : item)}>
       {isLast ? (

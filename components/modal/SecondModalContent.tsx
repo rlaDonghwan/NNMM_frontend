@@ -100,7 +100,6 @@ export default function SecondModalContent({
     setSelectedColor(updated)
   }
 
-
   const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(selectedChart)
 
   const chartData = isPieLike
@@ -267,6 +266,7 @@ export default function SecondModalContent({
                   showWarning('그래프 제목을 입력하세요!')
                   return
                 }
+
                 const rowsWithUnit = rows.map(row => ({
                   ...row,
                   unit:
@@ -274,14 +274,45 @@ export default function SecondModalContent({
                     row.unit ||
                     ''
                 }))
+
+                const chartData = {
+                  category,
+                  charts: [
+                    {
+                      chartType: selectedChart,
+                      title: chartTitle,
+                      order: 1,
+                      unit:
+                        indicators.find(
+                          ind => ind.key === rows[selectedRows[0]]?.indicatorKey
+                        )?.unit || '',
+                      years,
+                      fields: selectedRows.map((rowIndex, i) => {
+                        const row = rowsWithUnit[rowIndex]
+                        return {
+                          key: row.indicatorKey,
+                          label: generateLabel(row, indicators),
+                          field1: row.field1,
+                          field2: row.field2,
+                          unit: row.unit,
+                          color: selectedColor[i],
+                          data: Object.fromEntries(
+                            years.map(y => [y, Number(row.values[y] || 0)])
+                          )
+                        }
+                      })
+                    }
+                  ]
+                }
+
                 const res = await saveChartConfig({
                   chartType: selectedChart,
                   selectedRows,
-                  colorSet: selectedColor,
                   rows: rowsWithUnit,
                   indicators,
+                  colorSet: selectedColor,
                   years,
-                  title: chartTitle, // ⬅️ 저장 시 제목 포함
+                  title: chartTitle,
                   category
                 })
 

@@ -111,14 +111,15 @@ export default function ModalContent({
           onAdd={async newLabel => {
             // 새 지표 추가
             const indicator = indicators.find(ind => ind.label === newLabel)
-            const labelToUse = indicator ? indicator.label : newLabel
-            setSelectedIndicator(labelToUse)
-            onAddRowWithIndicator(labelToUse)
+            const keyToUse = indicator ? indicator.key : newLabel
+            setSelectedIndicator(keyToUse)
+            onAddRowWithIndicator(keyToUse)
           }}
           onSelect={label => {
-            // 지표 선택
-            setSelectedIndicator(label)
-            onAddRowWithIndicator(label)
+            const ind = indicators.find(ind => ind.label === label)
+            const keyToUse = ind ? ind.key : label
+            setSelectedIndicator(keyToUse)
+            onAddRowWithIndicator(keyToUse)
           }}
         />
 
@@ -221,24 +222,25 @@ export default function ModalContent({
                       })()}
                       onAdd={newUnit => {
                         // 새 단위 추가
-                        const label = row.indicatorKey
+                        const key = row.indicatorKey
                         setIndicators(prev =>
                           prev.map(ind =>
-                            ind.label === label ? {...ind, unit: newUnit} : ind
+                            ind.key === key ? {...ind, unit: newUnit} : ind
                           )
                         )
-                        setSelectedUnits(prev => ({...prev, [label]: newUnit}))
+
+                        setSelectedUnits(prev => ({...prev, [key]: newUnit}))
                       }}
                       onSelect={unit => {
                         // 단위 선택
-                        const label = row.indicatorKey
+                        const key = row.indicatorKey
                         setIndicators(prev =>
-                          prev.map(ind => (ind.label === label ? {...ind, unit} : ind))
+                          prev.map(ind => (ind.key === key ? {...ind, unit} : ind))
                         )
-                        setSelectedUnits(prev => ({...prev, [label]: unit}))
+                        setSelectedUnits(prev => ({...prev, [key]: unit}))
                         setRows(prev =>
                           prev.map(row =>
-                            row.indicatorKey === label ? {...row, unit} : row
+                            row.indicatorKey === key ? {...row, unit} : row
                           )
                         )
                       }}
