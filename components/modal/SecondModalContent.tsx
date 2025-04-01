@@ -100,6 +100,7 @@ export default function SecondModalContent({
     setSelectedColor(updated)
   }
 
+
   const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(selectedChart)
 
   const chartData = isPieLike

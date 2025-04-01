@@ -1,14 +1,31 @@
 'use client'
 
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useESGModal} from '@/components/modal/ESGModalContext'
 import GridItem from './GridItem'
+import {fetchUserCharts} from '@/services/chart-config'
 
 export default function Governance() {
   const [gridItems, setGridItems] = useState([]) // 대시보드에 표시될 아이템 리스트 상태
   const [isEditModalOpen, setIsEditModalOpen] = useState(false) // 삭제 모달 오픈 여부
   const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
   const {setIsModalOpen} = useESGModal() // ESG 입력 모달 컨트롤 함수
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const loadCharts = async () => {
+      try {
+        const data = await fetchUserCharts('')
+        const filtered = data.filter(chart => chart.category === 'governance')
+        setGridItems(filtered)
+      } catch (err) {
+        console.error('차트 불러오기 실패:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadCharts()
+  }, [])
 
   // 아이템 클릭 시 호출되는 함수 (신규 추가 또는 기존 수정)
   const handleClick = (item: any) => {
@@ -29,32 +46,34 @@ export default function Governance() {
   }
 
   return (
-    <div className="font-apple">
-      {' '}
-      {/* 전체에 font-apple 적용 */}
-      <div
-        className="grid gap-4"
-        style={{gridTemplateColumns: 'repeat(3, 400px)', gridAutoRows: '300px'}}>
-        {gridItems.map((item, index) => (
+    <div className="font-apple px-6 py-4">
+      {isLoading ? (
+        <p className="text-center text-gray-400 mt-10">차트를 불러오는 중입니다...</p>
+      ) : (
+        <div
+          className="grid gap-4"
+          style={{gridTemplateColumns: 'repeat(3, 400px)', gridAutoRows: '300px'}}>
+          {gridItems.map((item, index) => (
+            <GridItem
+              key={item.id} // 고유 키
+              item={item} // 아이템 데이터
+              index={index} // 인덱스
+              isLast={false} // 마지막 그리드 여부 (항상 false)
+              moveItem={moveItem} // 드래그 함수
+              handleClick={handleClick} // 클릭 이벤트
+            />
+          ))}
+          {/* 추가 버튼 그리드 */}
           <GridItem
-            key={item.id} // 고유 키
-            item={item} // 아이템 데이터
-            index={index} // 인덱스
-            isLast={false} // 마지막 그리드 여부 (항상 false)
-            moveItem={moveItem} // 드래그 함수
-            handleClick={handleClick} // 클릭 이벤트
+            key="add"
+            item={{}} // 빈 item
+            index={gridItems.length}
+            isLast={true} // 마지막 요소임을 표시
+            moveItem={moveItem}
+            handleClick={handleClick}
           />
-        ))}
-        {/* 추가 버튼 그리드 */}
-        <GridItem
-          key="add"
-          item={{}} // 빈 item
-          index={gridItems.length}
-          isLast={true} // 마지막 요소임을 표시
-          moveItem={moveItem}
-          handleClick={handleClick}
-        />
-      </div>
+        </div>
+      )}
       {/* 삭제 확인 모달 */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center font-apple">
