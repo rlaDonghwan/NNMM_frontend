@@ -19,6 +19,7 @@ import {
 import React from 'react'
 import toast from 'react-hot-toast'
 import {usePathname} from 'next/navigation'
+import {showWarning, showSuccess} from '@/utils/toast'
 
 ChartJS.register(
   BarElement,
@@ -261,6 +262,10 @@ export default function SecondModalContent({
           <Button
             onClick={async () => {
               try {
+                if (!chartTitle.trim()) {
+                  showWarning('그래프 제목을 입력하세요!')
+                  return
+                }
                 const rowsWithUnit = rows.map(row => ({
                   ...row,
                   unit:
