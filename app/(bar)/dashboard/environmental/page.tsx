@@ -14,7 +14,7 @@ export default function environmental() {
           {/* className="flex h-full w-full bg-white px-4 py-8"로 수정------------------------------ */}
           <Environment />
         </div>
-        <ESGModal category="social" />
+        <ESGModal category="environmental" />
       </ESGModalProvider>
     </DndProvider>
   )

@@ -2,8 +2,9 @@
 
 import {useEffect, useState} from 'react'
 import {useESGModal} from '@/components/modal/ESGModalContext'
+import ESGModal from '../modal/ESGModal'
 import GridItem from './GridItem'
-import {fetchUserCharts} from '@/services/chart-config'
+import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
 
 export default function Environmental() {
   const [gridItems, setGridItems] = useState([]) // 대시보드에 표시될 아이템 리스트 상태
@@ -15,7 +16,10 @@ export default function Environmental() {
     const loadCharts = async () => {
       try {
         const data = await fetchUserCharts('')
-        const filtered = data.filter(chart => chart.category === 'environmental')
+        const filtered = data
+          .filter(chart => chart.category === 'environmental')
+          //담에 붙는 애들은 안되면 지우면 됨 정렬 추가하는거임
+          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
         setGridItems(filtered)
       } catch (err) {
         console.error('차트 불러오기 실패:', err)
@@ -37,12 +41,40 @@ export default function Environmental() {
     }
   }
 
-  // 드래그 & 드롭으로 아이템 정렬
-  const moveItem = (dragIndex: number, hoverIndex: number) => {
+  // 드래그 & 드롭으로 아이템 정렬 원래 있던 코드
+  // const moveItem = async (dragIndex: number, hoverIndex: number) => {
+  //   const updated = [...gridItems] // 기존 배열 복사
+  //   const [removed] = updated.splice(dragIndex, 1) // 드래그한 항목 제거
+  //   updated.splice(hoverIndex, 0, removed) // 새로운 위치에 삽입
+
+  //   setGridItems(updated) // 상태 업데이트
+  //   try {
+  //     const orderedIds = updated.map(item => item.id)
+  //     await updateChartOrder(orderedIds)
+  //     console.log('순서 저장 완료')
+  //   } catch (err) {
+  //     console.error('순서 저장 실패:', err)
+  //   }
+  // }
+
+  //드래그 & 드롭 수정할 코드 수 틀리면 이거 지우고 위에꺼 살리기
+  const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems] // 기존 배열 복사
     const [removed] = updated.splice(dragIndex, 1) // 드래그한 항목 제거
     updated.splice(hoverIndex, 0, removed) // 새로운 위치에 삽입
-    setGridItems(updated) // 상태 업데이트
+
+    const orderedWithOrder = updated.map((Item, index) => ({
+      ...Item,
+      order: index + 1
+    }))
+    setGridItems(orderedWithOrder) // 상태 업데이트
+    try {
+      console.log('[updateChartOrder] 요청 데이터:', orderedWithOrder)
+      await updateChartOrder(orderedWithOrder)
+      console.log('순서 저장 완료')
+    } catch (err) {
+      console.error('순서 저장 실패:', err)
+    }
   }
   //-----------------------------------------------------------html 코드 수정 (그리드 사이즈 조정)
   return (
@@ -55,7 +87,7 @@ export default function Environmental() {
           {/* grid-cols-3 및 min-h-[]추가--------------------------------------------------- */}
           {gridItems.map((item, index) => (
             <GridItem
-              key={item.id} // 고유 키
+              key={item.id ?? index} // 고유 키
               item={item} // 아이템 데이터
               index={index} // 인덱스
               isLast={false} // 마지막 그리드 여부 (항상 false)
