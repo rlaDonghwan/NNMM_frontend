@@ -1,6 +1,6 @@
 'use client'
 
-import Social from '@/components/dashboard/Social'
+import Social from '@/components/dashboard/social'
 import ESGModal from '@/components/modal/ESGModal'
 import {ESGModalProvider} from '@/components/modal/ESGModalContext'
 import {DndProvider} from 'react-dnd'

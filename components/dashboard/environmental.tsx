@@ -10,14 +10,13 @@ export default function Environmental() {
   const [gridItems, setGridItems] = useState([]) // 차트 리스트 상태
   const [isEditModalOpen, setIsEditModalOpen] = useState(false) // 삭제 모달 오픈 여부
   const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID (삭제용)
-  const [isLoading, setIsLoading] = useState(true) // 로딩 중 여부
-  const {setIsModalOpen} = useESGModal() // ESG 입력 모달 열기 함수
+  const [isLoading, setIsLoading] = useState(true) // 로딩 상태 여부
+  const {setIsModalOpen, reset} = useESGModal() // 모달 열기 및 리셋 함수 가져오기
 
   // 마운트 시 차트 불러오기
   useEffect(() => {
     const loadCharts = async () => {
       try {
-
         const data = await fetchUserCharts('')
         const filtered = data
           .filter(chart => chart.category === 'environmental')
@@ -40,13 +39,20 @@ export default function Environmental() {
   }
 
   // 차트 클릭 시 (기존이면 삭제 모달, 새로 만들기면 입력 모달)
+
   const handleClick = (item: any) => {
     if (item._id) {
-      setSelectedItemId(item._id) // 선택한 항목 ID 저장
-      setIsEditModalOpen(true) // 삭제 모달 오픈
+      // 기존 차트 클릭 시 (삭제 모달 열기)
+      setSelectedItemId(item._id) // 선택된 차트 ID 저장
+      setIsEditModalOpen(true) // 삭제 확인 모달 오픈
     } else {
+      // + 버튼 클릭 시 (새 차트 추가)
       setIsModalOpen(true, newChart => {
-        setGridItems(prev => [...prev, newChart]) // 새 차트 저장 콜백 전달
+        setGridItems(prev => [...prev, newChart]) // 차트 리스트에 새 항목 추가
+        setTimeout(() => {
+          reset() // 모달 내부 상태 초기화
+          setIsModalOpen(false) // 모달 닫기
+        }, 300) // 0.3초 후 닫기
       })
     }
   }
@@ -86,18 +92,15 @@ export default function Environmental() {
       console.error('순서 저장 실패:', err)
     }
   }
-  //-----------------------------------------------------------html 코드 수정 (그리드 사이즈 조정)
+
   return (
     <div className="font-apple w-full h-screen">
-      {/* w-full h-screen 추가------------------------------------------------------------ */}
       {isLoading ? (
         <p className="text-center text-gray-400 mt-10">차트를 불러오는 중입니다...</p>
       ) : (
         <div className="grid grid-cols-3 gap-4">
-          {/* grid-cols-3 및 min-h-[]추가--------------------------------------------------- */}
           {gridItems.map((item, index) => (
             <GridItem
-
               key={item._id || index} // key는 _id 없을 경우 index로 처리
               item={item}
               index={index}

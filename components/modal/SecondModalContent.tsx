@@ -1,5 +1,6 @@
 'use client'
 
+// 필요한 라이브러리와 컴포넌트 import
 import {useEffect, useState} from 'react'
 import {Button} from '@/components/ui/button'
 import {saveChartConfig} from '@/services/chart-config'
@@ -22,6 +23,7 @@ import {usePathname} from 'next/navigation'
 import {showWarning} from '@/utils/toast'
 import {SecondModalContentProps} from '@/interface/modal'
 
+// Chart.js 구성요소 등록
 ChartJS.register(
   BarElement,
   LineElement,
@@ -34,7 +36,10 @@ ChartJS.register(
   RadialLinearScale
 )
 
+// 차트 타입별 컴포넌트 매핑
 const chartComponentMap = {Bar, Line, Pie, Doughnut, PolarArea, Radar}
+
+// 아이콘용 차트 타입 배열
 const chartIcons = [
   {type: 'Bar', image: '/images/bar-graph.png'},
   {type: 'Line', image: '/images/line-graph.png'},
@@ -44,6 +49,7 @@ const chartIcons = [
   {type: 'Radar', image: '/images/radar-chart.png'}
 ]
 
+// 차트 자동 추천 함수
 function recommendChartTypes(rows, years) {
   const indicatorsCount = rows.length
   const yearsCount = years.length
@@ -52,6 +58,7 @@ function recommendChartTypes(rows, years) {
     return years.every(y => valueYears.includes(y.toString()))
   })
 
+  // 조건별 추천
   if (indicatorsCount === 1 && yearsCount > 1 && isTimeSeries) return ['Bar', 'Line']
   if (indicatorsCount > 1 && yearsCount === 1)
     return ['Pie', 'Doughnut', 'PolarArea', 'Radar']
@@ -59,6 +66,7 @@ function recommendChartTypes(rows, years) {
   return ['Bar']
 }
 
+// 차트에 표시할 label 생성 함수
 function generateLabel(row, indicators) {
   const indicator = indicators.find(i => i.key === row.indicatorKey)
   const baseLabel = indicator?.label || row.indicatorKey
@@ -69,6 +77,7 @@ function generateLabel(row, indicators) {
   }`
 }
 
+// 메인 컴포넌트
 export default function SecondModalContent({
   years,
   rows,
@@ -81,17 +90,20 @@ export default function SecondModalContent({
   title,
   chartType,
   setChartType,
-  onChartSaved // 부모에서 차트 저장 후 목록 업데이트 콜백
+  onChartSaved
 }: SecondModalContentProps) {
   const [selectedChart, setSelectedChart] = useState(chartType || null)
   const [availableCharts, setAvailableCharts] = useState<string[]>([])
   const pathname = usePathname()
+
+  // 경로 기반 카테고리 추출
   const category = pathname.includes('social')
     ? 'social'
     : pathname.includes('environmental')
     ? 'environmental'
     : 'governance'
 
+  // 차트 자동 추천
   useEffect(() => {
     const recommended = recommendChartTypes(rows, years)
     setAvailableCharts(recommended)
@@ -101,14 +113,17 @@ export default function SecondModalContent({
     }
   }, [rows, years])
 
+  // 색상 변경
   const handleColorChange = (index: number, newColor: string) => {
     const updated = [...colorSet]
     updated[index] = newColor
     setColorSet(updated)
   }
 
+  // 파이계열 여부
   const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(selectedChart)
 
+  // 차트 데이터 구성
   const chartData = isPieLike
     ? {
         labels: selectedRows.map(i => generateLabel(rows[i], indicators)),
@@ -133,6 +148,7 @@ export default function SecondModalContent({
         })
       }
 
+  // 차트 옵션
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -146,6 +162,7 @@ export default function SecondModalContent({
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
 
+  // 저장 버튼 클릭 핸들러
   const handleSave = async () => {
     const isChartSelected = !!selectedChart
     const isDataSelected = selectedRows.length > 0
@@ -178,6 +195,7 @@ export default function SecondModalContent({
 
       toast.success('차트 저장에 성공했습니다!')
 
+      // 저장 후 콜백 실행 (차트 포맷 재가공)
       if (onChartSaved) {
         const formatted = {
           ...res.data,
@@ -207,7 +225,7 @@ export default function SecondModalContent({
       </div>
 
       <div className="flex flex-col md:flex-row justify-between">
-        {/* 왼쪽 영역 */}
+        {/* 왼쪽 설정 영역 */}
         <div className="flex flex-col w-full md:w-[50%]">
           <h3 className="font-apple mb-4">그래프 종류 선택</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
@@ -228,7 +246,7 @@ export default function SecondModalContent({
               ))}
           </div>
 
-          {/* 지표 추가/삭제 */}
+          {/* 데이터 선택 및 컬러 선택 */}
           <div className="flex flex-row items-center mb-2">
             <h3 className="font-apple min-w-[90px]">데이터 선택</h3>
             {selectedRows.length < rows.length && (
@@ -263,7 +281,7 @@ export default function SecondModalContent({
             />
           </div>
 
-          {/* 데이터 셀렉트 및 컬러 */}
+          {/* 지표별 선택 및 색상 설정 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
             {selectedRows.map((rowIndex, idx) => (
               <div key={idx} className="flex items-center">
@@ -294,7 +312,7 @@ export default function SecondModalContent({
           </div>
         </div>
 
-        {/* 오른쪽: 차트 미리보기 + 저장 */}
+        {/* 오른쪽: 차트 미리보기 영역 */}
         <div className="flex flex-col w-full md:w-[50%] items-center">
           <div className="bg-white-100 w-full max-w-full rounded-xl flex overflow-x-auto">
             <div className="flex w-full h-auto min-h-[400px] p-4 justify-center">
@@ -307,6 +325,7 @@ export default function SecondModalContent({
             </div>
           </div>
 
+          {/* 저장 버튼 */}
           <Button
             className="mt-4 bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded"
             onClick={handleSave}>
