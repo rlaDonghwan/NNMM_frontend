@@ -129,11 +129,11 @@ export default function GridItem({
     },
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
-
+  //----------------------------------------------------------------아래쪽 html코드 수정 p-6 >> px-4, py-2 추가
   return (
     <div
       ref={ref}
-      className="p-6 rounded-xl shadow-lg border-2 flex items-center justify-center cursor-pointer bg-white"
+      className="px-4 py-2 rounded-xl shadow-lg border-2 flex items-center justify-center cursor-pointer bg-white"
       style={{opacity: isDragging ? 0.5 : 1}}
       onClick={() => handleClick(isLast ? {} : item)}>
       {isLast ? (
