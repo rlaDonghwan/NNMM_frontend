@@ -28,14 +28,15 @@ export async function saveChartConfig({
     ...row,
     unit: indicators.find(ind => ind.key === row.indicatorKey)?.unit || row.unit || ''
   }))
-
+  const existingCharts = await fetchUserCharts(category)
+  const newOrder = existingCharts.length + 1
   const payload = {
     category,
     charts: [
       {
         chartType,
         title,
-        order: 1,
+        order: newOrder,
         unit:
           indicators.find(ind => ind.key === rows[selectedRows[0]]?.indicatorKey)?.unit ||
           '',
@@ -81,7 +82,16 @@ export const fetchUserCharts = async (category?: string) => {
 
 //----------------------------------------------------------------------------------------------------
 
-// 차트 순서 불러오기
-export const updateChartOrder = async (orderedIds: string[]) => {
-  return axios.post(`${BASE_URL}/chart/order`, {orderedIds}, {withCredentials: true})
+// 차트 순서 불러오기 + 기존 코드 밑에 코드 이상하면 이걸로 바꾸기
+// export const updateChartOrder = async (orderedIds: string[]) => {
+//   return axios.post(`${BASE_URL}/chart/order`, {orderedIds}, {withCredentials: true})
+// }
+//이차 차트 순서 불러오기 바꾼건데 코드 이해 안감 -> 다시 좀 보자잉
+export async function updateChartOrder(orderedCharts) {
+  return await fetch(`${BASE_URL}/esg-dashboard/order`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({charts: orderedCharts}),
+    credentials: 'include'
+  })
 }
