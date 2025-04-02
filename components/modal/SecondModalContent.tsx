@@ -90,6 +90,7 @@ export default function SecondModalContent({
   title,
   chartType,
   setChartType,
+  onBack,
   onChartSaved
 }: SecondModalContentProps) {
   const [selectedChart, setSelectedChart] = useState(chartType || null)
@@ -324,13 +325,20 @@ export default function SecondModalContent({
                 })}
             </div>
           </div>
-
-          {/* 저장 버튼 */}
-          <Button
-            className="mt-4 bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded"
-            onClick={handleSave}>
-            저장✔
-          </Button>
+          <div className="flex justify-between w-full mt-4 gap-2">
+            <Button
+              className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded"
+              onClick={() => {
+                if (typeof onBack === 'function') onBack()
+              }}>
+              ← 이전
+            </Button>
+            <Button
+              className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded"
+              onClick={handleSave}>
+              저장✔
+            </Button>
+          </div>
         </div>
       </div>
     </div>
