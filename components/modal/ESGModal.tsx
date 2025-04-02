@@ -21,7 +21,7 @@ export default function ESGModal({category}: ESGModalProps) {
     setYears,
     indicators,
     setIndicators,
-    onChartSaved,
+    onChartSaved, // ✅ 부모에서 전달되는 콜백
     reset
   } = useESGModal()
 
@@ -29,6 +29,7 @@ export default function ESGModal({category}: ESGModalProps) {
   const [selectedRows, setSelectedRows] = useState<number[]>([])
   const [title, setTitle] = useState<string>('')
   const [colorSet, setColorSet] = useState<string[]>([])
+  const [charts, setCharts] = useState<any[]>([]) // ✅ 새로 추가된 chart들을 관리
 
   useEffect(() => {
     const loadIndicators = async () => {
@@ -60,6 +61,7 @@ export default function ESGModal({category}: ESGModalProps) {
 
       // 콜백 실행 (환경 페이지에서 새 차트 추가)
       if (onChartSaved) onChartSaved(res.data)
+      setCharts(prev => [...prev, res.data]) // ✅ 내부에서도 반영
 
       reset()
       setTimeout(() => {
@@ -143,6 +145,12 @@ export default function ESGModal({category}: ESGModalProps) {
           setSelectedRows={setSelectedRows}
           colorSet={colorSet}
           setColorSet={setColorSet}
+          onChartSaved={newChart => {
+            // 👉 실제 부모에서 받은 콜백을 실행!
+            if (onChartSaved) {
+              onChartSaved(newChart)
+            }
+          }}
         />
       )}
     </Modal>

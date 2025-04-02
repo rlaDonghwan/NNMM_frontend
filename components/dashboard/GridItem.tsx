@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useRef} from 'react'
+import React, {useRef, useState} from 'react'
 import {useDrag, useDrop} from 'react-dnd'
 import {
   Chart as ChartJS,
@@ -16,10 +16,11 @@ import {
   Title
 } from 'chart.js'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
+
 // -----------------------------------------------------------------------즐겨찾기를 위한 별 추가
 import {FaRegStar, FaStar} from 'react-icons/fa'
-import {useState} from 'react'
 //------------------------------------------------------------------------여기까지
+
 ChartJS.register(
   BarElement,
   LineElement,
@@ -90,7 +91,7 @@ export default function GridItem({
   dragRef(dropRef(ref))
 
   const chartTypeKey = item.chartType?.toLowerCase()
-  const ChartComponent = chartComponentMap[chartTypeKey]
+  const ChartComponent = chartComponentMap[chartTypeKey as keyof typeof chartComponentMap]
 
   const isPieLike = ['pie', 'doughnut', 'polararea', 'radar'].includes(chartTypeKey || '')
 
@@ -123,15 +124,16 @@ export default function GridItem({
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: {display: true, position: 'top'},
+      legend: {display: true, position: 'top' as const},
       title: {
         display: true,
         text: item.title || '',
-        font: {size: 16, weight: 'bold'}
+        font: {size: 16, weight: 'bold' as const}
       }
     },
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
+
   //----------------------------------------------------------------토글을 위한 상태 추가
   // const [isFavorite, setIsFavorite] = useState(false) // 상태 추가
   //----------------------------------------------------------------아래쪽 html코드 수정 p-6 >> px-4, py-2 추가
@@ -156,15 +158,18 @@ export default function GridItem({
           데이터를 확인해 주세요
         </div>
       )}
+
       {/* 즐겨찾기 기능 추가------------------------------------------------------ */}
-      {/* <button
+      {/* 
+      <button
         className="flex h-full justify-end items-start"
         onClick={e => {
           e.stopPropagation() // 부모 onClick 방지
           setIsFavorite(prev => !prev)
         }}>
         {isFavorite ? <FaStar /> : <FaRegStar />}
-      </button> */}
+      </button> 
+      */}
       {/* 여기까지------------------------------------------------------ */}
     </div>
   )

@@ -7,10 +7,10 @@ import {fetchUserCharts} from '@/services/chart-config'
 
 export default function Social() {
   const [gridItems, setGridItems] = useState([]) // 차트 리스트 상태
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false) // 삭제 모달 오픈 여부
-  const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
-  const [isLoading, setIsLoading] = useState(true) // 로딩 상태
-  const {setIsModalOpen} = useESGModal() // ESG 입력 모달 컨트롤 함수
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedItemId, setSelectedItemId] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const {setIsModalOpen, reset} = useESGModal() // ✅ reset 추가
 
   useEffect(() => {
     const loadCharts = async () => {
@@ -28,12 +28,22 @@ export default function Social() {
     loadCharts()
   }, [])
 
+  // Social.tsx 안 handleClick 함수 내부
   const handleClick = (item: any) => {
     if (item._id) {
-      setSelectedItemId(item._id) // 삭제할 항목 설정
-      setIsEditModalOpen(true) // 삭제 모달 오픈
+      setSelectedItemId(item._id)
+      setIsEditModalOpen(true)
     } else {
-      setIsModalOpen(true) // ESG 입력 모달 오픈
+      // ✅ 모달 열 때 콜백 등록
+      setIsModalOpen(true, newChart => {
+        setGridItems(prev => [...prev, newChart]) // 차트 목록 갱신
+
+        // ✅ 모달 닫기와 상태 초기화
+        setTimeout(() => {
+          reset() // context 내부 상태 초기화
+          setIsModalOpen(false) // 모달 닫기
+        }, 300)
+      })
     }
   }
 
@@ -43,18 +53,16 @@ export default function Social() {
     updated.splice(hoverIndex, 0, removed)
     setGridItems(updated)
   }
-  //-----------------------------------------------------------html 코드 수정 (그리드 사이즈 조정)
+
   return (
     <div className="font-apple w-full h-screen">
-      {/* w-full h-screen 추가------------------------------------------------------------ */}
       {isLoading ? (
         <p className="text-center text-gray-400 mt-10">차트를 불러오는 중입니다...</p>
       ) : (
         <div className="grid grid-cols-3 gap-4">
-          {/* grid-cols-3 및 min-h-[]추가--------------------------------------------------- */}
           {gridItems.map((item, index) => (
             <GridItem
-              key={item._id || index} // key 안전 처리
+              key={item._id || index}
               item={item}
               index={index}
               isLast={false}
