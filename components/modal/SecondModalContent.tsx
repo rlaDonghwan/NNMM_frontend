@@ -178,9 +178,22 @@ export default function SecondModalContent({
 
       toast.success('차트 저장에 성공했습니다!')
 
-      // ✅ 저장 성공 시: 콜백으로 상위에 전달
       if (onChartSaved) {
-        onChartSaved(res.data) // 이 콜백에서 모달 닫히도록 만들어져 있어야 함
+        const formatted = {
+          ...res.data,
+          chartType: selectedChart.toLowerCase(),
+          title,
+          years,
+          fields: selectedRows.map((rowIndex, idx) => {
+            const row = rows[rowIndex]
+            return {
+              label: generateLabel(row, indicators),
+              color: colorSet[idx],
+              data: row.values
+            }
+          })
+        }
+        onChartSaved(formatted)
       }
     } catch (error) {
       toast.error('차트 저장 중 오류가 발생했습니다.')
