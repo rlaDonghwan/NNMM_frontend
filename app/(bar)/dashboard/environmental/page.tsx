@@ -13,7 +13,7 @@ export default function environmental() {
         <div className="flex h-full w-full bg-white pl-4 pt-8">
           <Environment />
         </div>
-        <ESGModal category="social" />
+        <ESGModal category="environmental" />
       </ESGModalProvider>
     </DndProvider>
   )
