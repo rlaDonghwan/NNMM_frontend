@@ -16,7 +16,10 @@ import {
   Title
 } from 'chart.js'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
-
+// -----------------------------------------------------------------------즐겨찾기를 위한 별 추가
+import {FaRegStar, FaStar} from 'react-icons/fa'
+import {useState} from 'react'
+//------------------------------------------------------------------------여기까지
 ChartJS.register(
   BarElement,
   LineElement,
@@ -129,24 +132,40 @@ export default function GridItem({
     },
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
+  //----------------------------------------------------------------토글을 위한 상태 추가
+  // const [isFavorite, setIsFavorite] = useState(false) // 상태 추가
   //----------------------------------------------------------------아래쪽 html코드 수정 p-6 >> px-4, py-2 추가
   return (
     <div
       ref={ref}
-      className="px-4 py-2 rounded-xl shadow-lg border-2 flex items-center justify-center cursor-pointer bg-white"
+      className="py-2 px-4 rounded-xl shadow-lg border-2 flex items-center justify-center cursor-pointer bg-white"
       style={{opacity: isDragging ? 0.5 : 1}}
       onClick={() => handleClick(isLast ? {} : item)}>
       {isLast ? (
         <span className="text-9xl text-gray-400">+</span>
       ) : ChartComponent && chartData ? (
-        <ChartComponent data={chartData} options={chartOptions} />
+        <ChartComponent
+          data={chartData}
+          options={chartOptions}
+          className="flex w-full h-full justify-center items-center"
+        />
       ) : (
-        <div className="text-gray-400 text-sm text-center">
+        <div className="text-gray-400 text-sm text-center ">
           차트를 불러올 수 없습니다
           <br />
           데이터를 확인해 주세요
         </div>
       )}
+      {/* 즐겨찾기 기능 추가------------------------------------------------------ */}
+      {/* <button
+        className="flex h-full justify-end items-start"
+        onClick={e => {
+          e.stopPropagation() // 부모 onClick 방지
+          setIsFavorite(prev => !prev)
+        }}>
+        {isFavorite ? <FaStar /> : <FaRegStar />}
+      </button> */}
+      {/* 여기까지------------------------------------------------------ */}
     </div>
   )
 }

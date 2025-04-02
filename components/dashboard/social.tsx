@@ -62,7 +62,6 @@ export default function Social() {
               handleClick={handleClick}
             />
           ))}
-
           <GridItem
             key="add"
             item={{}}
