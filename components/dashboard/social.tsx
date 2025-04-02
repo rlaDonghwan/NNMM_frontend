@@ -43,15 +43,15 @@ export default function Social() {
     updated.splice(hoverIndex, 0, removed)
     setGridItems(updated)
   }
-
+  //-----------------------------------------------------------html 코드 수정 (그리드 사이즈 조정)
   return (
-    <div className="font-apple px-6 py-4">
+    <div className="font-apple w-full h-screen">
+      {/* w-full h-screen 추가------------------------------------------------------------ */}
       {isLoading ? (
         <p className="text-center text-gray-400 mt-10">차트를 불러오는 중입니다...</p>
       ) : (
-        <div
-          className="grid gap-4"
-          style={{gridTemplateColumns: 'repeat(3, 400px)', gridAutoRows: '300px'}}>
+        <div className="grid grid-cols-3 gap-4">
+          {/* grid-cols-3 및 min-h-[]추가--------------------------------------------------- */}
           {gridItems.map((item, index) => (
             <GridItem
               key={item._id || index} // key 안전 처리
@@ -62,7 +62,6 @@ export default function Social() {
               handleClick={handleClick}
             />
           ))}
-
           <GridItem
             key="add"
             item={{}}

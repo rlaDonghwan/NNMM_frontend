@@ -28,7 +28,7 @@ export default function ESGModal({category}: ESGModalProps) {
 
   const [chartType, setChartType] = useState<string>('bar')
   const [selectedRows, setSelectedRows] = useState<number[]>([])
-  const [title, setTitle] = useState<string>('사용자 차트')
+  const [title, setTitle] = useState<string>('')
   const [colorSet, setColorSet] = useState<string[]>([])
 
   // 모달이 열릴 때 해당 카테고리의 인디케이터 불러오기
