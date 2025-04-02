@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useRef} from 'react'
+import React, {useRef, useState} from 'react'
 import {useDrag, useDrop} from 'react-dnd'
 import {
   Chart as ChartJS,
@@ -17,7 +17,10 @@ import {
 } from 'chart.js'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
 
-// Chart.js 컴포넌트 등록
+// -----------------------------------------------------------------------즐겨찾기를 위한 별 추가
+import {FaRegStar, FaStar} from 'react-icons/fa'
+//------------------------------------------------------------------------여기까지
+
 ChartJS.register(
   BarElement,
   LineElement,
@@ -36,12 +39,12 @@ const ItemType = {
 }
 
 const chartComponentMap = {
-  Bar,
-  Line,
-  Pie,
-  Doughnut,
-  PolarArea,
-  Radar
+  bar: Bar,
+  line: Line,
+  pie: Pie,
+  doughnut: Doughnut,
+  polararea: PolarArea,
+  radar: Radar
 }
 
 interface DragItem {
@@ -87,63 +90,87 @@ export default function GridItem({
 
   dragRef(dropRef(ref))
 
-  const ChartComponent = item.chartType && chartComponentMap[item.chartType]
+  const chartTypeKey = item.chartType?.toLowerCase()
+  const ChartComponent = chartComponentMap[chartTypeKey as keyof typeof chartComponentMap]
 
-  // 차트 데이터 구성
-  const valuesArray = Array.isArray(item.values)
-    ? item.values
-    : item.values && typeof item.values === 'object'
-    ? Object.values(item.values)
-    : item.years?.map(() => 0) // fallback: 0값 배열
+  const isPieLike = ['pie', 'doughnut', 'polararea', 'radar'].includes(chartTypeKey || '')
 
-  const chartData =
-    item?.labels?.length && valuesArray?.length
+  const chartData = item?.fields?.length
+    ? isPieLike
       ? {
-          labels: item.labels,
+          labels: item.fields.map(f => f.label),
           datasets: [
             {
-              label: item.title || '차트',
-              data: valuesArray,
-              backgroundColor: item.colorSet || ['#60A5FA'],
-              borderColor: item.colorSet || ['#60A5FA'],
-              borderWidth: 2
+              data: item.fields.map(f => {
+                const firstYear = item.years?.[0]
+                return Number(f.data?.[firstYear]) || 0
+              }),
+              backgroundColor: item.fields.map(f => f.color || '#60A5FA')
             }
           ]
         }
-      : null
-
-  const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(item.chartType)
+      : {
+          labels: item.years || [],
+          datasets: item.fields.map(f => ({
+            label: f.label,
+            data: (item.years || []).map(y => Number(f.data?.[y]) || 0),
+            backgroundColor: f.color || '#60A5FA',
+            borderColor: f.color || '#60A5FA',
+            borderWidth: 2
+          }))
+        }
+    : null
 
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: {display: true, position: 'top'},
+      legend: {display: true, position: 'top' as const},
       title: {
         display: true,
         text: item.title || '',
-        font: {size: 16, weight: 'bold'}
+        font: {size: 16, weight: 'bold' as const}
       }
     },
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
 
+  //----------------------------------------------------------------토글을 위한 상태 추가
+  // const [isFavorite, setIsFavorite] = useState(false) // 상태 추가
+  //----------------------------------------------------------------아래쪽 html코드 수정 p-6 >> px-4, py-2 추가
   return (
     <div
       ref={ref}
-      className="p-6 rounded-xl shadow flex items-center justify-center cursor-pointer bg-white"
+      className="py-2 px-4 rounded-xl shadow-lg border-2 flex items-center justify-center cursor-pointer bg-white"
       style={{opacity: isDragging ? 0.5 : 1}}
       onClick={() => handleClick(isLast ? {} : item)}>
       {isLast ? (
         <span className="text-9xl text-gray-400">+</span>
       ) : ChartComponent && chartData ? (
-        <ChartComponent data={chartData} options={chartOptions} />
+        <ChartComponent
+          data={chartData}
+          options={chartOptions}
+          className="flex w-full h-full justify-center items-center"
+        />
       ) : (
-        <div className="text-gray-400 text-sm text-center">
+        <div className="text-gray-400 text-sm text-center ">
           차트를 불러올 수 없습니다
           <br />
           데이터를 확인해 주세요
         </div>
       )}
+
+      {/* 즐겨찾기 기능 추가------------------------------------------------------ */}
+      {/* 
+      <button
+        className="flex h-full justify-end items-start"
+        onClick={e => {
+          e.stopPropagation() // 부모 onClick 방지
+          setIsFavorite(prev => !prev)
+        }}>
+        {isFavorite ? <FaStar /> : <FaRegStar />}
+      </button> 
+      */}
+      {/* 여기까지------------------------------------------------------ */}
     </div>
   )
 }

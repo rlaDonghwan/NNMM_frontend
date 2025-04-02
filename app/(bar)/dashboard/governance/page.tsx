@@ -1,6 +1,6 @@
 'use client'
 
-import Governance from '@/components/dashboard/governance' // Governance 컴포넌트 가져오기
+import Governance from '@/components/dashboard/governance'
 import ESGModal from '@/components/modal/ESGModal'
 import {ESGModalProvider} from '@/components/modal/ESGModalContext'
 import {DndProvider} from 'react-dnd'
@@ -10,7 +10,8 @@ export default function governance() {
   return (
     <DndProvider backend={HTML5Backend}>
       <ESGModalProvider>
-        <div className="flex h-full w-full bg-white pl-4 pt-8">
+        <div className="flex h-full w-full bg-white px-4 py-8">
+          {/* className="flex h-full w-full bg-white px-4 py-8"로 수정------------------------------ */}
           <Governance />
         </div>
         <ESGModal category="governance" />

@@ -1,6 +1,6 @@
 'use client'
 
-import Environment from '@/components/dashboard/environmental'
+import Environmental from '@/components/dashboard/environmental'
 import ESGModal from '@/components/modal/ESGModal'
 import {ESGModalProvider} from '@/components/modal/ESGModalContext'
 import {DndProvider} from 'react-dnd'
@@ -10,10 +10,11 @@ export default function environmental() {
   return (
     <DndProvider backend={HTML5Backend}>
       <ESGModalProvider>
-        <div className="flex h-full w-full bg-white pl-4 pt-8">
-          <Environment />
+        <div className="flex h-full w-full bg-white px-4 py-8">
+          {/* className="flex h-full w-full bg-white px-4 py-8"로 수정------------------------------ */}
+          <Environmental />
         </div>
-        <ESGModal category="social" />
+        <ESGModal category="environmental" />
       </ESGModalProvider>
     </DndProvider>
   )
