@@ -1,17 +1,15 @@
 'use client'
 
-// 모달 구성 관련 컴포넌트 및 훅 import
+import {useEffect, useState} from 'react'
 import Modal from './Modal'
 import ModalContent from './ModalContent'
 import SecondModalContent from './SecondModalContent'
 import {useESGModal} from './ESGModalContext'
 import {fetchIndicators} from '@/services/indicator'
-import {saveChartConfig} from '@/services/chart-config' // 차트 저장 함수 import
-import {useEffect, useState} from 'react'
-import {ESGModalProps, Row, Indicator} from '@/interface/modal' // 타입 인터페이스 import
+import {saveChartConfig} from '@/services/chart-config'
+import {ESGModalProps, Row, Indicator} from '@/interface/modal'
 
 export default function ESGModal({category}: ESGModalProps) {
-  // ESG 모달 관련 상태 및 메서드 불러오기
   const {
     isModalOpen,
     setIsModalOpen,
@@ -23,6 +21,7 @@ export default function ESGModal({category}: ESGModalProps) {
     setYears,
     indicators,
     setIndicators,
+    onChartSaved,
     reset
   } = useESGModal()
 
@@ -31,7 +30,6 @@ export default function ESGModal({category}: ESGModalProps) {
   const [title, setTitle] = useState<string>('')
   const [colorSet, setColorSet] = useState<string[]>([])
 
-  // 모달이 열릴 때 해당 카테고리의 인디케이터 불러오기
   useEffect(() => {
     const loadIndicators = async () => {
       try {
@@ -45,13 +43,11 @@ export default function ESGModal({category}: ESGModalProps) {
     loadIndicators()
   }, [category])
 
-  // 인디케이터의 단위 가져오기 함수
   const getUnit = (key: string): string => indicators.find(i => i.key === key)?.unit || ''
 
-  // 차트 데이터 저장 함수
   const handleSubmit = async () => {
     try {
-      await saveChartConfig({
+      const res = await saveChartConfig({
         chartType,
         selectedRows,
         rows,
@@ -61,8 +57,14 @@ export default function ESGModal({category}: ESGModalProps) {
         title,
         category
       })
-      setIsModalOpen(false)
+
+      // 콜백 실행 (환경 페이지에서 새 차트 추가)
+      if (onChartSaved) onChartSaved(res.data)
+
       reset()
+      setTimeout(() => {
+        setIsModalOpen(false)
+      }, 300) // 자연스럽게 닫히도록 딜레이
     } catch (err) {
       console.error('저장 오류:', err)
     }
