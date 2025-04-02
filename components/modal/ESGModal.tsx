@@ -26,9 +26,9 @@ export default function ESGModal({category}: ESGModalProps) {
     reset
   } = useESGModal()
 
-  const [chartType, setChartType] = useState<string>('bar')
+  const [chartType, setChartType] = useState<string>()
   const [selectedRows, setSelectedRows] = useState<number[]>([])
-  const [title, setTitle] = useState<string>('사용자 차트')
+  const [title, setTitle] = useState<string>('')
   const [colorSet, setColorSet] = useState<string[]>([])
 
   // 모달이 열릴 때 해당 카테고리의 인디케이터 불러오기
@@ -42,10 +42,8 @@ export default function ESGModal({category}: ESGModalProps) {
       }
     }
 
-    if (isModalOpen) {
-      loadIndicators()
-    }
-  }, [isModalOpen, category])
+    loadIndicators()
+  }, [category])
 
   // 인디케이터의 단위 가져오기 함수
   const getUnit = (key: string): string => indicators.find(i => i.key === key)?.unit || ''

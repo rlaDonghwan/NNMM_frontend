@@ -156,6 +156,10 @@ export default function SecondModalContent({
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
 
+  function onChartSaved(data: any) {
+    throw new Error('Function not implemented.')
+  }
+
   return (
     <div className="p-6 rounded-xl bg-white w-auto mx-auto font-apple">
       <div className="flex items-center justify-between border-b pb-4 mb-6">
@@ -247,7 +251,7 @@ export default function SecondModalContent({
             <h3 className="font-apple">그래프 제목</h3>
             <input
               type="text"
-              value={title}
+              value={title || ''} // undefined일 땐 빈 문자열 처리
               onChange={e => setTitle(e.target.value)}
               placeholder="차트 제목을 입력하세요"
               className="w-full px-4 py-2 border rounded font-apple"
@@ -295,11 +299,21 @@ export default function SecondModalContent({
                 showWarning('차트 제목을 입력해주세요.')
                 return
               }
-
               try {
-                setChartType(selectedChart) // ✅ 반영
-                console.log('selectedChart', selectedChart)
-                await onSubmit()
+                const res = await saveChartConfig({
+                  chartType: selectedChart,
+                  selectedRows,
+                  rows,
+                  indicators,
+                  colorSet,
+                  years,
+                  title,
+                  category
+                })
+
+                // ✅ 저장 성공 후, 콜백 실행
+                if (onChartSaved) onChartSaved(res.data)
+
                 toast.success('차트 저장에 성공했습니다!')
               } catch (error) {
                 toast.error('차트 저장 중 오류가 발생했습니다.')

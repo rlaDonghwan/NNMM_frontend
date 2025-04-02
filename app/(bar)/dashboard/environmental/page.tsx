@@ -1,6 +1,6 @@
 'use client'
 
-import Environment from '@/components/dashboard/environmental'
+import Environment from '@/components/dashboard/Environmental'
 import ESGModal from '@/components/modal/ESGModal'
 import {ESGModalProvider} from '@/components/modal/ESGModalContext'
 import {DndProvider} from 'react-dnd'
@@ -13,7 +13,7 @@ export default function environmental() {
         <div className="flex h-full w-full bg-white pl-4 pt-8">
           <Environment />
         </div>
-        <ESGModal category="social" />
+        <ESGModal category="environmental" />
       </ESGModalProvider>
     </DndProvider>
   )

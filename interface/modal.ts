@@ -19,7 +19,7 @@ export interface Row {
 
 export interface ESGModalContextType {
   isModalOpen: boolean
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsModalOpen: (open: boolean, callback?: (chart: any) => void) => void // ✅ 이렇게 수정!
   step: number
   setStep: React.Dispatch<React.SetStateAction<number>>
   rows: Row[]
@@ -28,6 +28,7 @@ export interface ESGModalContextType {
   setYears: React.Dispatch<React.SetStateAction<number[]>>
   indicators: Indicator[]
   setIndicators: React.Dispatch<React.SetStateAction<Indicator[]>>
+  onChartSaved: ((chart: any) => void) | null
   reset: () => void
 }
 
@@ -64,6 +65,7 @@ export interface SecondModalContentProps {
   onSubmit: () => void
   onBack: () => void
   onSubmitPage: (id?: string) => void
+  onChartSaved?: (chart: any) => void
   chartType: string
   setChartType: React.Dispatch<React.SetStateAction<string>>
   title: string
