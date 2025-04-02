@@ -156,6 +156,10 @@ export default function SecondModalContent({
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
 
+  function onChartSaved(data: any) {
+    throw new Error('Function not implemented.')
+  }
+
   return (
     <div className="flex flex-col overflow-auto">
       <div className="font-apple text-2xl border-b pb-4 mb-6">
@@ -255,6 +259,7 @@ export default function SecondModalContent({
             {/* --------------------------------------------------- */}
           </div>
         </div>
+
         {/* ---------------------------------------------------------------------------------------------- */}
         <div className="flex flex-col w-full md:w-[50%]">
           {/* <h3 className="font-apple mt-4">그래프 미리보기</h3> */}
@@ -268,44 +273,41 @@ export default function SecondModalContent({
                 })}
             </div>
           </div>
+              if (!isChartSelected && !isDataSelected && !isTitleValid) {
+                showWarning('그래프 종류, 데이터, 제목을 모두 입력해주세요.')
+                return
+              } else if (!isChartSelected) {
+                showWarning('그래프 종류를 선택해주세요.')
+                return
+              } else if (!isDataSelected) {
+                showWarning('데이터를 1개 이상 선택해주세요.')
+                return
+              } else if (!isTitleValid) {
+                showWarning('차트 제목을 입력해주세요.')
+                return
+              }
+              try {
+                const res = await saveChartConfig({
+                  chartType: selectedChart,
+                  selectedRows,
+                  rows,
+                  indicators,
+                  colorSet,
+                  years,
+                  title,
+                  category
+                })
 
-          {/* 하단 저장 버튼 ----------------------------------------------*/}
-          <div className="flex flex-row gap-4 justify-end">
-            <Button
-              onClick={onBack}
-              className="bg-gray-200 text-black text-lg px-8 py-2 rounded-full hover:bg-gray-300">
-              &lt; 이전
-            </Button>
-            <Button
-              onClick={async () => {
-                const isTitleValid = title.trim().length > 0
-                const isChartSelected = !!selectedChart
-                const isDataSelected = selectedRows.length > 0
-                if (!isChartSelected && !isDataSelected && !isTitleValid) {
-                  showWarning('그래프 종류, 데이터, 제목을 모두 입력해주세요.')
-                  return
-                } else if (!isChartSelected) {
-                  showWarning('그래프 종류를 선택해주세요.')
-                  return
-                } else if (!isDataSelected) {
-                  showWarning('데이터를 1개 이상 선택해주세요.')
-                  return
-                } else if (!isTitleValid) {
-                  showWarning('차트 제목을 입력해주세요.')
-                  return
-                }
-                try {
-                  setChartType(selectedChart) // ✅ 반영
-                  console.log('selectedChart', selectedChart)
-                  await onSubmit()
-                  toast.success('차트 저장에 성공했습니다!')
-                } catch (error) {
-                  toast.error('차트 저장 중 오류가 발생했습니다.')
-                }
-              }}>
-              저장✔
-            </Button>
-          </div>
+                // ✅ 저장 성공 후, 콜백 실행
+                if (onChartSaved) onChartSaved(res.data)
+
+                toast.success('차트 저장에 성공했습니다!')
+              } catch (error) {
+                toast.error('차트 저장 중 오류가 발생했습니다.')
+              }
+            }}>
+            저장✔
+          </Button>
         </div>
       </div>
     </div>

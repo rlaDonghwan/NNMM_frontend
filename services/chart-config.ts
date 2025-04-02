@@ -59,6 +59,8 @@ export async function saveChartConfig({
     ]
   }
 
+  console.log('[saveChartConfig] Sending Payload:', JSON.stringify(payload, null, 2))
+
   // ✅ 절대 경로로 수정
   return axios.post(`${BASE_URL}/esg-dashboard`, payload, {
     withCredentials: true

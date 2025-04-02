@@ -1,6 +1,6 @@
 'use client'
 
-import Environment from '@/components/dashboard/environmental'
+import Environment from '@/components/dashboard/Environmental'
 import ESGModal from '@/components/modal/ESGModal'
 import {ESGModalProvider} from '@/components/modal/ESGModalContext'
 import {DndProvider} from 'react-dnd'

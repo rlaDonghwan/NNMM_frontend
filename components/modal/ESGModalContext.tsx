@@ -11,6 +11,9 @@ export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
   const [rows, setRows] = useState<Row[]>([])
   const [years, setYears] = useState<number[]>([2022, 2023, 2024])
   const [indicators, setIndicators] = useState<Indicator[]>([])
+  // 동환 추가
+  const [onChartSaved, setOnChartSaved] = useState<((chart: any) => void) | null>(null)
+  //추가
 
   const reset = () => {
     setStep(1)
@@ -22,7 +25,11 @@ export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
     <ESGModalContext.Provider
       value={{
         isModalOpen,
-        setIsModalOpen,
+        setIsModalOpen: (open: boolean, callback?: (chart: any) => void) => {
+          setIsModalOpen(open)
+          if (callback) setOnChartSaved(() => callback)
+        },
+        onChartSaved,
         step,
         setStep,
         rows,
