@@ -161,106 +161,110 @@ export default function SecondModalContent({
   }
 
   return (
-    <div className="p-6 rounded-xl bg-white w-auto mx-auto font-apple">
-      <div className="flex items-center justify-between border-b pb-4 mb-6">
-        <h2 className="text-2xl font-semibold">그래프 선택</h2>
+    <div className="flex flex-col overflow-auto">
+      <div className="font-apple text-2xl border-b pb-4 mb-6">
+        <h2>그래프 선택</h2>
       </div>
-
-      <div className="grid grid-cols-4 gap-6">
-        {/* 그래프 종류 선택 */}
-        <div className="col-span-1 space-y-4">
-          <h3 className="font-apple">그래프 종류 선택</h3>
-          <div className="grid grid-cols-2 gap-[2px]">
-            {chartIcons
-              .filter(({type}) => availableCharts.includes(type))
-              .map(({type, image}) => (
-                <button
-                  key={type}
-                  className={`w-20 h-20 rounded-lg border flex items-center justify-center shadow-sm ${
-                    selectedChart === type ? 'border-black' : 'border-gray-300'
-                  }`}
-                  onClick={() => setSelectedChart(type)}>
-                  <img src={image} alt={type} className="w-10 h-10 object-contain" />
-                </button>
-              ))}
-          </div>
-        </div>
-
-        {/* 데이터 선택 */}
-        <div className="col-span-1 space-y-2">
-          <h3 className="font-apple">데이터 선택</h3>
-          <div className="flex flex-col gap-2">
-            {selectedRows.map((rowIndex, idx) => (
-              <div key={idx} className="flex items-center gap-2">
-                <select
-                  className="flex-1 border rounded px-2 py-1"
-                  value={rowIndex}
-                  onChange={e => {
-                    const newSelected = [...selectedRows]
-                    newSelected[idx] = Number(e.target.value)
-                    setSelectedRows(newSelected)
-                  }}>
-                  {rows
-                    .filter((_, i) => !selectedRows.includes(i) || i === rowIndex)
-                    .map((row, i) => (
-                      <option key={i} value={i}>
-                        {generateLabel(row, indicators)}
-                      </option>
-                    ))}
-                </select>
-                <input
-                  type="color"
-                  className="w-6 h-6 border rounded"
-                  value={colorSet[idx]}
-                  onChange={e => handleColorChange(idx, e.target.value)}
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="flex justify-between mt-2">
-            {selectedRows.length < rows.length && (
-              <Button
-                className="text-sm bg-green-200 hover:bg-green-300 px-3 py-1"
-                onClick={() => {
-                  const unusedIndex = rows.findIndex((_, i) => !selectedRows.includes(i))
-                  if (unusedIndex !== -1) {
-                    setSelectedRows([...selectedRows, unusedIndex])
-                    setColorSet([...colorSet, '#A78BFA'])
-                  }
-                }}>
-                + 지표 추가
-              </Button>
-            )}
-            {selectedRows.length > 1 && (
-              <Button
-                className="text-sm bg-red-200 hover:bg-red-300 px-3 py-1"
-                onClick={() => {
-                  setSelectedRows(selectedRows.slice(0, -1))
-                  setColorSet(colorSet.slice(0, -1))
-                }}>
-                - 삭제
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* 차트 제목 + 미리보기 */}
-        <div className="col-span-2 space-y-4">
+      <div className="flex flex-col md:flex-row justify-between">
+        {/* ---------------------------------------------------------------------------------------------- */}
+        <div className="flex flex-col w-full md:w-[50%]">
+          {/* 그래프 종류 선택 -------------------------------------*/}
           <div>
-            <h3 className="font-apple">그래프 제목</h3>
-            <input
-              type="text"
-              value={title || ''} // undefined일 땐 빈 문자열 처리
-              onChange={e => setTitle(e.target.value)}
-              placeholder="차트 제목을 입력하세요"
-              className="w-full px-4 py-2 border rounded font-apple"
-            />
+            <h3 className="font-apple mb-4">그래프 종류 선택</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+              {chartIcons
+                .filter(({type}) => availableCharts.includes(type))
+                .map(({type, image}) => (
+                  <button
+                    key={type}
+                    className={`w-20 h-20 rounded-lg border flex items-center justify-center shadow-sm mx-auto ${
+                      selectedChart === type ? 'border-black' : 'border-gray-300'
+                    }`}
+                    onClick={() => setSelectedChart(type)}>
+                    <img src={image} alt={type} className="w-10 h-10 object-contain" />
+                  </button>
+                ))}
+            </div>
           </div>
+          {/* --------------------------------------------------*/}
+          {/* 추가/삭제 버튼 ---------------------------------------*/}
+          <div>
+            <div className="flex flex-row items-center mb-2">
+              <h3 className="font-apple min-w-[90px]">데이터 선택</h3>
+              {selectedRows.length < rows.length && (
+                <Button
+                  className="text-sm bg-green-400 hover:bg-green-300 px-3 py-1 mr-3"
+                  onClick={() => {
+                    const unusedIndex = rows.findIndex(
+                      (_, i) => !selectedRows.includes(i)
+                    )
+                    if (unusedIndex !== -1) {
+                      setSelectedRows([...selectedRows, unusedIndex])
+                      setColorSet([...colorSet, '#A78BFA'])
+                    }
+                  }}>
+                  + 지표 추가
+                </Button>
+              )}
+              {selectedRows.length > 1 && (
+                <Button
+                  className="text-sm bg-red-400 hover:bg-red-300 px-3 py-1 mr-3"
+                  onClick={() => {
+                    setSelectedRows(selectedRows.slice(0, -1))
+                    setColorSet(colorSet.slice(0, -1))
+                  }}>
+                  - 삭제
+                </Button>
+              )}
+              {/* --------------------------------------------------*/}
+              {/* 차트 제목 입력---------------------------------------*/}
+              <input
+                type="text"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="차트 제목을 입력하세요"
+                className="w-full px-4 py-2 border rounded font-apple"
+              />
+            </div>
+            {/* --------------------------------------------------- */}
+            {/* 데이터 선택 ------------------------------------------*/}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+              {selectedRows.map((rowIndex, idx) => (
+                <div key={idx} className="flex items-center">
+                  <select
+                    className="flex-1 border rounded w-[200px]"
+                    value={rowIndex}
+                    onChange={e => {
+                      const newSelected = [...selectedRows]
+                      newSelected[idx] = Number(e.target.value)
+                      setSelectedRows(newSelected)
+                    }}>
+                    {rows
+                      .filter((_, i) => !selectedRows.includes(i) || i === rowIndex)
+                      .map((row, i) => (
+                        <option key={i} value={i}>
+                          {generateLabel(row, indicators)}
+                        </option>
+                      ))}
+                  </select>
+                  <input
+                    type="color"
+                    className="w-6 h-6 border rounded ml-2"
+                    value={colorSet[idx]}
+                    onChange={e => handleColorChange(idx, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+            {/* --------------------------------------------------- */}
+          </div>
+        </div>
 
-          <h3 className="font-apple mt-4">그래프 미리보기</h3>
-          <div className="bg-white-100 w-full max-w-full rounded-xl h-64 flex items-center justify-center overflow-x-auto">
-            <div className="w-[90%] h-full p-4">
+        {/* ---------------------------------------------------------------------------------------------- */}
+        <div className="flex flex-col w-full md:w-[50%]">
+          {/* <h3 className="font-apple mt-4">그래프 미리보기</h3> */}
+          <div className="bg-white-100 w-full max-w-full rounded-xl flex overflow-x-auto">
+            <div className=" flex w-full h-auto min-h-[400px] p-4 justify-center">
               {selectedChart &&
                 chartComponentMap[selectedChart] &&
                 React.createElement(chartComponentMap[selectedChart], {
@@ -269,23 +273,6 @@ export default function SecondModalContent({
                 })}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* 하단 저장 버튼 */}
-      <div className="w-full bg-white rounded-xl shadow p-6">
-        <div className="flex justify-end mt-6 gap-3">
-          <Button
-            onClick={onBack}
-            className="bg-gray-200 text-black text-lg px-8 py-2 rounded-full hover:bg-gray-300">
-            &lt; 이전
-          </Button>
-          <Button
-            onClick={async () => {
-              const isTitleValid = title.trim().length > 0
-              const isChartSelected = !!selectedChart
-              const isDataSelected = selectedRows.length > 0
-
               if (!isChartSelected && !isDataSelected && !isTitleValid) {
                 showWarning('그래프 종류, 데이터, 제목을 모두 입력해주세요.')
                 return
