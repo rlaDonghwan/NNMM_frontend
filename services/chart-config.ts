@@ -59,8 +59,6 @@ export async function saveChartConfig({
     ]
   }
 
-  console.log('[saveChartConfig] Sending Payload:', JSON.stringify(payload, null, 2))
-
   // ✅ 절대 경로로 수정
   return axios.post(`${BASE_URL}/esg-dashboard`, payload, {
     withCredentials: true
@@ -78,7 +76,7 @@ export const fetchUserCharts = async (category?: string) => {
     params
   })
 
-  console.log('[fetchUserCharts] Response:', res.data)
+  console.log('[📊 chart item structure]', res.data)
   return res.data
 }
 
@@ -88,7 +86,7 @@ export const fetchUserCharts = async (category?: string) => {
 // export const updateChartOrder = async (orderedIds: string[]) => {
 //   return axios.post(`${BASE_URL}/chart/order`, {orderedIds}, {withCredentials: true})
 // }
-//이차 차트 순서 불러오기 바꾼건데 코드 이해 안감 -> 다시 좀 보자잉 : 주석 너무 좋습니다 형님
+//이차 차트 순서 불러오기 바꾼건데 코드 이해 안감 -> 다시 좀 보자잉
 export async function updateChartOrder(orderedCharts) {
   return await fetch(`${BASE_URL}/esg-dashboard/order`, {
     method: 'POST',
