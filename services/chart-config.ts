@@ -97,9 +97,6 @@ export const updateChartOrder = async (
     console.log('차트 순서 저장 성공!', response.data)
   } catch (error: any) {
     console.error('차트 순서 저장 실패 😢')
-    console.error('📦 error.response?.data:', error?.response?.data)
-    console.error('📦 error.message:', error?.message)
-    console.error('📦 error:', error)
   }
 }
 
