@@ -12,7 +12,26 @@ export default function Social() {
   const [isLoading, setIsLoading] = useState(true) // 로딩 상태 여부
   const {setIsModalOpen, reset} = useESGModal() // 모달 열기 및 리셋 함수 가져오기
 
+  //이렇게 useEffect써야 Favorite기능이 먹어서 여기 부분만 건들건들했습니다.
   useEffect(() => {
+    const loadCharts = async () => {
+      try {
+        const data = await fetchUserCharts('')
+        const filtered = data
+          .filter(chart => chart.category === 'social')
+          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+        setGridItems(filtered)
+      } catch (err) {
+        console.error('차트 불러오기 실패:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadCharts()
+  }, [])
+                
+<!--   useEffect(() => {
     const loadCharts = async () => {
       try {
         const data = await fetchUserCharts('')
@@ -38,7 +57,9 @@ export default function Social() {
     }
 
     loadCharts()
-  }, [])
+  }, [])               -->
+                
+  
 
   const handleChartSaved = (newChart: any) => {
     setGridItems(prev => {
@@ -103,7 +124,7 @@ export default function Social() {
           {/* 차트 카드 목록 출력 */}
           {gridItems.map((item, index) => (
             <GridItem
-              key={item._id || index} // 키 값 (없으면 인덱스로 대체)
+              key={item._id} // 키 값 (없으면 인덱스로 대체)
               item={item} // 차트 데이터
               index={index} // 현재 인덱스
               isLast={false} // 마지막 아이템 아님

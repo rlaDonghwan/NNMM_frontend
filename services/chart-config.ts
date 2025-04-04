@@ -59,8 +59,6 @@ export async function saveChartConfig({
     ]
   }
 
-  console.log('[saveChartConfig] Sending Payload:', JSON.stringify(payload, null, 2))
-
   // ✅ 절대 경로로 수정
   return axios.post(`${BASE_URL}/esg-dashboard`, payload, {
     withCredentials: true
@@ -78,11 +76,10 @@ export const fetchUserCharts = async (category?: string) => {
     params
   })
 
-  console.log('[fetchUserCharts] Response:', res.data)
+  console.log('[📊 chart item structure]', res.data)
   return res.data
 }
 //----------------------------------------------------------------------------------------------------
-
 export const updateChartOrder = async (
   updatedCharts: {chartId: string; dashboardId: string; newOrder: number}[]
 ) => {

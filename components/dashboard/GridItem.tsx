@@ -16,8 +16,8 @@ import {
   Title
 } from 'chart.js'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
-
 // -----------------------------------------------------------------------즐겨찾기를 위한 별 추가
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 import {FaRegStar, FaStar} from 'react-icons/fa'
 //------------------------------------------------------------------------여기까지
 
@@ -94,8 +94,11 @@ export default function GridItem({
   const ChartComponent = chartComponentMap[chartTypeKey as keyof typeof chartComponentMap]
 
   const isPieLike = ['pie', 'doughnut', 'polararea', 'radar'].includes(chartTypeKey || '')
-
-  const chartData = item?.fields?.length
+  if (!item) {
+    return null
+  }
+  console.log(item)
+  const chartData = item.fields?.length
     ? isPieLike
       ? {
           labels: item.fields.map(f => f.label),
@@ -134,9 +137,11 @@ export default function GridItem({
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
 
-  //----------------------------------------------------------------토글을 위한 상태 추가
-  // const [isFavorite, setIsFavorite] = useState(false) // 상태 추가
-  //----------------------------------------------------------------아래쪽 html코드 수정 p-6 >> px-4, py-2 추가
+  //----------------------------------------------------------------Favorite 토글을 위한 상태 추가
+  const [isFavorite, setIsFavorite] = useState(item.isFavorite || false) // 상태 추가
+  const chartId = item.chartId
+  const dashboardId = item.dashboardId
+  //----------------------------------------------------------------
   return (
     <div
       ref={ref}
@@ -158,18 +163,61 @@ export default function GridItem({
           데이터를 확인해 주세요
         </div>
       )}
-
+      {/* 지현쓰가 만든 코드 일단 주석 처리 해두고 밑에다가 새로운 버튼 만들게요 */}
       {/* 즐겨찾기 기능 추가------------------------------------------------------ */}
-      {/* 
-      <button
+      {/* <button
         className="flex h-full justify-end items-start"
         onClick={e => {
           e.stopPropagation() // 부모 onClick 방지
           setIsFavorite(prev => !prev)
         }}>
         {isFavorite ? <FaStar /> : <FaRegStar />}
-      </button> 
-      */}
+      </button> */}
+
+      {/* 여기서부터 상진쓰가 만드는 코드 */}
+      {!isLast && (
+        <button
+          className="flex h-full justify-end items-start"
+          onClick={async e => {
+            e.stopPropagation()
+
+            const newFavorite = !isFavorite
+            setIsFavorite(newFavorite)
+            console.log(
+              '요청 URL:',
+              `${BASE_URL}/esg-dashboard/favorite/${item.dashboardId}`
+            )
+
+            try {
+              const res = await fetch(
+                `${BASE_URL}/esg-dashboard/favorite/${item.dashboardId}`,
+                {
+                  method: 'PATCH',
+                  headers: {'Content-Type': 'application/json'},
+                  credentials: 'include',
+                  body: JSON.stringify({
+                    chartId: item.chartId,
+                    isFavorite: newFavorite, // ✅ 토글된 상태
+                    userId: item.userId
+                  })
+                }
+              )
+
+              const result = await res.json()
+
+              if (!res.ok) {
+                console.error('즐겨찾기 업데이트 실패:', result)
+                setIsFavorite(!newFavorite) // 실패 시 되돌리기
+              }
+            } catch (err) {
+              console.error('즐겨찾기 요청 에러:', err)
+              setIsFavorite(!newFavorite) // 실패 시 되돌리기
+            }
+          }}>
+          {isFavorite ? <FaStar /> : <FaRegStar />}
+        </button>
+      )}
+
       {/* 여기까지------------------------------------------------------ */}
     </div>
   )
