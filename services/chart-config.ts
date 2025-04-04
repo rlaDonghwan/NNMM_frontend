@@ -98,3 +98,15 @@ export const updateChartOrder = async (
 }
 
 //----------------------------------------------------------------------------------------------------
+
+export const fetchChartDetail = async (dashboardId: string, chartId: string) => {
+  console.log('[🔥 chart fetch 요청]', dashboardId, chartId)
+
+  const res = await axios.patch(
+    `${BASE_URL}/esg-dashboard/load-chart`,
+    {dashboard: dashboardId, chartId},
+    {withCredentials: true}
+  )
+
+  return res.data
+}

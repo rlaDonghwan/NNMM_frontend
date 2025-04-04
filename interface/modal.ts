@@ -19,7 +19,8 @@ export interface Row {
 
 export interface ESGModalContextType {
   isModalOpen: boolean
-  setIsModalOpen: (open: boolean, callback?: (chart: any) => void) => void // ✅ 이렇게 수정!
+  setIsModalOpen: (open: boolean, callback?: (chart: any) => void) => void // ✅ 그대로
+  setIsEditModalOpen: (open: boolean, callback?: (chart: any) => void) => void // ✅ 그대로
   step: number
   setStep: React.Dispatch<React.SetStateAction<number>>
   rows: Row[]
@@ -29,6 +30,8 @@ export interface ESGModalContextType {
   indicators: Indicator[]
   setIndicators: React.Dispatch<React.SetStateAction<Indicator[]>>
   onChartSaved: ((chart: any) => void) | null
+  chartToEdit: any | null // ✅ 추가: 수정할 차트 데이터
+  setChartToEdit: React.Dispatch<React.SetStateAction<any | null>> // ✅ 추가: 차트 설정 함수
   reset: () => void
 }
 
