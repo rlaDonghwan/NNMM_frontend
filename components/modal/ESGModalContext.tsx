@@ -14,8 +14,13 @@ export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
   const [indicators, setIndicators] = useState<Indicator[]>([])
   const [onChartSaved, setOnChartSaved] = useState<((chart: any) => void) | null>(null)
   const [chartToEdit, setChartToEdit] = useState<any | null>(null)
+  const setIsModalOpenWithCallback = (open: boolean, callback: (chart: any) => void) => {
+    setIsModalOpen(open)
+    setOnChartSaved(() => callback) // 예: 콜백 저장용 state
+  }
+  //----------------------------------------------------------------------------------------------------
 
-  // ✅ 신규 또는 수정모드로 모달 열기 명확하게 처리
+  // 신규 또는 수정모드로 모달 열기 명확하게 처리
   const setIsModalOpen = (open: boolean, callback?: (chart: any) => void) => {
     setIsModalOpenState(open)
     if (open && callback) setOnChartSaved(() => callback)
@@ -25,7 +30,9 @@ export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
       setIsEditModalOpen(false) // 명확히 닫을 때 수정모드 비활성화
     }
   }
+  //----------------------------------------------------------------------------------------------------
 
+  // 상태 초기화
   const reset = () => {
     setStep(1)
     setRows([])
@@ -34,14 +41,15 @@ export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
     setChartToEdit(null)
     setIsEditModalOpen(false)
   }
+  //----------------------------------------------------------------------------------------------------
 
-  // ✅ 수정모드로 바로 여는 헬퍼 함수 추가
+  // 수정모드로 바로 여는 헬퍼 함수 추가
   const openEditModal = (chart: any, callback?: (chart: any) => void) => {
     setChartToEdit(chart)
     setIsEditModalOpen(true)
     setIsModalOpen(true, callback)
   }
-
+  //----------------------------------------------------------------------------------------------------
   return (
     <ESGModalContext.Provider
       value={{
@@ -61,15 +69,18 @@ export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
         chartToEdit,
         setChartToEdit,
         reset,
-        openEditModal // ✅ 추가로 export
+        openEditModal,
+        setIsModalOpenWithCallback
       }}>
       {children}
     </ESGModalContext.Provider>
   )
 }
-
+//----------------------------------------------------------------------------------------------------
+// ESGModalContext를 사용하는 커스텀 훅
 export const useESGModal = () => {
   const context = useContext(ESGModalContext)
   if (!context) throw new Error('useESGModal must be used within ESGModalProvider')
   return context
 }
+//----------------------------------------------------------------------------------------------------

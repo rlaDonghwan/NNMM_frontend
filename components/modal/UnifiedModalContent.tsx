@@ -15,7 +15,8 @@ export default function UnifiedModalContent({
   setIndicators,
   onRemoveRow,
   onAddRowWithIndicator,
-  onSubmitPage
+  onSubmitPage,
+  setSelectedRows
 }: ModalContentProps) {
   const pathname = usePathname()
   const category = pathname.includes('social')
@@ -25,12 +26,8 @@ export default function UnifiedModalContent({
     : 'governance'
 
   const {isEditModalOpen, chartToEdit} = useESGModal()
-
   const [selectedIndicator, setSelectedIndicator] = useState(indicators[0]?.key || '')
-  const [companyName, setCompanyName] = useState('')
-  const [selectedYear, setSelectedYear] = useState('')
   const [selectedUnits, setSelectedUnits] = useState<Record<string, string>>({})
-
   const yearOptions = useMemo(() => {
     const startYear = 2025
     const options: string[] = []
@@ -39,7 +36,8 @@ export default function UnifiedModalContent({
     }
     return options
   }, [])
-
+  //----------------------------------------------------------------------------------------------------
+  // 연도 추가
   const handleYearSelect = (year: string) => {
     const parsed = parseInt(year)
     if (!isNaN(parsed)) {
@@ -53,11 +51,15 @@ export default function UnifiedModalContent({
       }
     }
   }
+  //----------------------------------------------------------------------------------------------------
 
+  // 연도 삭제
   const removeYearByValue = (year: number) => {
     setYears(prev => prev.filter(y => y !== year))
   }
+  //----------------------------------------------------------------------------------------------------
 
+  // 데이터 수정 시 기존 값을 기반으로 입력 필드 값 채우기
   const onValueChange = (rowIndex: number, year: number, value: string) => {
     const updatedRows = [...rows]
     if (!updatedRows[rowIndex].values) {
@@ -66,6 +68,7 @@ export default function UnifiedModalContent({
     updatedRows[rowIndex].values[year] = value
     setRows(updatedRows)
   }
+  //----------------------------------------------------------------------------------------------------
 
   // 데이터 수정 시 기존 값을 기반으로 입력 필드 값 채우기
   useEffect(() => {
@@ -90,7 +93,13 @@ export default function UnifiedModalContent({
       setRows(updatedRows)
     }
   }, [isEditModalOpen, chartToEdit])
+  //----------------------------------------------------------------------------------------------------
 
+  // 데이터 추가 시 기존 값 기반으로 입력 필드 값 채우기
+  useEffect(() => {
+    setSelectedRows?.(prev => prev.filter(i => i >= 0 && i < rows.length))
+  }, [rows])
+  //----------------------------------------------------------------------------------------------------
   return (
     <div className="w-auto overflow-auto bg-white rounded-xl shadow p-5">
       {/* 헤더 */}
