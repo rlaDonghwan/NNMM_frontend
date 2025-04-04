@@ -4,7 +4,6 @@ import {useEffect, useState} from 'react'
 import {useESGModal} from '@/components/modal/ESGModalContext'
 import GridItem from './GridItem'
 import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
-
 export default function Social() {
   const [gridItems, setGridItems] = useState([]) // 차트 리스트 상태
   const [isEditModalOpen, setIsEditModalOpen] = useState(false) // 삭제 모달 오픈 여부

@@ -142,6 +142,10 @@ export default function GridItem({
   const [isFavorite, setIsFavorite] = useState(item.isFavorite || false) // 상태 추가
   const chartId = item.chartId
   const dashboardId = item.dashboardId
+  console.log('[ChartId 확인]', item.chartId)
+  console.log('[DashboardId 확인]', item.dashboardId)
+  console.log('[UserId 확인]', item.userId)
+
   //----------------------------------------------------------------
   return (
     <div

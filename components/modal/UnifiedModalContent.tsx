@@ -247,7 +247,7 @@ export default function UnifiedModalContent({
                   {years.map(year => (
                     <td key={year} className="px-2">
                       <input
-                        type="text"
+                        type="number"
                         value={row.values[year] || ''}
                         onChange={e => onValueChange(rowIndex, year, e.target.value)}
                         className="w-[80px] px-2 py-1 rounded border font-apple"
