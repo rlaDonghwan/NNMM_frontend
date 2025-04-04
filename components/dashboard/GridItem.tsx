@@ -19,6 +19,7 @@ import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
 // -----------------------------------------------------------------------즐겨찾기를 위한 별 추가
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 import {FaRegStar, FaStar} from 'react-icons/fa'
+import {toggleFavoriteChart} from '@/services/chart-config'
 //------------------------------------------------------------------------여기까지
 
 ChartJS.register(
@@ -97,7 +98,7 @@ export default function GridItem({
   if (!item) {
     return null
   }
-  console.log(item)
+  // console.log(item)
   const chartData = item.fields?.length
     ? isPieLike
       ? {
@@ -167,16 +168,6 @@ export default function GridItem({
           데이터를 확인해 주세요
         </div>
       )}
-      {/* 지현쓰가 만든 코드 일단 주석 처리 해두고 밑에다가 새로운 버튼 만들게요 */}
-      {/* 즐겨찾기 기능 추가------------------------------------------------------ */}
-      {/* <button
-        className="flex h-full justify-end items-start"
-        onClick={e => {
-          e.stopPropagation() // 부모 onClick 방지
-          setIsFavorite(prev => !prev)
-        }}>
-        {isFavorite ? <FaStar /> : <FaRegStar />}
-      </button> */}
 
       {/* 여기서부터 상진쓰가 만드는 코드 */}
       {!isLast && (
@@ -187,42 +178,22 @@ export default function GridItem({
 
             const newFavorite = !isFavorite
             setIsFavorite(newFavorite)
-            console.log(
-              '요청 URL:',
-              `${BASE_URL}/esg-dashboard/favorite/${item.dashboardId}`
-            )
 
-            try {
-              const res = await fetch(
-                `${BASE_URL}/esg-dashboard/favorite/${item.dashboardId}`,
-                {
-                  method: 'PATCH',
-                  headers: {'Content-Type': 'application/json'},
-                  credentials: 'include',
-                  body: JSON.stringify({
-                    chartId: item.chartId,
-                    isFavorite: newFavorite, // ✅ 토글된 상태
-                    userId: item.userId
-                  })
-                }
-              )
+            const success = await toggleFavoriteChart({
+              dashboardId: item.dashboardId,
+              chartId: item.chartId,
+              userId: item.userId,
+              isFavorite: newFavorite,
+              onError: () => setIsFavorite(!newFavorite) // 실패 시 롤백
+            })
 
-              const result = await res.json()
-
-              if (!res.ok) {
-                console.error('즐겨찾기 업데이트 실패:', result)
-                setIsFavorite(!newFavorite) // 실패 시 되돌리기
-              }
-            } catch (err) {
-              console.error('즐겨찾기 요청 에러:', err)
-              setIsFavorite(!newFavorite) // 실패 시 되돌리기
+            if (!success) {
+              console.error('즐겨찾기 토글 실패 ❌')
             }
           }}>
           {isFavorite ? <FaStar /> : <FaRegStar />}
         </button>
       )}
-
-      {/* 여기까지------------------------------------------------------ */}
     </div>
   )
 }

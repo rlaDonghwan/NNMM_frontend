@@ -18,7 +18,7 @@ export default function Social() {
         const data = await fetchUserCharts('')
         const filtered = data
           .filter(chart => chart.category === 'social')
-          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999)) // 차트 순서
         setGridItems(filtered)
       } catch (err) {
         console.error('차트 불러오기 실패:', err)
@@ -29,7 +29,7 @@ export default function Social() {
 
     loadCharts()
   }, [])
-
+  //------------------------------------------------------------------------------------
   const handleChartSaved = (newChart: any) => {
     setGridItems(prev => {
       const exists = prev.some(item => item._id === newChart._id)
@@ -38,6 +38,8 @@ export default function Social() {
         : [...prev, newChart]
     })
   }
+  //------------------------------------------------------------------------------------
+
   const handleClick = (item: any) => {
     if (item._id) {
       setSelectedItemId(item._id)
@@ -57,6 +59,7 @@ export default function Social() {
       })
     }
   }
+  //------------------------------------------------------------------------------------
   const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems]
     const [removed] = updated.splice(dragIndex, 1)
@@ -82,7 +85,7 @@ export default function Social() {
       console.error('순서 저장 실패:', err)
     }
   }
-
+  //------------------------------------------------------------------------------------
   return (
     <div className="font-apple w-full h-screen">
       {/* 로딩 중이면 메시지 출력 */}
@@ -112,7 +115,7 @@ export default function Social() {
           />
         </div>
       )}
-
+      {/* //------------------------------------------------------------------------------------ */}
       {/* 삭제 확인 모달 */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center font-apple">

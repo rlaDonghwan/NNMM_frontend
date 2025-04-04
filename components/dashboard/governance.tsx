@@ -11,23 +11,13 @@ export default function Governance() {
   const [selectedItemId, setSelectedItemId] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const {setIsModalOpen, reset} = useESGModal()
-
+  //------------------------------------------------------------------------------------
   useEffect(() => {
     const loadCharts = async () => {
       try {
         const data = await fetchUserCharts('')
         const filtered = data
           .filter(chart => chart.category === 'governance')
-          .flatMap(chart => {
-            if (!chart.dashboardId && chart._id && chart.charts) {
-              return chart.charts.map(c => ({
-                ...c,
-                dashboardId: chart._id,
-                category: chart.category
-              }))
-            }
-            return [{...chart}]
-          })
           .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
         setGridItems(filtered)
       } catch (err) {
@@ -39,7 +29,8 @@ export default function Governance() {
 
     loadCharts()
   }, [])
-
+  //------------------------------------------------------------------------------------
+  // 차트 저장 후 상태 업데이트
   const handleChartSaved = (newChart: any) => {
     setGridItems(prev => {
       const exists = prev.some(item => item._id === newChart._id)
@@ -48,6 +39,7 @@ export default function Governance() {
         : [...prev, newChart]
     })
   }
+  //------------------------------------------------------------------------------------
 
   const handleClick = (item: any) => {
     if (item._id) {
@@ -68,6 +60,7 @@ export default function Governance() {
       })
     }
   }
+  //------------------------------------------------------------------------------------
 
   const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems]
@@ -94,7 +87,7 @@ export default function Governance() {
       console.error('순서 저장 실패:', err)
     }
   }
-
+  //------------------------------------------------------------------------------------
   return (
     <div className="font-apple w-full h-screen">
       {isLoading ? (
@@ -122,7 +115,7 @@ export default function Governance() {
           />
         </div>
       )}
-
+      {/* //------------------------------------------------------------------------------------ */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center font-apple">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
