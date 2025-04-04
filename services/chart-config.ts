@@ -110,3 +110,35 @@ export const fetchChartDetail = async (dashboardId: string, chartId: string) => 
 
   return res.data
 }
+//----------------------------------------------------------------------------------------------------
+export const toggleFavoriteChart = async ({
+  dashboardId,
+  chartId,
+  userId,
+  isFavorite,
+  onError
+}: {
+  dashboardId: string
+  chartId: string
+  userId: string
+  isFavorite: boolean
+  onError?: () => void
+}) => {
+  try {
+    const res = await axios.patch(
+      `${BASE_URL}/esg-dashboard/favorite/${dashboardId}`,
+      {
+        chartId,
+        isFavorite,
+        userId
+      },
+      {withCredentials: true}
+    )
+
+    return res.status === 200
+  } catch (error) {
+    console.error('[❌ 즐겨찾기 토글 실패]', error)
+    if (onError) onError()
+    return false
+  }
+}
