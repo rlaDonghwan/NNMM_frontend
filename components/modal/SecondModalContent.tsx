@@ -326,6 +326,7 @@ export default function SecondModalContent({
             </div>
           </div>
           <div className="flex justify-end w-full mt-4 gap-2">
+            {/* -------------------------------------------------버튼들 바꿈 */}
             <Button
               className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded font-apple"
               onClick={() => {
