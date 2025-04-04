@@ -3,7 +3,7 @@
 // 필요한 라이브러리와 컴포넌트 import
 import {useEffect, useState} from 'react'
 import {Button} from '@/components/ui/button'
-import {saveChartConfig} from '@/services/chart-config'
+import {deleteChart, saveChartConfig, updateChart} from '@/services/chart-config'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -22,6 +22,7 @@ import toast from 'react-hot-toast'
 import {usePathname} from 'next/navigation'
 import {showWarning} from '@/utils/toast'
 import {SecondModalContentProps} from '@/interface/modal'
+import {useESGModal} from './ESGModalContext' // 👈 추가 필요
 
 // Chart.js 구성요소 등록
 ChartJS.register(
@@ -65,6 +66,7 @@ function recommendChartTypes(rows, years) {
   if (indicatorsCount > 1 && yearsCount > 1) return ['Line']
   return ['Bar']
 }
+//----------------------------------------------------------------------------------------------------
 
 // 차트에 표시할 label 생성 함수
 function generateLabel(row, indicators) {
@@ -76,6 +78,7 @@ function generateLabel(row, indicators) {
     parts && unit ? ` / ${unit})` : unit ? ` (${unit})` : parts ? ')' : ''
   }`
 }
+//----------------------------------------------------------------------------------------------------
 
 // 메인 컴포넌트
 export default function SecondModalContent({
@@ -91,18 +94,21 @@ export default function SecondModalContent({
   chartType,
   setChartType,
   onBack,
-  onChartSaved
+  onChartSaved,
+  closeModal,
+  refetchCharts
 }: SecondModalContentProps) {
   const [selectedChart, setSelectedChart] = useState(chartType || null)
   const [availableCharts, setAvailableCharts] = useState<string[]>([])
+  const {isEditModalOpen, chartToEdit} = useESGModal()
   const pathname = usePathname()
-
   // 경로 기반 카테고리 추출
   const category = pathname.includes('social')
     ? 'social'
     : pathname.includes('environmental')
     ? 'environmental'
     : 'governance'
+  //----------------------------------------------------------------------------------------------------
 
   // 차트 자동 추천
   useEffect(() => {
@@ -113,6 +119,33 @@ export default function SecondModalContent({
       setChartType?.(recommended[0])
     }
   }, [rows, years])
+  //----------------------------------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (isEditModalOpen && chartToEdit) {
+      console.log('[🧩 chartToEdit]', chartToEdit) // 이건 잘 됐고
+
+      // 이거 추가해봐
+      console.log('[🆔 ChartId 확인]', chartToEdit._id)
+      console.log('[🧾 DashboardId 확인]', chartToEdit.dashboardId)
+
+      if (!chartToEdit.dashboardId) {
+        toast.error('dashboardId가 없습니다. 수정 요청 실패 ⚠️')
+      }
+
+      setSelectedRows(chartToEdit.fields?.map((_, i) => i) || [])
+      setColorSet(chartToEdit.fields?.map(f => f.color || '#cccccc') || [])
+      setTitle(chartToEdit.title || '')
+      setChartType(chartToEdit.chartType || 'Bar')
+      setSelectedChart(chartToEdit.chartType || 'Bar')
+    }
+  }, [isEditModalOpen, chartToEdit])
+  //----------------------------------------------------------------------------------------------------
+
+  useEffect(() => {
+    setSelectedRows?.(prev => prev.filter(i => i >= 0 && i < rows.length))
+  }, [rows])
+  //----------------------------------------------------------------------------------------------------
 
   // 색상 변경
   const handleColorChange = (index: number, newColor: string) => {
@@ -120,10 +153,11 @@ export default function SecondModalContent({
     updated[index] = newColor
     setColorSet(updated)
   }
+  //----------------------------------------------------------------------------------------------------
 
   // 파이계열 여부
   const isPieLike = ['Pie', 'Doughnut', 'PolarArea', 'Radar'].includes(selectedChart)
-
+  //----------------------------------------------------------------------------------------------------
   // 차트 데이터 구성
   const chartData = isPieLike
     ? {
@@ -148,6 +182,7 @@ export default function SecondModalContent({
           }
         })
       }
+  //----------------------------------------------------------------------------------------------------
 
   // 차트 옵션
   const chartOptions = {
@@ -171,6 +206,7 @@ export default function SecondModalContent({
     }
     return color
   }
+  //----------------------------------------------------------------------------------------------------
   //colorset 랜덤 초기화
   useEffect(() => {
     if (colorSet.length < selectedRows.length) {
@@ -178,6 +214,7 @@ export default function SecondModalContent({
       setColorSet(newColors)
     }
   }, [selectedRows])
+  //----------------------------------------------------------------------------------------------------
 
   // 저장 버튼 클릭 핸들러
   const handleSave = async () => {
@@ -230,11 +267,100 @@ export default function SecondModalContent({
         }
         onChartSaved(formatted)
       }
+      // 모달 닫기
+      setTimeout(() => {
+        closeModal?.()
+      }, 100)
     } catch (error) {
       toast.error('차트 저장 중 오류가 발생했습니다.')
     }
   }
+  //----------------------------------------------------------------------------------------------------
 
+  // 수정 저장 핸들러
+  const handleUpdate = async () => {
+    if (!chartToEdit?.dashboardId || !chartToEdit?._id) {
+      toast.error('차트 정보가 올바르지 않습니다.')
+      return
+    }
+
+    try {
+      const updateDto = {
+        chartType: selectedChart,
+        title,
+        unit:
+          indicators.find(ind => ind.key === rows[selectedRows[0]]?.indicatorKey)?.unit ||
+          '',
+        years,
+        fields: selectedRows.map((rowIndex, i) => {
+          const row = rows[rowIndex]
+          return {
+            key: row.indicatorKey,
+            label:
+              indicators.find(ind => ind.key === row.indicatorKey)?.label ||
+              row.indicatorKey,
+            field1: row.field1,
+            field2: row.field2,
+            unit: row.unit,
+            color: colorSet[i],
+            data: Object.fromEntries(years.map(y => [y, Number(row.values[y] || 0)]))
+          }
+        })
+      }
+
+      const updated = await updateChart({
+        dashboardId: chartToEdit.dashboardId,
+        chartId: chartToEdit._id,
+        updateDto
+      })
+
+      toast.success('차트 수정 완료! 🎉')
+
+      if (onChartSaved) {
+        onChartSaved({
+          _id: chartToEdit._id,
+          dashboardId: chartToEdit.dashboardId,
+          chartType: selectedChart.toLowerCase(),
+          title,
+          years,
+          fields: updateDto.fields
+        })
+      }
+
+      setTimeout(() => closeModal?.(), 200)
+    } catch (err) {
+      toast.error('차트 수정에 실패했습니다 ❌')
+    }
+  }
+  //----------------------------------------------------------------------------------------------------
+
+  // 삭제 핸들러
+  const handleDelete = async () => {
+    const confirm = window.confirm('정말 삭제하시겠습니까? 🗑️')
+    if (!confirm) return
+
+    try {
+      await deleteChart({
+        dashboardId: chartToEdit.dashboardId,
+        chartId: chartToEdit._id
+      })
+
+      toast.success('차트가 삭제되었습니다!')
+
+      // SecondModalContent.tsx → handleDelete 안에서 이걸 꼭 해줘야 함
+      if (onChartSaved) {
+        onChartSaved({
+          _id: chartToEdit._id,
+          deleted: true
+        })
+      }
+
+      setTimeout(() => closeModal?.(), 200)
+    } catch (error) {
+      toast.error('차트 삭제 중 오류가 발생했습니다 ❌')
+    }
+  }
+  //----------------------------------------------------------------------------------------------------
   return (
     <div className="flex flex-col overflow-auto">
       <div className="font-apple text-2xl border-b pb-4 mb-6">
@@ -268,7 +394,7 @@ export default function SecondModalContent({
             <h3 className="font-apple min-w-[90px]">데이터 선택</h3>
             {selectedRows.length < rows.length && (
               <Button
-                className="text-sm bg-green-400 hover:bg-green-300 px-3 py-1 mr-3"
+                className="text-sm bg-green-400 hover:bg-green-300 px-3 py-1 mr-3 font-apple"
                 onClick={() => {
                   const unusedIndex = rows.findIndex((_, i) => !selectedRows.includes(i))
                   if (unusedIndex !== -1) {
@@ -281,7 +407,7 @@ export default function SecondModalContent({
             )}
             {selectedRows.length > 1 && (
               <Button
-                className="text-sm bg-red-400 hover:bg-red-300 px-3 py-1 mr-3"
+                className="text-sm bg-red-400 hover:bg-red-300 px-3 py-1 mr-3 font-apple"
                 onClick={() => {
                   setSelectedRows(selectedRows.slice(0, -1))
                   setColorSet(colorSet.slice(0, -1))
@@ -350,19 +476,32 @@ export default function SecondModalContent({
             </div>
           </div>
           <div className="flex justify-end w-full mt-4 gap-2">
-            {/* -------------------------------------------------버튼들 바꿈 */}
             <Button
               className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded font-apple"
-              onClick={() => {
-                if (typeof onBack === 'function') onBack()
-              }}>
+              onClick={onBack}>
               &lt; 이전
             </Button>
-            <Button
-              className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
-              onClick={handleSave}>
-              저장 ✔
-            </Button>
+
+            {isEditModalOpen ? (
+              <>
+                <Button
+                  className="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded font-apple"
+                  onClick={handleDelete}>
+                  삭제 🗑️
+                </Button>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
+                  onClick={handleUpdate}>
+                  수정 저장 ✔
+                </Button>
+              </>
+            ) : (
+              <Button
+                className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
+                onClick={handleSave}>
+                저장 ✔
+              </Button>
+            )}
           </div>
         </div>
       </div>

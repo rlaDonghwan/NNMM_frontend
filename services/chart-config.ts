@@ -58,8 +58,6 @@ export async function saveChartConfig({
       }
     ]
   }
-
-  // ✅ 절대 경로로 수정
   return axios.post(`${BASE_URL}/esg-dashboard`, payload, {
     withCredentials: true
   })
@@ -80,6 +78,8 @@ export const fetchUserCharts = async (category?: string) => {
   return res.data
 }
 //----------------------------------------------------------------------------------------------------
+// 차트 순서 업데이트 함수
+// 대시보드에서 차트 순서 업데이트
 export const updateChartOrder = async (
   updatedCharts: {chartId: string; dashboardId: string; newOrder: number}[]
 ) => {
@@ -98,7 +98,8 @@ export const updateChartOrder = async (
 }
 
 //----------------------------------------------------------------------------------------------------
-
+// 차트 상세 정보 호출 함수
+// 대시보드에서 차트 상세 정보 호출
 export const fetchChartDetail = async (dashboardId: string, chartId: string) => {
   console.log('[🔥 chart fetch 요청]', dashboardId, chartId) // 요청 전 로그 출력
 
@@ -118,6 +119,8 @@ export const fetchChartDetail = async (dashboardId: string, chartId: string) => 
 }
 
 //----------------------------------------------------------------------------------------------------
+// 즐겨찾기 토글 함수
+// 대시보드에서 차트 즐겨찾기 토글
 export const toggleFavoriteChart = async ({
   dashboardId,
   chartId,
@@ -149,3 +152,63 @@ export const toggleFavoriteChart = async ({
     return false
   }
 }
+//----------------------------------------------------------------------------------------------------
+
+// 차트 수정 함수
+export const updateChart = async ({
+  dashboardId,
+  chartId,
+  updateDto
+}: {
+  dashboardId: string
+  chartId: string
+  updateDto: any
+}) => {
+  try {
+    const res = await axios.patch(
+      `${BASE_URL}/esg-dashboard/update-chart`,
+      {
+        dashboardId,
+        chartId,
+        updateDto
+      },
+      {
+        withCredentials: true
+      }
+    )
+    console.log('[✅ 차트 수정 성공]', res.data)
+    return res.data
+  } catch (error) {
+    console.error('[❌ 차트 수정 실패]', error)
+    throw error
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+// 차트 삭제 함수
+export const deleteChart = async ({
+  dashboardId,
+  chartId
+}: {
+  dashboardId: string
+  chartId: string
+}) => {
+  try {
+    const res = await axios.patch(
+      `${BASE_URL}/esg-dashboard/delete-chart`,
+      {
+        dashboardId,
+        chartId
+      },
+      {
+        withCredentials: true
+      }
+    )
+    console.log('[🗑️ 차트 삭제 성공]', res.data)
+    return res.data
+  } catch (error) {
+    console.error('[❌ 차트 삭제 실패]', error)
+    throw error
+  }
+}
+//----------------------------------------------------------------------------------------------------
