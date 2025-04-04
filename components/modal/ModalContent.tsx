@@ -265,7 +265,7 @@ export default function ModalContent({
 
             onSubmitPage?.() // 다음 단계로 이동
           }}
-          className="bg-gray-200 text-black text-lg px-8 py-2 rounded-full hover:bg-gray-300 font-apple">
+          className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded font-apple">
           다음 &gt;
         </Button>
       </div>

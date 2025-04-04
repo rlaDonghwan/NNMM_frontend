@@ -325,18 +325,18 @@ export default function SecondModalContent({
                 })}
             </div>
           </div>
-          <div className="flex justify-between w-full mt-4 gap-2">
+          <div className="flex justify-end w-full mt-4 gap-2">
             <Button
-              className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded"
+              className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded font-apple"
               onClick={() => {
                 if (typeof onBack === 'function') onBack()
               }}>
-              ← 이전
+              &lt; 이전
             </Button>
             <Button
-              className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded"
+              className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
               onClick={handleSave}>
-              저장✔
+              저장 ✔
             </Button>
           </div>
         </div>
