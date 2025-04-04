@@ -3,7 +3,7 @@
 import {useEffect, useState} from 'react'
 import {useESGModal} from '@/components/modal/ESGModalContext'
 import GridItem from './GridItem'
-import {fetchUserCharts} from '@/services/chart-config'
+import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
 
 export default function Social() {
   const [gridItems, setGridItems] = useState([]) // 차트 리스트 상태
@@ -20,7 +20,6 @@ export default function Social() {
         const filtered = data
           .filter(chart => chart.category === 'social')
           .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
-
         setGridItems(filtered)
       } catch (err) {
         console.error('차트 불러오기 실패:', err)
@@ -31,30 +30,88 @@ export default function Social() {
 
     loadCharts()
   }, [])
+                
+<!--   useEffect(() => {
+    const loadCharts = async () => {
+      try {
+        const data = await fetchUserCharts('')
+        const filtered = data
+          .filter(chart => chart.category === 'social')
+          .flatMap(chart => {
+            if (!chart.dashboardId && chart._id && chart.charts) {
+              return chart.charts.map(c => ({
+                ...c,
+                dashboardId: chart._id,
+                category: chart.category
+              }))
+            }
+            return [{...chart}]
+          })
+          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+        setGridItems(filtered)
+      } catch (err) {
+        console.error('차트 불러오기 실패:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
+    loadCharts()
+  }, [])               -->
+                
+  
+
+  const handleChartSaved = (newChart: any) => {
+    setGridItems(prev => {
+      const exists = prev.some(item => item._id === newChart._id)
+      return exists
+        ? prev.map(item => (item._id === newChart._id ? newChart : item))
+        : [...prev, newChart]
+    })
+  }
   const handleClick = (item: any) => {
     if (item._id) {
-      // 기존 차트 클릭 시 (삭제 모달 열기)
-      setSelectedItemId(item._id) // 선택된 차트 ID 저장
-      setIsEditModalOpen(true) // 삭제 확인 모달 오픈
+      setSelectedItemId(item._id)
+      setIsEditModalOpen(true)
     } else {
-      // + 버튼 클릭 시 (새 차트 추가)
       setIsModalOpen(true, newChart => {
-        setGridItems(prev => [...prev, newChart]) // 차트 리스트에 새 항목 추가
+        setGridItems(prev => {
+          const exists = prev.some(item => item._id === newChart._id)
+          return exists
+            ? prev.map(item => (item._id === newChart._id ? newChart : item))
+            : [...prev, newChart]
+        })
         setTimeout(() => {
-          reset() // 모달 내부 상태 초기화
-          setIsModalOpen(false) // 모달 닫기
-        }, 300) // 0.3초 후 닫기
+          reset()
+          setIsModalOpen(false)
+        }, 100)
       })
     }
   }
+  const moveItem = async (dragIndex: number, hoverIndex: number) => {
+    const updated = [...gridItems]
+    const [removed] = updated.splice(dragIndex, 1)
+    updated.splice(hoverIndex, 0, removed)
 
-  // 드래그 앤 드롭 시 위치 변경
-  const moveItem = (dragIndex: number, hoverIndex: number) => {
-    const updated = [...gridItems] // 기존 리스트 복사
-    const [removed] = updated.splice(dragIndex, 1) // 드래그한 항목 제거
-    updated.splice(hoverIndex, 0, removed) // 새로운 위치에 삽입
-    setGridItems(updated) // 상태 업데이트
+    const orderedWithOrder = updated.map((item, index) => ({
+      ...item,
+      order: index + 1,
+      category: item.category ?? 'governance',
+      dashboardId: item.dashboardId
+    }))
+    setGridItems(orderedWithOrder)
+
+    try {
+      const formattedForRequest = orderedWithOrder.map(({_id, order, dashboardId}) => ({
+        chartId: _id,
+        dashboardId,
+        newOrder: order
+      }))
+      await updateChartOrder(formattedForRequest)
+      console.log('순서 저장 완료')
+    } catch (err) {
+      console.error('순서 저장 실패:', err)
+    }
   }
 
   return (

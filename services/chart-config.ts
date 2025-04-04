@@ -79,19 +79,22 @@ export const fetchUserCharts = async (category?: string) => {
   console.log('[📊 chart item structure]', res.data)
   return res.data
 }
+//----------------------------------------------------------------------------------------------------
+export const updateChartOrder = async (
+  updatedCharts: {chartId: string; dashboardId: string; newOrder: number}[]
+) => {
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/esg-dashboard/batch-update-orders`,
+      updatedCharts,
+      {
+        withCredentials: true
+      }
+    )
+    console.log('차트 순서 저장 성공!', response.data)
+  } catch (error: any) {
+    console.error('차트 순서 저장 실패 😢')
+  }
+}
 
 //----------------------------------------------------------------------------------------------------
-
-// 차트 순서 불러오기 + 기존 코드 밑에 코드 이상하면 이걸로 바꾸기
-// export const updateChartOrder = async (orderedIds: string[]) => {
-//   return axios.post(`${BASE_URL}/chart/order`, {orderedIds}, {withCredentials: true})
-// }
-//이차 차트 순서 불러오기 바꾼건데 코드 이해 안감 -> 다시 좀 보자잉
-export async function updateChartOrder(orderedCharts) {
-  return await fetch(`${BASE_URL}/esg-dashboard/order`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({charts: orderedCharts}),
-    credentials: 'include'
-  })
-}
