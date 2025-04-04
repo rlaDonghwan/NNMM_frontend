@@ -30,36 +30,6 @@ export default function Social() {
 
     loadCharts()
   }, [])
-                
-<!--   useEffect(() => {
-    const loadCharts = async () => {
-      try {
-        const data = await fetchUserCharts('')
-        const filtered = data
-          .filter(chart => chart.category === 'social')
-          .flatMap(chart => {
-            if (!chart.dashboardId && chart._id && chart.charts) {
-              return chart.charts.map(c => ({
-                ...c,
-                dashboardId: chart._id,
-                category: chart.category
-              }))
-            }
-            return [{...chart}]
-          })
-          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
-        setGridItems(filtered)
-      } catch (err) {
-        console.error('차트 불러오기 실패:', err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadCharts()
-  }, [])               -->
-                
-  
 
   const handleChartSaved = (newChart: any) => {
     setGridItems(prev => {

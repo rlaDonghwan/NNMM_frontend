@@ -2,7 +2,6 @@
 
 import {useEffect, useState} from 'react'
 import {useESGModal} from '@/components/modal/ESGModalContext'
-import ESGModal from '../modal/ESGModal'
 import GridItem from './GridItem'
 import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
 
@@ -10,24 +9,16 @@ export default function Environmental() {
   const [gridItems, setGridItems] = useState([]) // 대시보드에 표시될 아이템 리스트 상태
   const [isEditModalOpen, setIsEditModalOpen] = useState(false) // 삭제 모달 오픈 여부
   const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
-  const {setIsModalOpen} = useESGModal() // ESG 입력 모달 컨트롤 함수
+  const {setIsModalOpen, reset} = useESGModal() // 모달 열기 및 리셋 함수 가져오기
   const [isLoading, setIsLoading] = useState(true)
+
   useEffect(() => {
     const loadCharts = async () => {
       try {
         const data = await fetchUserCharts('')
         const filtered = data
           .filter(chart => chart.category === 'environmental')
-          .filter(
-            chart =>
-              chart.fields && chart.fields.length > 0 && chart.years && chart.chartType
-          )
-          .map(chart => ({
-            ...chart,
-            id: chart.chartId || chart._id // ✅ 여기서 id를 보장
-          }))
-
-        console.log('[✅ filtered charts]', filtered)
+          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
         setGridItems(filtered)
       } catch (err) {
         console.error('차트 불러오기 실패:', err)
@@ -38,41 +29,6 @@ export default function Environmental() {
 
     loadCharts()
   }, [])
-  
-  
-//     useEffect(() => {
-//     const loadCharts = async () => {
-//       try {
-//         const data = await fetchUserCharts('')
-//         const filtered = data
-//           .filter(chart => chart.category === 'environmental')
-//           .flatMap(chart => {
-//             //  차트가 평탄화되어 들어온 경우에 원래 dashboardId 없을 수 있음
-//             if (!chart.dashboardId && chart._id && chart.charts) {
-//               // 대시보드 전체에서 charts[]가 있는 형태일 경우 처리 (보조 안전)
-//               return chart.charts.map(c => ({
-//                 ...c,
-//                 dashboardId: chart._id,
-//                 category: chart.category
-//               }))
-//             }
-
-//             // 일반적인 chart일 경우 dashboardId 보존
-//             return [{...chart}]
-//           })
-//           .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
-
-//         setGridItems(filtered)
-//       } catch (err) {
-//         console.error('차트 불러오기 실패:', err)
-//       } finally {
-//         setIsLoading(false)
-//       }
-//     }
-
-//     loadCharts()
-//   }, [])
-
 
   const handleChartSaved = (newChart: any) => {
     setGridItems(prev => {
@@ -103,7 +59,6 @@ export default function Environmental() {
       })
     }
   }
-
   // 드래그 & 드롭 순서 저장
   const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems]
@@ -135,50 +90,53 @@ export default function Environmental() {
   }
 
   return (
-    <div className="font-apple px-6 py-4">
+    <div className="font-apple w-full h-screen">
+      {/* 로딩 중이면 메시지 출력 */}
       {isLoading ? (
         <p className="text-center text-gray-400 mt-10">차트를 불러오는 중입니다...</p>
       ) : (
-        <div
-          className="grid gap-4"
-          style={{gridTemplateColumns: 'repeat(3, 400px)', gridAutoRows: '300px'}}>
+        <div className="grid grid-cols-3 gap-4">
+          {/* 차트 카드 목록 출력 */}
           {gridItems.map((item, index) => (
             <GridItem
-              key={item._id} // ✅ _id만 사용해서 key 중복 방지
-              item={item}
-              index={index}
-              isLast={false}
-              moveItem={moveItem}
-              handleClick={handleClick}
+              key={item._id} // 키 값 (없으면 인덱스로 대체)
+              item={item} // 차트 데이터
+              index={index} // 현재 인덱스
+              isLast={false} // 마지막 아이템 아님
+              moveItem={moveItem} // 드래그 함수
+              handleClick={handleClick} // 클릭 핸들러
             />
           ))}
-          {/* 추가 버튼 그리드 */}
+          {/* + 버튼용 빈 아이템 */}
           <GridItem
             key="add"
-            item={{}} // 빈 item
-            index={gridItems.length}
-            isLast={true} // 마지막 요소임을 표시
+            item={{}} // 빈 데이터
+            index={gridItems.length} // 마지막 인덱스
+            isLast={true} // 마지막 아이템임
             moveItem={moveItem}
             handleClick={handleClick}
           />
         </div>
       )}
-      {/* 삭제 모달 */}
+
+      {/* 삭제 확인 모달 */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center font-apple">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h2 className="text-xl font-semibold mb-4">삭제 확인</h2>
             <p>이 차트를 삭제하시겠습니까?</p>
             <div className="flex justify-end">
+              {/* 닫기 버튼 */}
               <button
                 onClick={() => setIsEditModalOpen(false)}
                 className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
                 닫기
               </button>
+              {/* 삭제 버튼 */}
               <button
                 onClick={() => {
-                  setGridItems(prev => prev.filter(item => item._id !== selectedItemId))
-                  setIsEditModalOpen(false)
+                  setGridItems(prev => prev.filter(item => item._id !== selectedItemId)) // 해당 ID의 차트 삭제
+                  setIsEditModalOpen(false) // 모달 닫기
                 }}
                 className="mt-4 bg-red-500 text-white py-2 px-4 rounded ml-4">
                 삭제
