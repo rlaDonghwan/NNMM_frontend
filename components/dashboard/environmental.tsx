@@ -16,8 +16,6 @@ export default function Environmental() {
     const loadCharts = async () => {
       try {
         const data = await fetchUserCharts('')
-        console.log('[📊 chart item structure]', data)
-
         const filtered = data
           .filter(chart => chart.category === 'environmental')
           .filter(

@@ -16,8 +16,8 @@ import {
   Title
 } from 'chart.js'
 import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from 'react-chartjs-2'
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 // -----------------------------------------------------------------------즐겨찾기를 위한 별 추가
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 import {FaRegStar, FaStar} from 'react-icons/fa'
 //------------------------------------------------------------------------여기까지
 
@@ -137,13 +137,11 @@ export default function GridItem({
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
 
-  //----------------------------------------------------------------토글을 위한 상태 추가
+  //----------------------------------------------------------------Favorite 토글을 위한 상태 추가
   const [isFavorite, setIsFavorite] = useState(item.isFavorite || false) // 상태 추가
   const chartId = item.chartId
   const dashboardId = item.dashboardId
-  console.log('[item info]', item._id, item.chartId, item.dashboardId)
-
-  //----------------------------------------------------------------아래쪽 html코드 수정 p-6 >> px-4, py-2 추가
+  //----------------------------------------------------------------
   return (
     <div
       ref={ref}
@@ -197,8 +195,9 @@ export default function GridItem({
                 headers: {'Content-Type': 'application/json'},
                 credentials: 'include',
                 body: JSON.stringify({
-                  chartId: item.chartId, // ✅ chart의 _id
-                  isFavorite: newFavorite // ✅ 토글된 상태
+                  chartId: item.chartId,
+                  isFavorite: newFavorite, //  토글된 상태
+                  userId: item.userId
                 })
               }
             )

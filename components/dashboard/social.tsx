@@ -12,39 +12,15 @@ export default function Social() {
   const [isLoading, setIsLoading] = useState(true) // 로딩 상태 여부
   const {setIsModalOpen, reset} = useESGModal() // 모달 열기 및 리셋 함수 가져오기
 
-  // useEffect(() => {
-  //   // 컴포넌트 마운트 시 차트 불러오기
-  //   const loadCharts = async () => {
-  //     try {
-  //       const data = await fetchUserCharts('') // 전체 차트 불러오기
-  //       const filtered = data.filter(chart => chart.category === 'social') // social 카테고리만 필터링
-  //       setGridItems(filtered) // 차트 상태 업데이트
-  //     } catch (err) {
-  //       console.error('차트 불러오기 실패:', err) // 에러 콘솔 출력
-  //     } finally {
-  //       setIsLoading(false) // 로딩 종료
-  //     }
-  //   }
-
-  //   loadCharts() // 실행
-  // }, [])
+  //이렇게 useEffect써야 Favorite기능이 먹어서 여기 부분만 건들건들했습니다.
   useEffect(() => {
     const loadCharts = async () => {
       try {
         const data = await fetchUserCharts('')
         const filtered = data
           .filter(chart => chart.category === 'social')
-          .flatMap(chart => {
-            if (!chart.dashboardId && chart._id && chart.charts) {
-              return chart.charts.map(c => ({
-                ...c,
-                dashboardId: chart._id,
-                category: chart.category
-              }))
-            }
-            return [{...chart}]
-          })
           .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+
         setGridItems(filtered)
       } catch (err) {
         console.error('차트 불러오기 실패:', err)
@@ -55,6 +31,7 @@ export default function Social() {
 
     loadCharts()
   }, [])
+
   const handleClick = (item: any) => {
     if (item._id) {
       // 기존 차트 클릭 시 (삭제 모달 열기)
