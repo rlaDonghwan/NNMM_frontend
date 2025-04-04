@@ -33,7 +33,7 @@ export default function Social() {
     if (item._id) {
       // 기존 차트 클릭 시 (삭제 모달 열기)
       setSelectedItemId(item._id) // 선택된 차트 ID 저장
-      setIsEditModalOpen(true) // 삭제 확인 모달 오픈
+      setIsEditModalOpen(true) // 삭제 확인 모달 오픈...
     } else {
       // + 버튼 클릭 시 (새 차트 추가)
       setIsModalOpen(true, newChart => {
