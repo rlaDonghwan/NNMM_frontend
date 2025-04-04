@@ -20,8 +20,22 @@ export default function Environmental() {
         const data = await fetchUserCharts('')
         const filtered = data
           .filter(chart => chart.category === 'environmental')
-          //담에 붙는 애들은 안되면 지우면 됨 정렬 추가하는거임
+          .flatMap(chart => {
+            //  차트가 평탄화되어 들어온 경우에 원래 dashboardId 없을 수 있음
+            if (!chart.dashboardId && chart._id && chart.charts) {
+              // 대시보드 전체에서 charts[]가 있는 형태일 경우 처리 (보조 안전)
+              return chart.charts.map(c => ({
+                ...c,
+                dashboardId: chart._id,
+                category: chart.category
+              }))
+            }
+
+            // 일반적인 chart일 경우 dashboardId 보존
+            return [{...chart}]
+          })
           .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+
         setGridItems(filtered)
       } catch (err) {
         console.error('차트 불러오기 실패:', err)
@@ -33,60 +47,61 @@ export default function Environmental() {
     loadCharts()
   }, [])
 
-  // 새 차트 저장 후 호출될 콜백
+  // ✅ 중복 방지 및 수정 반영
   const handleChartSaved = (newChart: any) => {
-    setGridItems(prev => [...prev, newChart]) // 기존 차트 배열에 새 차트 추가
+    setGridItems(prev => {
+      const exists = prev.some(item => item._id === newChart._id)
+      return exists
+        ? prev.map(item => (item._id === newChart._id ? newChart : item))
+        : [...prev, newChart]
+    })
   }
 
   // 차트 클릭 시 (기존이면 삭제 모달, 새로 만들기면 입력 모달)
-
   const handleClick = (item: any) => {
     if (item._id) {
-      // 기존 차트 클릭 시 (삭제 모달 열기)
-      setSelectedItemId(item._id) // 선택된 차트 ID 저장
-      setIsEditModalOpen(true) // 삭제 확인 모달 오픈
+      setSelectedItemId(item._id)
+      setIsEditModalOpen(true)
     } else {
-      // + 버튼 클릭 시 (새 차트 추가)
       setIsModalOpen(true, newChart => {
-        setGridItems(prev => [...prev, newChart]) // 차트 리스트에 새 항목 추가
+        setGridItems(prev => {
+          const exists = prev.some(item => item._id === newChart._id)
+          return exists
+            ? prev.map(item => (item._id === newChart._id ? newChart : item))
+            : [...prev, newChart]
+        })
         setTimeout(() => {
-          reset() // 모달 내부 상태 초기화
-          setIsModalOpen(false) // 모달 닫기
-        }, 300) // 0.3초 후 닫기
+          reset()
+          setIsModalOpen(false)
+        }, 100)
       })
     }
   }
 
-  // 드래그 & 드롭으로 아이템 정렬 원래 있던 코드
-  // const moveItem = async (dragIndex: number, hoverIndex: number) => {
-  //   const updated = [...gridItems] // 기존 배열 복사
-  //   const [removed] = updated.splice(dragIndex, 1) // 드래그한 항목 제거
-  //   updated.splice(hoverIndex, 0, removed) // 새로운 위치에 삽입
-
-  //   setGridItems(updated) // 상태 업데이트
-  //   try {
-  //     const orderedIds = updated.map(item => item.id)
-  //     await updateChartOrder(orderedIds)
-  //     console.log('순서 저장 완료')
-  //   } catch (err) {
-  //     console.error('순서 저장 실패:', err)
-  //   }
-  // }
-
-  //드래그 & 드롭 수정할 코드 수 틀리면 이거 지우고 위에꺼 살리기
+  // 드래그 & 드롭 순서 저장
   const moveItem = async (dragIndex: number, hoverIndex: number) => {
-    const updated = [...gridItems] // 기존 배열 복사
-    const [removed] = updated.splice(dragIndex, 1) // 드래그한 항목 제거
-    updated.splice(hoverIndex, 0, removed) // 새로운 위치에 삽입
+    const updated = [...gridItems]
+    const [removed] = updated.splice(dragIndex, 1)
+    updated.splice(hoverIndex, 0, removed)
 
-    const orderedWithOrder = updated.map((Item, index) => ({
-      ...Item,
-      order: index + 1
+    const orderedWithOrder = updated.map((item, index) => ({
+      ...item,
+      order: index + 1,
+      category: item.category ?? 'environmental',
+      dashboardId: item.dashboardId // ✅ 반드시 포함되어야 함!
     }))
-    setGridItems(orderedWithOrder) // 상태 업데이트
+
+    setGridItems(orderedWithOrder)
+
     try {
-      console.log('[updateChartOrder] 요청 데이터:', orderedWithOrder)
-      await updateChartOrder(orderedWithOrder)
+      // ✅ 순서 + dashboardId 포함된 데이터 전달
+      const formattedForRequest = orderedWithOrder.map(({_id, order, dashboardId}) => ({
+        chartId: _id,
+        dashboardId,
+        newOrder: order
+      }))
+
+      await updateChartOrder(formattedForRequest)
       console.log('순서 저장 완료')
     } catch (err) {
       console.error('순서 저장 실패:', err)
@@ -101,12 +116,12 @@ export default function Environmental() {
         <div className="grid grid-cols-3 gap-4">
           {gridItems.map((item, index) => (
             <GridItem
-              key={item._id || index} // key는 _id 없을 경우 index로 처리
+              key={item._id} // ✅ _id만 사용해서 key 중복 방지
               item={item}
               index={index}
               isLast={false}
-              moveItem={moveItem} // 드래그 이동
-              handleClick={handleClick} // 클릭 이벤트 (모달 열기)
+              moveItem={moveItem}
+              handleClick={handleClick}
             />
           ))}
 
@@ -130,13 +145,13 @@ export default function Environmental() {
             <p>이 차트를 삭제하시겠습니까?</p>
             <div className="flex justify-end">
               <button
-                onClick={() => setIsEditModalOpen(false)} // 취소
+                onClick={() => setIsEditModalOpen(false)}
                 className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
                 닫기
               </button>
               <button
                 onClick={() => {
-                  setGridItems(prev => prev.filter(item => item._id !== selectedItemId)) // 해당 ID 삭제
+                  setGridItems(prev => prev.filter(item => item._id !== selectedItemId))
                   setIsEditModalOpen(false)
                 }}
                 className="mt-4 bg-red-500 text-white py-2 px-4 rounded ml-4">

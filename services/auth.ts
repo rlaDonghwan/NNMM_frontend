@@ -23,5 +23,15 @@ export const fetchCurrentUser = async () => {
   })
   return res.data
 }
-
+//----------------------------------------------------------------------------------------------------
+export const checkLogin = async (): Promise<boolean> => {
+  try {
+    const res = await axios.get(`${BASE_URL}/users/me`, {
+      withCredentials: true
+    })
+    return !!res.data?._id // 사용자 데이터가 있으면 true
+  } catch (error) {
+    return false // 에러가 나면 로그인 안 된 상태로 간주
+  }
+}
 //----------------------------------------------------------------------------------------------------
