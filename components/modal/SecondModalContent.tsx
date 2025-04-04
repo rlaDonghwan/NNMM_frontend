@@ -257,7 +257,7 @@ export default function SecondModalContent({
                   const unusedIndex = rows.findIndex((_, i) => !selectedRows.includes(i))
                   if (unusedIndex !== -1) {
                     setSelectedRows([...selectedRows, unusedIndex])
-                    setColorSet([...colorSet, '#A78BFA'])
+                    setColorSet([...colorSet, '#88CCE6'])
                   }
                 }}>
                 + 지표 추가
