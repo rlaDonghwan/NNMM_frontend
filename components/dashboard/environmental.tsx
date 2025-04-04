@@ -11,7 +11,7 @@ export default function Environmental() {
   const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
   const {setIsModalOpen, reset} = useESGModal() // 모달 열기 및 리셋 함수 가져오기
   const [isLoading, setIsLoading] = useState(true)
-
+  //------------------------------------------------------------------------------------
   useEffect(() => {
     const loadCharts = async () => {
       try {
@@ -29,7 +29,7 @@ export default function Environmental() {
 
     loadCharts()
   }, [])
-
+  //------------------------------------------------------------------------------------
   const handleChartSaved = (newChart: any) => {
     setGridItems(prev => {
       const exists = prev.some(item => item._id === newChart._id)
@@ -38,7 +38,7 @@ export default function Environmental() {
         : [...prev, newChart]
     })
   }
-
+  //------------------------------------------------------------------------------------
   // 차트 클릭 시 (기존이면 삭제 모달, 새로 만들기면 입력 모달)
   const handleClick = (item: any) => {
     if (item._id) {
@@ -59,6 +59,8 @@ export default function Environmental() {
       })
     }
   }
+  //------------------------------------------------------------------------------------
+
   // 드래그 & 드롭 순서 저장
   const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems]
@@ -69,13 +71,13 @@ export default function Environmental() {
       ...item,
       order: index + 1,
       category: item.category ?? 'environmental',
-      dashboardId: item.dashboardId // ✅ 반드시 포함되어야 함!
+      dashboardId: item.dashboardId //  반드시 포함되어야 함!
     }))
 
     setGridItems(orderedWithOrder)
 
     try {
-      // ✅ 순서 + dashboardId 포함된 데이터 전달
+      // 순서 + dashboardId 포함된 데이터 전달
       const formattedForRequest = orderedWithOrder.map(({_id, order, dashboardId}) => ({
         chartId: _id,
         dashboardId,
@@ -88,7 +90,7 @@ export default function Environmental() {
       console.error('순서 저장 실패:', err)
     }
   }
-
+  //------------------------------------------------------------------------------------
   return (
     <div className="font-apple w-full h-screen">
       {/* 로딩 중이면 메시지 출력 */}
@@ -118,7 +120,7 @@ export default function Environmental() {
           />
         </div>
       )}
-
+      {/* //------------------------------------------------------------------------------------ */}
       {/* 삭제 확인 모달 */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center font-apple">
