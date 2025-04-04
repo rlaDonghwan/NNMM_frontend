@@ -162,6 +162,22 @@ export default function SecondModalContent({
     },
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
+  //랜덤 색상 생성 함수
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF'
+    let color = '#'
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)]
+    }
+    return color
+  }
+  //colorset 랜덤 초기화
+  useEffect(() => {
+    if (colorSet.length < selectedRows.length) {
+      const newColors = selectedRows.map(() => getRandomColor())
+      setColorSet(newColors)
+    }
+  }, [selectedRows])
 
   // 저장 버튼 클릭 핸들러
   const handleSave = async () => {
@@ -257,7 +273,7 @@ export default function SecondModalContent({
                   const unusedIndex = rows.findIndex((_, i) => !selectedRows.includes(i))
                   if (unusedIndex !== -1) {
                     setSelectedRows([...selectedRows, unusedIndex])
-                    setColorSet([...colorSet, '#A78BFA'])
+                    setColorSet([...colorSet, '#88CCE6'])
                   }
                 }}>
                 + 지표 추가
@@ -283,6 +299,14 @@ export default function SecondModalContent({
           </div>
 
           {/* 지표별 선택 및 색상 설정 */}
+          <Button
+            onClick={() => {
+              const randomColors = selectedRows.map(() => getRandomColor())
+              setColorSet(randomColors)
+            }}
+            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-600 text-white rounded font-apple">
+            랜덤 색상
+          </Button>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
             {selectedRows.map((rowIndex, idx) => (
               <div key={idx} className="flex items-center">
@@ -325,18 +349,19 @@ export default function SecondModalContent({
                 })}
             </div>
           </div>
-          <div className="flex justify-between w-full mt-4 gap-2">
+          <div className="flex justify-end w-full mt-4 gap-2">
+            {/* -------------------------------------------------버튼들 바꿈 */}
             <Button
-              className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded"
+              className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded font-apple"
               onClick={() => {
                 if (typeof onBack === 'function') onBack()
               }}>
-              ← 이전
+              &lt; 이전
             </Button>
             <Button
-              className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded"
+              className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
               onClick={handleSave}>
-              저장✔
+              저장 ✔
             </Button>
           </div>
         </div>

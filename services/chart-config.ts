@@ -59,8 +59,6 @@ export async function saveChartConfig({
     ]
   }
 
-  console.log('[saveChartConfig] Sending Payload:', JSON.stringify(payload, null, 2))
-
   // ✅ 절대 경로로 수정
   return axios.post(`${BASE_URL}/esg-dashboard`, payload, {
     withCredentials: true
@@ -78,22 +76,76 @@ export const fetchUserCharts = async (category?: string) => {
     params
   })
 
-  console.log('[fetchUserCharts] Response:', res.data)
+  // console.log('[📊 chart item structure]', res.data)
   return res.data
+}
+//----------------------------------------------------------------------------------------------------
+export const updateChartOrder = async (
+  updatedCharts: {chartId: string; dashboardId: string; newOrder: number}[]
+) => {
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/esg-dashboard/batch-update-orders`,
+      updatedCharts,
+      {
+        withCredentials: true
+      }
+    )
+    console.log('차트 순서 저장 성공!', response.data)
+  } catch (error: any) {
+    console.error('차트 순서 저장 실패 😢')
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
 
-// 차트 순서 불러오기 + 기존 코드 밑에 코드 이상하면 이걸로 바꾸기
-// export const updateChartOrder = async (orderedIds: string[]) => {
-//   return axios.post(`${BASE_URL}/chart/order`, {orderedIds}, {withCredentials: true})
-// }
-//이차 차트 순서 불러오기 바꾼건데 코드 이해 안감 -> 다시 좀 보자잉 : 주석 너무 좋습니다 형님
-export async function updateChartOrder(orderedCharts) {
-  return await fetch(`${BASE_URL}/esg-dashboard/order`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({charts: orderedCharts}),
-    credentials: 'include'
-  })
+export const fetchChartDetail = async (dashboardId: string, chartId: string) => {
+  console.log('[🔥 chart fetch 요청]', dashboardId, chartId) // 요청 전 로그 출력
+
+  try {
+    const res = await axios.patch(
+      `${BASE_URL}/esg-dashboard/load-chart`,
+      {dashboard: dashboardId, chartId},
+      {withCredentials: true}
+    )
+
+    console.log('[✅ chart fetch 응답]', res.data) // 응답 데이터 로그 출력
+    return res.data
+  } catch (error) {
+    console.error('[❌ chart fetch 실패]', error) // 에러 로그 출력
+    throw error // 에러를 다시 던져서 호출한 곳에서 처리할 수 있게 함
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+export const toggleFavoriteChart = async ({
+  dashboardId,
+  chartId,
+  userId,
+  isFavorite,
+  onError
+}: {
+  dashboardId: string
+  chartId: string
+  userId: string
+  isFavorite: boolean
+  onError?: () => void
+}) => {
+  try {
+    const res = await axios.patch(
+      `${BASE_URL}/esg-dashboard/favorite/${dashboardId}`,
+      {
+        chartId,
+        isFavorite,
+        userId
+      },
+      {withCredentials: true}
+    )
+
+    return res.status === 200
+  } catch (error) {
+    console.error('[❌ 즐겨찾기 토글 실패]', error)
+    if (onError) onError()
+    return false
+  }
 }
