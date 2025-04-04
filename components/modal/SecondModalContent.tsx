@@ -162,6 +162,22 @@ export default function SecondModalContent({
     },
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
+  //랜덤 색상 생성 함수
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF'
+    let color = '#'
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)]
+    }
+    return color
+  }
+  //colorset 랜덤 초기화
+  useEffect(() => {
+    if (colorSet.length < selectedRows.length) {
+      const newColors = selectedRows.map(() => getRandomColor())
+      setColorSet(newColors)
+    }
+  }, [selectedRows])
 
   // 저장 버튼 클릭 핸들러
   const handleSave = async () => {
@@ -283,6 +299,14 @@ export default function SecondModalContent({
           </div>
 
           {/* 지표별 선택 및 색상 설정 */}
+          <Button
+            onClick={() => {
+              const randomColors = selectedRows.map(() => getRandomColor())
+              setColorSet(randomColors)
+            }}
+            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-600 text-white rounded font-apple">
+            랜덤 색상
+          </Button>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
             {selectedRows.map((rowIndex, idx) => (
               <div key={idx} className="flex items-center">

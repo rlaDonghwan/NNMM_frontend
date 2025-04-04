@@ -6,6 +6,10 @@ import GridItem from './GridItem'
 import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
 import {Bar, Pie} from 'react-chartjs-2'
+import GridItem from './GridItem'
+import {fetchUserCharts} from '@/services/chart-config'
+import {DndProvider} from 'react-dnd'
+import {HTML5Backend} from 'react-dnd-html5-backend'
 
 export default function TotalDashboard() {
   const [gridItems, setGridItems] = useState([]) // 차트 리스트 상태
@@ -13,6 +17,28 @@ export default function TotalDashboard() {
   const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 차트의 ID (삭제용)
   const [isLoading, setIsLoading] = useState(true) // 로딩 상태 여부
   const {setIsModalOpen, reset} = useESGModal() // 모달 열기 및 리셋 함수 가져오기
+  
+  const [favoriteCharts, setFavoriteCharts] = useState([])
+
+  useState(() => {
+    const loadFavorites = async () => {
+      try {
+        const data = await fetchUserCharts('')
+        const favorites = data
+          .filter(chart => chart.isFavorite === true)
+          .map(chart => ({
+            ...chart,
+            chartId: chart.chartId ?? chart._id,
+            dashboardId: chart.dashboardId ?? chart._id,
+            userId: chart.userId
+          }))
+        setFavoriteCharts(favorites)
+      } catch (err) {
+        console.error('즐겨찾기 차트 불러오기 실패:', err)
+      }
+    }
+    loadFavorites()
+  })
 
   //이렇게 useEffect써야 Favorite기능이 먹어서 여기 부분만 건들건들했습니다.
   useEffect(() => {
@@ -209,5 +235,5 @@ export default function TotalDashboard() {
         </div>
       </div>
     </div>
-  )
+
 }
