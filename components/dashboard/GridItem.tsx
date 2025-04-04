@@ -98,7 +98,7 @@ export default function GridItem({
   if (!item) {
     return null
   }
-  console.log(item)
+  // console.log(item)
   const chartData = item.fields?.length
     ? isPieLike
       ? {

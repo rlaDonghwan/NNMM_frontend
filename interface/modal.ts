@@ -1,6 +1,7 @@
 export interface ESGModalProps {
   category: 'social' | 'environmental' | 'governance'
 }
+
 export interface Indicator {
   key: string
   label: string
@@ -15,24 +16,6 @@ export interface Row {
   field1?: string
   field2?: string
   unit?: string
-}
-
-export interface ESGModalContextType {
-  isModalOpen: boolean
-  setIsModalOpen: (open: boolean, callback?: (chart: any) => void) => void // ✅ 그대로
-  setIsEditModalOpen: (open: boolean, callback?: (chart: any) => void) => void // ✅ 그대로
-  step: number
-  setStep: React.Dispatch<React.SetStateAction<number>>
-  rows: Row[]
-  setRows: React.Dispatch<React.SetStateAction<Row[]>>
-  years: number[]
-  setYears: React.Dispatch<React.SetStateAction<number[]>>
-  indicators: Indicator[]
-  setIndicators: React.Dispatch<React.SetStateAction<Indicator[]>>
-  onChartSaved: ((chart: any) => void) | null
-  chartToEdit: any | null // ✅ 추가: 수정할 차트 데이터
-  setChartToEdit: React.Dispatch<React.SetStateAction<any | null>> // ✅ 추가: 차트 설정 함수
-  reset: () => void
 }
 
 export interface ModalContentProps {
@@ -51,6 +34,26 @@ export interface ModalContentProps {
   onSubmitPage: () => void
 }
 
+// ESGModalContextType 타입 정의
+export interface ESGModalContextType {
+  isModalOpen: boolean
+  setIsModalOpen: (open: boolean, callback?: (chart: any) => void) => void
+  isEditModalOpen: boolean
+  setIsEditModalOpen: (open: boolean) => void
+  onChartSaved: ((chart: any) => void) | null
+  step: number
+  setStep: React.Dispatch<React.SetStateAction<number>>
+  rows: any[]
+  setRows: React.Dispatch<React.SetStateAction<any[]>>
+  years: number[]
+  setYears: React.Dispatch<React.SetStateAction<number[]>>
+  indicators: any[]
+  setIndicators: React.Dispatch<React.SetStateAction<any[]>>
+  chartToEdit: any | null
+  setChartToEdit: React.Dispatch<React.SetStateAction<any | null>>
+  reset: () => void
+  openEditModal: (chart: any, callback?: (chart: any) => void) => void // ✅ 추가
+}
 export interface SecondModalContentProps {
   years: number[]
   setYears: React.Dispatch<React.SetStateAction<number[]>>
@@ -67,8 +70,7 @@ export interface SecondModalContentProps {
   getUnit: (key: string) => string
   onSubmit: () => void
   onBack: () => void
-  onSubmitPage: (id?: string) => void
-  onChartSaved?: (chart: any) => void
+  onSubmitPage: () => void // ✅ 이거 추가!
   chartType: string
   setChartType: React.Dispatch<React.SetStateAction<string>>
   title: string
@@ -77,4 +79,5 @@ export interface SecondModalContentProps {
   setSelectedRows: React.Dispatch<React.SetStateAction<number[]>>
   colorSet: string[]
   setColorSet: React.Dispatch<React.SetStateAction<string[]>>
+  onChartSaved?: (chart: any) => void
 }

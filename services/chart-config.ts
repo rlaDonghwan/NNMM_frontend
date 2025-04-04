@@ -76,7 +76,7 @@ export const fetchUserCharts = async (category?: string) => {
     params
   })
 
-  console.log('[📊 chart item structure]', res.data)
+  // console.log('[📊 chart item structure]', res.data)
   return res.data
 }
 //----------------------------------------------------------------------------------------------------
@@ -100,16 +100,23 @@ export const updateChartOrder = async (
 //----------------------------------------------------------------------------------------------------
 
 export const fetchChartDetail = async (dashboardId: string, chartId: string) => {
-  console.log('[🔥 chart fetch 요청]', dashboardId, chartId)
+  console.log('[🔥 chart fetch 요청]', dashboardId, chartId) // 요청 전 로그 출력
 
-  const res = await axios.patch(
-    `${BASE_URL}/esg-dashboard/load-chart`,
-    {dashboard: dashboardId, chartId},
-    {withCredentials: true}
-  )
+  try {
+    const res = await axios.patch(
+      `${BASE_URL}/esg-dashboard/load-chart`,
+      {dashboard: dashboardId, chartId},
+      {withCredentials: true}
+    )
 
-  return res.data
+    console.log('[✅ chart fetch 응답]', res.data) // 응답 데이터 로그 출력
+    return res.data
+  } catch (error) {
+    console.error('[❌ chart fetch 실패]', error) // 에러 로그 출력
+    throw error // 에러를 다시 던져서 호출한 곳에서 처리할 수 있게 함
+  }
 }
+
 //----------------------------------------------------------------------------------------------------
 export const toggleFavoriteChart = async ({
   dashboardId,

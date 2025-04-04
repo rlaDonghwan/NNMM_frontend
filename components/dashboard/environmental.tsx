@@ -1,8 +1,8 @@
 'use client'
 
 import {useEffect, useState} from 'react'
-import {useESGModal, useEditESGModal} from '@/components/modal/ESGModalContext'
-import ESGModal from '../modal/ESGModal'
+import {useESGModal} from '@/components/modal/ESGModalContext' // ✅ 통일된 훅만 import
+import ESGModal from '../modal/UnifiedESGModal'
 import GridItem from './GridItem'
 import {
   fetchChartDetail,
@@ -12,9 +12,7 @@ import {
 
 export default function Environmental() {
   const [gridItems, setGridItems] = useState([]) // 대시보드에 표시될 아이템 리스트 상태
-  const [selectedItemId, setSelectedItemId] = useState(null) // 선택된 아이템 ID
-  const {setIsModalOpen, reset} = useESGModal()
-  const {setIsEditModalOpen, setChartToEdit} = useEditESGModal() // 🔧 chartToEdit 추가
+  const {setIsModalOpen, reset, setChartToEdit, setIsEditModalOpen} = useESGModal() // ✅ setIsEditModalOpen 추가
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -23,6 +21,7 @@ export default function Environmental() {
         const data = await fetchUserCharts('')
         const filtered = data
           .filter(chart => chart.category === 'environmental')
+          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999)) // 차트 순서 삭제 금지
           .filter(
             chart =>
               chart.fields && chart.fields.length > 0 && chart.years && chart.chartType
@@ -57,11 +56,14 @@ export default function Environmental() {
   const handleClick = async (item: any) => {
     if (item._id) {
       try {
-        // 🔥 서버에서 chart 상세 정보 불러오기
+        reset()
+
         const chartData = await fetchChartDetail(item.dashboardId, item._id)
 
-        setChartToEdit(chartData) // Context에 chart 설정
-        setIsEditModalOpen(true, updated => {
+        setChartToEdit(chartData)
+        setIsEditModalOpen(true) // ✅ 확실한 수정모드 설정
+
+        setIsModalOpen(true, updated => {
           setGridItems(prev => {
             const exists = prev.some(c => c._id === updated._id)
             return exists
@@ -73,16 +75,17 @@ export default function Environmental() {
         console.error('차트 불러오기 실패:', err)
       }
     } else {
-      // 신규 차트 생성
+      reset()
+      setIsEditModalOpen(false) // 신규 생성이므로 수정모드 비활성화
       setIsModalOpen(true, newChart => {
         setGridItems(prev => [...prev, newChart])
         setTimeout(() => {
-          reset()
           setIsModalOpen(false)
         }, 100)
       })
     }
   }
+
   // 드래그 & 드롭 순서 저장
   const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems]
@@ -93,7 +96,7 @@ export default function Environmental() {
       ...item,
       order: index + 1,
       category: item.category ?? 'environmental',
-      dashboardId: item.dashboardId // ✅ 반드시 포함되어야 함!
+      dashboardId: item.dashboardId
     }))
 
     setGridItems(orderedWithOrder)
@@ -137,6 +140,9 @@ export default function Environmental() {
           />
         </div>
       )}
+
+      {/* 모달은 항상 렌더링 */}
+      <ESGModal category="environmental" />
     </div>
   )
 }

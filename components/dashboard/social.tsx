@@ -19,7 +19,7 @@ export default function Social() {
         const data = await fetchUserCharts('')
         const filtered = data
           .filter(chart => chart.category === 'social')
-          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+          .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999)) // 차트 순서
         setGridItems(filtered)
       } catch (err) {
         console.error('차트 불러오기 실패:', err)
