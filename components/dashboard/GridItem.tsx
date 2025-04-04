@@ -175,46 +175,48 @@ export default function GridItem({
       </button> */}
 
       {/* 여기서부터 상진쓰가 만드는 코드 */}
-      <button
-        className="flex h-full justify-end items-start"
-        onClick={async e => {
-          e.stopPropagation()
+      {!isLast && (
+        <button
+          className="flex h-full justify-end items-start"
+          onClick={async e => {
+            e.stopPropagation()
 
-          const newFavorite = !isFavorite
-          setIsFavorite(newFavorite)
-          console.log(
-            '요청 URL:',
-            `${BASE_URL}/esg-dashboard/favorite/${item.dashboardId}`
-          )
-
-          try {
-            const res = await fetch(
-              `${BASE_URL}/esg-dashboard/favorite/${item.dashboardId}`,
-              {
-                method: 'PATCH',
-                headers: {'Content-Type': 'application/json'},
-                credentials: 'include',
-                body: JSON.stringify({
-                  chartId: item.chartId,
-                  isFavorite: newFavorite, //  토글된 상태
-                  userId: item.userId
-                })
-              }
+            const newFavorite = !isFavorite
+            setIsFavorite(newFavorite)
+            console.log(
+              '요청 URL:',
+              `${BASE_URL}/esg-dashboard/favorite/${item.dashboardId}`
             )
 
-            const result = await res.json()
+            try {
+              const res = await fetch(
+                `${BASE_URL}/esg-dashboard/favorite/${item.dashboardId}`,
+                {
+                  method: 'PATCH',
+                  headers: {'Content-Type': 'application/json'},
+                  credentials: 'include',
+                  body: JSON.stringify({
+                    chartId: item.chartId,
+                    isFavorite: newFavorite, // ✅ 토글된 상태
+                    userId: item.userId
+                  })
+                }
+              )
 
-            if (!res.ok) {
-              console.error('즐겨찾기 업데이트 실패:', result)
+              const result = await res.json()
+
+              if (!res.ok) {
+                console.error('즐겨찾기 업데이트 실패:', result)
+                setIsFavorite(!newFavorite) // 실패 시 되돌리기
+              }
+            } catch (err) {
+              console.error('즐겨찾기 요청 에러:', err)
               setIsFavorite(!newFavorite) // 실패 시 되돌리기
             }
-          } catch (err) {
-            console.error('즐겨찾기 요청 에러:', err)
-            setIsFavorite(!newFavorite) // 실패 시 되돌리기
-          }
-        }}>
-        {isFavorite ? <FaStar /> : <FaRegStar />}
-      </button>
+          }}>
+          {isFavorite ? <FaStar /> : <FaRegStar />}
+        </button>
+      )}
 
       {/* 여기까지------------------------------------------------------ */}
     </div>
