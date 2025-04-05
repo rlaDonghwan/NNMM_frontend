@@ -5,19 +5,22 @@ import {useESGModal} from '@/components/modal/ESGModalContext'
 import GridItem from './GridItem'
 import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
-import {Bar, Pie} from 'react-chartjs-2'
+import {Pie} from 'react-chartjs-2'
 import {DndProvider} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
-import GoalsModal from '@/components/modal/goalsModal' // ✅ 수정된 이름으로 import
+import GoalsModal from '@/components/modal/goalsModal'
 
 export default function TotalDashboard() {
+  // 상태: 차트 리스트, 선택 차트 ID, 편집 여부, 로딩 여부
   const [gridItems, setGridItems] = useState<any[]>([])
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  const {setIsModalOpen, reset, setIsGoalModalOpen} = useESGModal() // ✅ goal 모달 상태 함수 가져오기
+  // 모달 제어 관련 함수
+  const {setIsModalOpen, reset, setIsGoalModalOpen} = useESGModal()
 
+  // 📌 즐겨찾기 차트 불러오기
   useEffect(() => {
     const loadFavoriteCharts = async () => {
       try {
@@ -36,6 +39,7 @@ export default function TotalDashboard() {
     loadFavoriteCharts()
   }, [])
 
+  // 📌 차트 저장 시 업데이트
   const handleChartSaved = (newChart: any) => {
     setGridItems(prev => {
       const exists = prev.some(item => item._id === newChart._id)
@@ -45,6 +49,7 @@ export default function TotalDashboard() {
     })
   }
 
+  // 📌 차트 클릭 시 모달 열기
   const handleClick = (item: any) => {
     if (item._id) {
       setSelectedItemId(item._id)
@@ -65,11 +70,12 @@ export default function TotalDashboard() {
     }
   }
 
-  // ✅ 목표 설정 버튼 클릭 시 goal 모달 열기
+  // 📌 목표 설정 버튼 클릭 시 모달 열기
   const handleGoalClick = () => {
     setIsGoalModalOpen(true)
   }
 
+  // 📌 차트 드래그 정렬
   const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems]
     const [removed] = updated.splice(dragIndex, 1)
@@ -96,7 +102,8 @@ export default function TotalDashboard() {
     }
   }
 
-  const data = {
+  // 💡 예시용 파이 차트 데이터
+  const dummyPieData = {
     labels: ['Used', 'Remaining'],
     datasets: [
       {
@@ -107,18 +114,8 @@ export default function TotalDashboard() {
     ]
   }
 
-  const options = {
-    indexAxis: 'y' as const,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        min: 0,
-        max: 100
-      }
-    }
-  }
-
-  const data2 = {
+  // 💡 예시용 ESG 비율 파이 데이터
+  const esgRatioData = {
     labels: ['E', 'S', 'G'],
     datasets: [
       {
@@ -135,21 +132,23 @@ export default function TotalDashboard() {
 
   return (
     <div className="flex flex-col gap-y-4 w-full h-screen">
-      {/* ✅ 목표 설정 버튼 */}
+      {/* 🔘 목표 설정 버튼 */}
       <button
         className="w-[110px] h-[36px] border-2 rounded-xl font-apple"
         onClick={handleGoalClick}>
         목표 설정
       </button>
 
-      {/* ✅ 목표 설정 모달 */}
+      {/* 📦 목표 설정 모달 */}
       <GoalsModal />
 
+      {/* 🔍 ESG 요약 차트 */}
       <div className="grid grid-cols-[2.02fr_0.98fr] gap-4 h-full w-full">
+        {/* ESG 카테고리별 파이 */}
         <div className="bg-white rounded-xl shadow-lg border-2 p-4">
           <div className="flex flex-row gap-4 h-full w-full justify-center">
             {['Environmental', 'Social', 'Governance'].map(label => (
-              <div>
+              <div key={label}>
                 <div className="flex justify-center">
                   <ComboboxWithCreate
                     items={['2020', '2021', '2022', '2023']}
@@ -159,20 +158,23 @@ export default function TotalDashboard() {
                   />
                 </div>
                 <div className="h-[270px] mt-2">
-                  <Pie data={data} />
+                  <Pie data={dummyPieData} />
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* ESG 기여도 차트 */}
         <div className="bg-white rounded-xl shadow-lg border-2 p-4">
           <div className="flex flex-row w-full justify-center font-apple">기여도</div>
           <div className="flex flex-row w-full h-[270px] mt-2 justify-center">
-            <Pie data={data2} />
+            <Pie data={esgRatioData} />
           </div>
         </div>
       </div>
 
+      {/* ⭐️ 즐겨찾기 영역 */}
       <div className="flex flex-row font-apple justify-start ml-4">즐겨찾기</div>
 
       {isLoading ? (
