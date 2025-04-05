@@ -13,31 +13,10 @@ import {
 export default function Environmental() {
   // 대시보드에 표시될 차트 목록 상태
   const [gridItems, setGridItems] = useState([])
-
   // ESG 모달 관련 상태 제어 함수들
   const {setIsModalOpen, reset, setChartToEdit, setIsEditModalOpen} = useESGModal()
-
   // 로딩 상태
   const [isLoading, setIsLoading] = useState(true)
-
-  // 모달 닫힌 후 콜백으로 데이터 반영하는 함수
-  const handleChartSaved = (chart: any) => {
-    if (!chart) return
-
-    if (chart.deleted) {
-      // 삭제된 항목은 목록에서 제거
-      setGridItems(prev => prev.filter(item => item._id !== chart._id))
-    } else {
-      // 새로 추가되었거나 기존 항목이 수정된 경우 반영
-      setGridItems(prev => {
-        const exists = prev.some(item => item._id === chart._id)
-        return exists
-          ? prev.map(item => (item._id === chart._id ? chart : item))
-          : [...prev, chart]
-      })
-    }
-  }
-  //----------------------------------------------------------------------------------------------------
 
   // 초기 마운트 시 차트 목록 불러오기
   useEffect(() => {
@@ -67,6 +46,25 @@ export default function Environmental() {
 
     loadCharts()
   }, [])
+  //----------------------------------------------------------------------------------------------------
+
+  // 모달 닫힌 후 콜백으로 데이터 반영하는 함수
+  const handleChartSaved = (chart: any) => {
+    if (!chart) return
+
+    if (chart.deleted) {
+      // 삭제된 항목은 목록에서 제거
+      setGridItems(prev => prev.filter(item => item._id !== chart._id))
+    } else {
+      // 새로 추가되었거나 기존 항목이 수정된 경우 반영
+      setGridItems(prev => {
+        const exists = prev.some(item => item._id === chart._id)
+        return exists
+          ? prev.map(item => (item._id === chart._id ? chart : item))
+          : [...prev, chart]
+      })
+    }
+  }
   //----------------------------------------------------------------------------------------------------
 
   // 차트 클릭 시 수정 모달 열기

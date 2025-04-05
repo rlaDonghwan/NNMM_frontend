@@ -296,15 +296,20 @@ export default function SecondModalContent({
     }
 
     try {
+      // ✅ 첫 번째 row에서 unit 추출 (없으면 indicator 단위 참고)
+      const firstRow = rows[selectedRows[0]]
+      const fallbackUnit = indicators.find(
+        ind => ind.key === firstRow?.indicatorKey
+      )?.unit
+
       const updateDto = {
         chartType: selectedChart,
         title,
-        unit:
-          indicators.find(ind => ind.key === rows[selectedRows[0]]?.indicatorKey)?.unit ||
-          '',
+        unit: firstRow?.unit || fallbackUnit || '기본단위', // ✅ 빈 문자열 방지
         years,
         fields: selectedRows.map((rowIndex, i) => {
           const row = rows[rowIndex]
+          const fallbackUnit = indicators.find(ind => ind.key === row?.indicatorKey)?.unit
           return {
             key: row.indicatorKey,
             label:
@@ -312,7 +317,7 @@ export default function SecondModalContent({
               row.indicatorKey,
             field1: row.field1,
             field2: row.field2,
-            unit: row.unit,
+            unit: row.unit || fallbackUnit || '기본단위', // ✅ 각 필드에도 unit 보장
             color: colorSet[i],
             data: Object.fromEntries(years.map(y => [y, Number(row.values[y] || 0)]))
           }
@@ -343,6 +348,7 @@ export default function SecondModalContent({
       toast.error('차트 수정에 실패했습니다 ❌')
     }
   }
+
   //----------------------------------------------------------------------------------------------------
 
   // 삭제 핸들러
