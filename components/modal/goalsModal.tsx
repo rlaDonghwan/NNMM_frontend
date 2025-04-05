@@ -105,7 +105,7 @@ export default function GoalsModal() {
                   </div>
                   <button
                     onClick={() => handleRemoveScope(selectedCategory, item.label)}
-                    className="text-white text-xl bg-red-500 rounded-2xl w-24"
+                    className="text-white text-xl bg-red-500 rounded-2xl w-12"
                     title="삭제">
                     -
                   </button>
