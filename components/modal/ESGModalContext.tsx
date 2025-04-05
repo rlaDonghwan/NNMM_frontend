@@ -8,6 +8,7 @@ const ESGModalContext = createContext<ESGModalContextType | null>(null)
 export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
   const [isModalOpen, setIsModalOpenState] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isGoalModalOpen, setIsGoalModalOpenSate] = useState(false)
   const [step, setStep] = useState(1)
   const [rows, setRows] = useState<Row[]>([])
   const [years, setYears] = useState<number[]>([2022, 2023, 2024])
@@ -50,6 +51,10 @@ export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
     setIsModalOpen(true, callback)
   }
   //----------------------------------------------------------------------------------------------------
+  const setIsGoalModalOpen = (open: boolean, callback?: (chart: any) => void) => {
+    setIsGoalModalOpenSate(open)
+  }
+
   return (
     <ESGModalContext.Provider
       value={{
@@ -57,6 +62,8 @@ export const ESGModalProvider = ({children}: {children: React.ReactNode}) => {
         setIsModalOpen,
         isEditModalOpen,
         setIsEditModalOpen,
+        isGoalModalOpen,
+        setIsGoalModalOpen,
         onChartSaved,
         step,
         setStep,
