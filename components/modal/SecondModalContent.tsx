@@ -251,8 +251,16 @@ export default function SecondModalContent({
 
       // 저장 후 콜백 실행 (차트 포맷 재가공)
       if (onChartSaved) {
+        const dashboardId = res.data._id
+        const userId = res.data.userId
+        const chart = res.data.charts?.[0]
+
         const formatted = {
-          ...res.data,
+          ...chart,
+          _id: chart._id,
+          chartId: chart._id,
+          dashboardId,
+          userId,
           chartType: selectedChart.toLowerCase(),
           title,
           years,
@@ -267,6 +275,7 @@ export default function SecondModalContent({
         }
         onChartSaved(formatted)
       }
+
       // 모달 닫기
       setTimeout(() => {
         closeModal?.()
