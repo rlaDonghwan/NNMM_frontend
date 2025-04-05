@@ -149,7 +149,7 @@ export default function TotalDashboard() {
         <div className="bg-white rounded-xl shadow-lg border-2 p-4">
           <div className="flex flex-row gap-4 h-full w-full justify-center">
             {['Environmental', 'Social', 'Governance'].map(label => (
-              <div key={label}>
+              <div>
                 <div className="flex justify-center">
                   <ComboboxWithCreate
                     items={['2020', '2021', '2022', '2023']}
