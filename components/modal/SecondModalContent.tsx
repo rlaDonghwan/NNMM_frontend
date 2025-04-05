@@ -22,7 +22,7 @@ import toast from 'react-hot-toast'
 import {usePathname} from 'next/navigation'
 import {showWarning} from '@/utils/toast'
 import {SecondModalContentProps} from '@/interface/modal'
-import {useESGModal} from './ESGModalContext' // 👈 추가 필요
+import {useESGModal} from './ESGModalContext'
 
 // Chart.js 구성요소 등록
 ChartJS.register(
@@ -62,10 +62,11 @@ function recommendChartTypes(rows, years) {
   // 조건별 추천
   if (indicatorsCount === 1 && yearsCount > 1 && isTimeSeries) return ['Bar', 'Line']
   if (indicatorsCount > 1 && yearsCount === 1)
-    return ['Pie', 'Doughnut', 'PolarArea', 'Radar']
-  if (indicatorsCount > 1 && yearsCount > 1) return ['Line']
+    return ['Bar', 'Pie', 'Doughnut', 'PolarArea', 'Radar']
+  if (indicatorsCount > 1 && yearsCount > 1) return ['Bar', 'Line']
   return ['Bar']
 }
+
 //----------------------------------------------------------------------------------------------------
 
 // 차트에 표시할 label 생성 함수
@@ -161,27 +162,37 @@ export default function SecondModalContent({
   // 차트 데이터 구성
   const chartData = isPieLike
     ? {
-        labels: selectedRows.map(i => generateLabel(rows[i], indicators)),
+        labels: selectedRows
+          .map(i => rows[i])
+          .filter(Boolean)
+          .map(row => generateLabel(row, indicators)),
         datasets: [
           {
-            data: selectedRows.map(i => Number(rows[i].values[years[0]]) || 0),
+            data: selectedRows
+              .map(i => rows[i])
+              .filter(Boolean)
+              .map(row => Number(row.values?.[years[0]]) || 0),
             backgroundColor: colorSet
           }
         ]
       }
     : {
         labels: years,
-        datasets: selectedRows.map((rowIndex, idx) => {
-          const row = rows[rowIndex]
-          return {
-            label: generateLabel(row, indicators),
-            data: years.map(y => Number(row.values[y]) || 0),
-            backgroundColor: colorSet[idx % colorSet.length],
-            borderColor: colorSet[idx % colorSet.length],
-            borderWidth: 2
-          }
-        })
+        datasets: selectedRows
+          .map((rowIndex, idx) => {
+            const row = rows[rowIndex]
+            if (!row) return null
+            return {
+              label: generateLabel(row, indicators),
+              data: years.map(y => Number(row.values?.[y]) || 0),
+              backgroundColor: colorSet[idx % colorSet.length],
+              borderColor: colorSet[idx % colorSet.length],
+              borderWidth: 2
+            }
+          })
+          .filter(Boolean) // null 제거
       }
+
   //----------------------------------------------------------------------------------------------------
 
   // 차트 옵션
@@ -285,15 +296,20 @@ export default function SecondModalContent({
     }
 
     try {
+      // ✅ 첫 번째 row에서 unit 추출 (없으면 indicator 단위 참고)
+      const firstRow = rows[selectedRows[0]]
+      const fallbackUnit = indicators.find(
+        ind => ind.key === firstRow?.indicatorKey
+      )?.unit
+
       const updateDto = {
         chartType: selectedChart,
         title,
-        unit:
-          indicators.find(ind => ind.key === rows[selectedRows[0]]?.indicatorKey)?.unit ||
-          '',
+        unit: firstRow?.unit || fallbackUnit || '기본단위', // ✅ 빈 문자열 방지
         years,
         fields: selectedRows.map((rowIndex, i) => {
           const row = rows[rowIndex]
+          const fallbackUnit = indicators.find(ind => ind.key === row?.indicatorKey)?.unit
           return {
             key: row.indicatorKey,
             label:
@@ -301,7 +317,7 @@ export default function SecondModalContent({
               row.indicatorKey,
             field1: row.field1,
             field2: row.field2,
-            unit: row.unit,
+            unit: row.unit || fallbackUnit || '기본단위', // ✅ 각 필드에도 unit 보장
             color: colorSet[i],
             data: Object.fromEntries(years.map(y => [y, Number(row.values[y] || 0)]))
           }
@@ -332,6 +348,7 @@ export default function SecondModalContent({
       toast.error('차트 수정에 실패했습니다 ❌')
     }
   }
+
   //----------------------------------------------------------------------------------------------------
 
   // 삭제 핸들러
