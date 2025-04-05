@@ -95,6 +95,8 @@ export interface ESGModalContextType {
   setIsModalOpen: (open: boolean, callback?: (chart: any) => void) => void // 모달 열기 + 콜백 등록
   isEditModalOpen: boolean // 수정 모드 여부
   setIsEditModalOpen: (open: boolean) => void // 수정 모드 토글 함수
+  isGoalModalOpen: boolean // 목표 설정 모달 열림 여부
+  setIsGoalModalOpen: (open: boolean) => void
   onChartSaved: ((chart: any) => void) | null // 저장 후 콜백 함수
   step: number // 현재 단계 (1 or 2)
   setStep: React.Dispatch<React.SetStateAction<number>> // 단계 설정 함수

@@ -66,6 +66,15 @@ export default function TotalDashboard() {
     }
   }
 
+  const Goal = (item: any) => {
+    if (item._id) {
+      setSelectedItemId(item._id)
+      setIsEditModalOpen(true)
+    } else {
+      setIsEditModalOpen(true)
+    }
+  }
+
   const moveItem = async (dragIndex: number, hoverIndex: number) => {
     const updated = [...gridItems]
     const [removed] = updated.splice(dragIndex, 1)
@@ -93,12 +102,12 @@ export default function TotalDashboard() {
   }
 
   const data = {
-    labels: ['Jan'],
+    labels: ['Used', 'Remaining'],
     datasets: [
       {
-        label: 'Percentage',
-        data: [12],
-        backgroundColor: 'rgba(255, 99, 132, 0.2)'
+        data: [12, 88], // 총합이 100이 되도록
+        backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(200, 200, 200, 0.2)'],
+        borderWidth: 0
       }
     ]
   }
@@ -120,18 +129,55 @@ export default function TotalDashboard() {
       {
         label: '비율',
         data: [23, 21, 56],
-        backgroundColor: 'rgba(255, 99, 132, 0.2)'
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(255, 99, 132, 0.8)',
+          'rgba(200, 200, 200, 0.2)'
+        ]
       }
     ]
   }
 
   return (
     <div className="flex flex-col gap-y-4 w-full h-screen">
+      <button
+        className="w-[110px] h-[36px] border-2 rounded-xl font-apple"
+        onClick={Goal}>
+        목표 설정
+      </button>
+      <div className="grid grid-cols-[2.02fr_0.98fr] gap-4 h-full w-full">
+        <div className="bg-white rounded-xl shadow-lg border-2 p-4">
+          <div className="flex flex-row gap-4 h-full w-full justify-center">
+            {['Environmental', 'Social', 'Governance'].map(label => (
+              <div key={label}>
+                <div className="flex justify-center">
+                  <ComboboxWithCreate
+                    items={['2020', '2021', '2022', '2023']}
+                    placeholder={label}
+                    onAdd={() => {}}
+                    onSelect={() => {}}
+                  />
+                </div>
+                <div className="h-[270px] mt-2">
+                  <Pie data={data} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-lg border-2 p-4">
+          <div className="flex flex-row w-full justify-center font-apple">기여도</div>
+          <div className="flex flex-row w-full h-[270px] mt-2 justify-center">
+            <Pie data={data2} />
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-row font-apple justify-start ml-4">즐겨찾기</div>
       {isLoading ? (
         <p className="text-center text-gray-400 mt-10">차트를 불러오는 중입니다...</p>
       ) : (
         <DndProvider backend={HTML5Backend}>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 pb-4">
             {gridItems.map((item, index) => (
               <GridItem
                 key={item._id}
@@ -145,36 +191,6 @@ export default function TotalDashboard() {
           </div>
         </DndProvider>
       )}
-
-      <div className="grid grid-cols-[2.02fr_0.98fr] gap-4 h-full w-full pb-4">
-        <div className="bg-white rounded-xl shadow-lg border-2 p-4">
-          <div className="flex flex-col gap-4 h-full w-full justify-center">
-            {['Environmental', 'Social', 'Governance'].map(label => (
-              <div key={label}>
-                <div className="flex flex-row justify-between items-center font-apple">
-                  <span>{label}</span>
-                  <ComboboxWithCreate
-                    items={['2020', '2021', '2022', '2023']}
-                    placeholder={label}
-                    onAdd={() => {}}
-                    onSelect={() => {}}
-                  />
-                  <button className="w-[110px] h-[36px] border-2 rounded-xl font-apple">
-                    목표 설정
-                  </button>
-                </div>
-                <div className="h-[100px] mt-2">
-                  <Bar data={data} options={options} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-lg border-2 p-4">
-          <Pie data={data2} />
-        </div>
-      </div>
     </div>
   )
 }
