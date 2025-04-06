@@ -109,6 +109,24 @@ export default function SecondModalContent({
     : pathname.includes('environmental')
     ? 'environmental'
     : 'governance'
+
+  const niceColorPalette = [
+    '#A8DADC', // 부드러운 민트
+    '#F4A261', // 살구 오렌지
+    '#E76F51', // 연한 토마토 레드
+    '#B5E48C', // 연두색
+    '#FFD6A5', // 복숭아색
+    '#D3C0F9', // 연보라
+    '#FDCBBA', // 살구빛 핑크
+    '#D2E3C8', // 연한 올리브 그린
+    '#BDE0FE', // 연한 하늘색
+    '#FFCAD4' // 베이비 핑크
+  ]
+
+  const getNiceColor = (index: number) => {
+    return niceColorPalette[index % niceColorPalette.length]
+  }
+
   //----------------------------------------------------------------------------------------------------
 
   // 차트 자동 추천
@@ -221,10 +239,11 @@ export default function SecondModalContent({
   //colorset 랜덤 초기화
   useEffect(() => {
     if (colorSet.length < selectedRows.length) {
-      const newColors = selectedRows.map(() => getRandomColor())
+      const newColors = selectedRows.map((_, idx) => getNiceColor(idx))
       setColorSet(newColors)
     }
   }, [selectedRows])
+
   //----------------------------------------------------------------------------------------------------
 
   // 저장 버튼 클릭 핸들러

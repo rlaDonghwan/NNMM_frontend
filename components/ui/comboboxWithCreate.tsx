@@ -37,7 +37,7 @@ export default function ComboboxWithCreate({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-[110px] justify-center font-apple">
+        <Button variant="outline" className="w-[170px] justify-center font-apple">
           {selected || placeholder || '선택하세요'}
         </Button>
       </PopoverTrigger>

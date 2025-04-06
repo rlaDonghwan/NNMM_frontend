@@ -9,18 +9,57 @@ import {Pie} from 'react-chartjs-2'
 import {DndProvider} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
 import GoalsModal from '@/components/modal/goalsModal'
+import {fetchGoalsByCategory} from '@/services/esg-goal'
 
 export default function TotalDashboard() {
-  // 상태: 차트 리스트, 선택 차트 ID, 편집 여부, 로딩 여부
   const [gridItems, setGridItems] = useState<any[]>([])
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-
-  // 모달 제어 관련 함수
   const {setIsModalOpen, reset, setIsGoalModalOpen} = useESGModal()
 
-  // 📌 즐겨찾기 차트 불러오기
+  const ESG_COLORS = {
+    Environmental: '#2ECC71',
+    Social: '#3498DB',
+    Governance: '#9B59B6'
+  }
+
+  const [goalData, setGoalData] = useState({
+    Environmental: [],
+    Social: [],
+    Governance: []
+  })
+
+  const [selectedIndicators, setSelectedIndicators] = useState({
+    Environmental: null,
+    Social: null,
+    Governance: null
+  })
+
+  // ✅ 목표 리로드 함수 분리
+  const loadGoalData = async () => {
+    try {
+      const [env, soc, gov] = await Promise.all([
+        fetchGoalsByCategory('environmental'),
+        fetchGoalsByCategory('social'),
+        fetchGoalsByCategory('governance')
+      ])
+
+      setGoalData({
+        Environmental: env,
+        Social: soc,
+        Governance: gov
+      })
+
+      // ✅ 각 카테고리의 첫 번째 지표를 기본 선택
+      setSelectedIndicators({
+        Environmental: env.length > 0 ? env[0].indicatorKey : null,
+        Social: soc.length > 0 ? soc[0].indicatorKey : null,
+        Governance: gov.length > 0 ? gov[0].indicatorKey : null
+      })
+    } catch (err) {
+      console.error('목표값 로딩 실패:', err)
+    }
+  }
+
   useEffect(() => {
     const loadFavoriteCharts = async () => {
       try {
@@ -37,148 +76,121 @@ export default function TotalDashboard() {
     }
 
     loadFavoriteCharts()
+    loadGoalData()
   }, [])
 
-  // 📌 차트 저장 시 업데이트
-  const handleChartSaved = (newChart: any) => {
-    setGridItems(prev => {
-      const exists = prev.some(item => item._id === newChart._id)
-      return exists
-        ? prev.map(item => (item._id === newChart._id ? newChart : item))
-        : [...prev, newChart]
-    })
-  }
-
-  // 📌 차트 클릭 시 모달 열기
-  const handleClick = (item: any) => {
-    if (item._id) {
-      setSelectedItemId(item._id)
-      setIsEditModalOpen(true)
-    } else {
-      setIsModalOpen(true, newChart => {
-        setGridItems(prev => {
-          const exists = prev.some(item => item._id === newChart._id)
-          return exists
-            ? prev.map(item => (item._id === newChart._id ? newChart : item))
-            : [...prev, newChart]
-        })
-        setTimeout(() => {
-          reset()
-          setIsModalOpen(false)
-        }, 100)
-      })
-    }
-  }
-
-  // 📌 목표 설정 버튼 클릭 시 모달 열기
   const handleGoalClick = () => {
     setIsGoalModalOpen(true)
   }
 
-  // 📌 차트 드래그 정렬
-  const moveItem = async (dragIndex: number, hoverIndex: number) => {
-    const updated = [...gridItems]
-    const [removed] = updated.splice(dragIndex, 1)
-    updated.splice(hoverIndex, 0, removed)
-
-    const orderedWithOrder = updated.map((item, index) => ({
-      ...item,
-      order: index + 1,
-      category: item.category ?? 'governance',
-      dashboardId: item.dashboardId
+  const handleIndicatorSelect = (category: string, indicatorKey: string) => {
+    setSelectedIndicators(prev => ({
+      ...prev,
+      [category]: indicatorKey
     }))
-    setGridItems(orderedWithOrder)
+  }
 
-    try {
-      const formattedForRequest = orderedWithOrder.map(({_id, order, dashboardId}) => ({
-        chartId: _id,
-        dashboardId,
-        newOrder: order
-      }))
-      await updateChartOrder(formattedForRequest)
-      console.log('순서 저장 완료')
-    } catch (err) {
-      console.error('순서 저장 실패:', err)
+  const getPieDataForIndicator = (category: string) => {
+    const selectedKey = selectedIndicators[category]
+    const data = goalData[category] || []
+    const selected = data.find(d => d.indicatorKey === selectedKey)
+
+    if (!selected) {
+      return {
+        labels: ['N/A'],
+        datasets: [{data: [1], backgroundColor: ['#cccccc']}]
+      }
+    }
+
+    return {
+      labels: [selected.indicatorKey, '목표까지'],
+      datasets: [
+        {
+          data: [selected.targetValue, 100 - selected.targetValue],
+          backgroundColor: [ESG_COLORS[category], '#eeeeee']
+        }
+      ]
     }
   }
 
-  // 💡 예시용 파이 차트 데이터
-  const dummyPieData = {
-    labels: ['Used', 'Remaining'],
-    datasets: [
-      {
-        data: [12, 88],
-        backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(200, 200, 200, 0.2)'],
-        borderWidth: 0
-      }
-    ]
-  }
+  const getContributionRatio = () => {
+    const e = goalData.Environmental.length
+    const s = goalData.Social.length
+    const g = goalData.Governance.length
+    const total = e + s + g
 
-  // 💡 예시용 ESG 비율 파이 데이터
-  const esgRatioData = {
-    labels: ['E', 'S', 'G'],
-    datasets: [
-      {
-        label: '비율',
-        data: [23, 21, 56],
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.8)',
-          'rgba(200, 200, 200, 0.2)'
-        ]
+    if (total === 0) {
+      return {
+        labels: ['N/A'],
+        datasets: [{data: [1], backgroundColor: ['#cccccc']}]
       }
-    ]
+    }
+
+    return {
+      labels: ['E', 'S', 'G'],
+      datasets: [
+        {
+          data: [e, s, g],
+          backgroundColor: [
+            ESG_COLORS.Environmental,
+            ESG_COLORS.Social,
+            ESG_COLORS.Governance
+          ]
+        }
+      ]
+    }
   }
 
   return (
     <div className="flex flex-col gap-y-4 w-full h-screen">
-      {/* 🔘 목표 설정 버튼 */}
       <button
         className="w-[110px] h-[36px] border-2 rounded-xl font-apple"
         onClick={handleGoalClick}>
         목표 설정
       </button>
 
-      {/* 📦 목표 설정 모달 */}
-      <GoalsModal />
+      {/* ✅ 콜백 전달 */}
+      <GoalsModal onGoalsSaved={loadGoalData} />
 
-      {/* 🔍 ESG 요약 차트 */}
+      {/* ESG 요약 차트 및 기여도 영역 */}
       <div className="grid grid-cols-[2.02fr_0.98fr] gap-4 h-full w-full">
-        {/* ESG 카테고리별 파이 */}
-        <div className="bg-white rounded-xl shadow-lg border-2 p-4">
-          <div className="flex flex-row gap-4 h-full w-full justify-center">
+        {/* ESG 요약 파이차트 */}
+        <div className="bg-white rounded-xl shadow-lg border-2 p-4 h-[400px]">
+          <div className="flex flex-row gap-x-20 justify-center">
             {['Environmental', 'Social', 'Governance'].map(label => (
               <div key={label}>
                 <div className="flex justify-center">
                   <ComboboxWithCreate
-                    items={['2020', '2021', '2022', '2023']}
-                    placeholder={label}
+                    items={goalData[label].map(goal => goal.indicatorKey)}
+                    selected={selectedIndicators[label] || ''}
+                    placeholder={`${label} 지표 선택`}
                     onAdd={() => {}}
-                    onSelect={() => {}}
+                    onSelect={value => handleIndicatorSelect(label, value)}
                   />
                 </div>
-                <div className="h-[270px] mt-2">
-                  <Pie data={dummyPieData} />
+                <div className="h-[320px] mt-2">
+                  <Pie data={getPieDataForIndicator(label)} />
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ESG 기여도 차트 */}
-        <div className="bg-white rounded-xl shadow-lg border-2 p-4">
-          <div className="flex flex-row w-full justify-center font-apple">기여도</div>
-          <div className="flex flex-row w-full h-[270px] mt-2 justify-center">
-            <Pie data={esgRatioData} />
+        {/* 기여도 차트 */}
+        <div className="bg-white rounded-xl shadow-lg border-2 p-4 h-[400px]">
+          <div className="flex justify-center font-apple">기여도</div>
+          <div className="flex h-[320px] mt-2 justify-center">
+            <Pie data={getContributionRatio()} />
           </div>
         </div>
       </div>
 
-      {/* ⭐️ 즐겨찾기 영역 */}
-      <div className="flex flex-row font-apple justify-start ml-4">즐겨찾기</div>
-
+      {/* 즐겨찾기 차트 그리드 */}
+      <div className="flex font-apple ml-4">즐겨찾기</div>
       {isLoading ? (
-        <p className="text-center text-gray-400 mt-10">차트를 불러오는 중입니다...</p>
+        <p className="text-center text-gray-400 mt-10 font-apple">
+          차트를 불러오는 중입니다...
+        </p>
       ) : (
         <DndProvider backend={HTML5Backend}>
           <div className="grid grid-cols-3 gap-4 pb-4">
@@ -188,8 +200,46 @@ export default function TotalDashboard() {
                 item={item}
                 index={index}
                 isLast={false}
-                moveItem={moveItem}
-                handleClick={handleClick}
+                moveItem={async (dragIndex, hoverIndex) => {
+                  const updated = [...gridItems]
+                  const [removed] = updated.splice(dragIndex, 1)
+                  updated.splice(hoverIndex, 0, removed)
+
+                  const orderedWithOrder = updated.map((item, index) => ({
+                    ...item,
+                    order: index + 1,
+                    category: item.category ?? 'governance',
+                    dashboardId: item.dashboardId
+                  }))
+                  setGridItems(orderedWithOrder)
+
+                  try {
+                    const formattedForRequest = orderedWithOrder.map(
+                      ({_id, order, dashboardId}) => ({
+                        chartId: _id,
+                        dashboardId,
+                        newOrder: order
+                      })
+                    )
+                    await updateChartOrder(formattedForRequest)
+                  } catch (err) {
+                    console.error('순서 저장 실패:', err)
+                  }
+                }}
+                handleClick={item => {
+                  setIsModalOpen(true, newChart => {
+                    setGridItems(prev => {
+                      const exists = prev.some(i => i._id === newChart._id)
+                      return exists
+                        ? prev.map(i => (i._id === newChart._id ? newChart : i))
+                        : [...prev, newChart]
+                    })
+                    setTimeout(() => {
+                      reset()
+                      setIsModalOpen(false)
+                    }, 100)
+                  })
+                }}
               />
             ))}
           </div>
