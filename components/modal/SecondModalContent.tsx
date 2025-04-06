@@ -480,7 +480,7 @@ export default function SecondModalContent({
               const randomColors = selectedRows.map(() => getRandomColor())
               setColorSet(randomColors)
             }}
-            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-600 text-white rounded font-apple">
+            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-600 text-white rounded font-apple mb-4">
             랜덤 색상
           </Button>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
