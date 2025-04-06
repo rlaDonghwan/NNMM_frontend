@@ -142,12 +142,6 @@ export default function SecondModalContent({
 
   useEffect(() => {
     if (isEditModalOpen && chartToEdit) {
-      console.log('[🧩 chartToEdit]', chartToEdit) // 이건 잘 됐고
-
-      // 이거 추가해봐
-      console.log('[🆔 ChartId 확인]', chartToEdit._id)
-      console.log('[🧾 DashboardId 확인]', chartToEdit.dashboardId)
-
       if (!chartToEdit.dashboardId) {
         toast.error('dashboardId가 없습니다. 수정 요청 실패 ⚠️')
       }
@@ -165,7 +159,18 @@ export default function SecondModalContent({
     setSelectedRows?.(prev => prev.filter(i => i >= 0 && i < rows.length))
   }, [rows])
   //----------------------------------------------------------------------------------------------------
-
+  // 모달 닫을 때 기본값 초기화
+  useEffect(() => {
+    if (!isEditModalOpen) {
+      // 생성 모드일 때 기본값 초기화
+      setTitle('')
+      setSelectedChart(null)
+      setChartType('')
+      setColorSet([])
+      setSelectedRows([])
+    }
+  }, [isEditModalOpen])
+  //----------------------------------------------------------------------------------------------------
   // 색상 변경
   const handleColorChange = (index: number, newColor: string) => {
     const updated = [...colorSet]
@@ -475,7 +480,7 @@ export default function SecondModalContent({
               const randomColors = selectedRows.map(() => getRandomColor())
               setColorSet(randomColors)
             }}
-            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-600 text-white rounded font-apple">
+            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-600 text-white rounded font-apple mb-4">
             랜덤 색상
           </Button>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">

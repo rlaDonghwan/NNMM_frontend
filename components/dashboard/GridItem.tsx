@@ -126,6 +126,7 @@ export default function GridItem({
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: isPieLike ? false : true,
     plugins: {
       legend: {display: true, position: 'top' as const},
       title: {
