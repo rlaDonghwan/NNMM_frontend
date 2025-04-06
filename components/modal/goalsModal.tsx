@@ -5,7 +5,7 @@ import {useESGModal} from './ESGModalContext'
 import Modal from './Modal'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
 import {
-  fetchIndicatorsFromDashboard,
+  fetchIndicatorsWithPrevYearData,
   fetchGoalsByCategory,
   saveGoalsToServer,
   deleteGoal
@@ -14,7 +14,7 @@ import {toast} from 'react-hot-toast'
 import {Button} from '@/components/ui/button'
 
 interface GoalsModalProps {
-  onGoalsSaved?: () => void // ✅ 저장 후 실행할 콜백 (TotalDashboard 등에서 전달)
+  onGoalsSaved?: () => void
 }
 
 export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
@@ -23,50 +23,55 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
   const categoryOptions = ['Environmental', 'Social', 'Governance']
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
+  const currentYear = new Date().getFullYear()
+  const prevYear = currentYear - 1
+
   const [goalValues, setGoalValues] = useState<{
     [category: string]: {
-      [label: string]: {value: string; unit: string; key?: string}
+      [label: string]: {
+        value: string
+        unit: string
+        key?: string
+        prevValue?: number
+      }
     }
   }>({})
 
-  // ✅ 카테고리 변경 시 지표 + 저장된 목표값 함께 불러오기
   useEffect(() => {
-    const loadIndicatorsAndGoals = async () => {
+    const loadData = async () => {
       if (!selectedCategory) return
-      try {
-        const categoryKey = selectedCategory.toLowerCase()
+      const categoryKey = selectedCategory.toLowerCase()
 
+      try {
         const [indicators, savedGoals] = await Promise.all([
-          fetchIndicatorsFromDashboard(categoryKey),
-          fetchGoalsByCategory(categoryKey)
+          fetchIndicatorsWithPrevYearData(categoryKey, currentYear),
+          fetchGoalsByCategory(categoryKey, currentYear)
         ])
 
         const formatted = indicators.reduce((acc, field) => {
-          const saved = savedGoals.find(
-            goal => goal.indicatorKey === field.key || goal.indicatorKey === field.label
-          )
+          const saved = savedGoals.find(goal => goal.indicatorKey === field.key)
           acc[field.label] = {
             value: saved?.targetValue?.toString() || '',
             unit: field.unit || '',
-            key: field.key || field.label
+            key: field.key || field.label,
+            prevValue: field.prevValue || field.data?.[prevYear] || 0
           }
           return acc
-        }, {} as {[label: string]: {value: string; unit: string; key?: string}})
+        }, {} as Record<string, {value: string; unit: string; key?: string; prevValue?: number}>)
 
         setGoalValues(prev => ({
           ...prev,
           [selectedCategory]: formatted
         }))
       } catch (err) {
-        console.error('지표/목표값 불러오기 실패:', err)
-        toast.error('지표 불러오기 중 오류가 발생했습니다.')
+        toast.error('지표/목표값 불러오기 오류')
+        console.error(err)
       }
     }
 
-    loadIndicatorsAndGoals()
+    loadData()
   }, [selectedCategory])
 
-  // ✅ 입력값 변경
   const handleInputChange = (label: string, value: string) => {
     if (!selectedCategory) return
     setGoalValues(prev => ({
@@ -74,39 +79,33 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
       [selectedCategory]: {
         ...prev[selectedCategory],
         [label]: {
-          ...prev[selectedCategory]?.[label],
+          ...prev[selectedCategory][label],
           value
         }
       }
     }))
   }
 
-  // ✅ 항목 제거 (서버 삭제 포함)
   const handleRemoveScope = async (label: string) => {
     if (!selectedCategory) return
     const categoryKey = selectedCategory.toLowerCase()
     const indicatorKey = goalValues[selectedCategory]?.[label]?.key
-
     if (!indicatorKey) return
 
     try {
-      await deleteGoal(indicatorKey, categoryKey)
-      toast.success(`'${label}' 항목이 삭제되었습니다.`)
+      await deleteGoal(indicatorKey, categoryKey, currentYear)
+      toast.success(`'${label}' 삭제 완료`)
+      const updated = {...goalValues[selectedCategory]}
+      delete updated[label]
+      setGoalValues(prev => ({
+        ...prev,
+        [selectedCategory]: updated
+      }))
     } catch (err) {
-      console.error(err)
-      toast.error(`'${label}' 삭제에 실패했습니다.`)
+      toast.error(`'${label}' 삭제 실패`)
     }
-
-    // ✅ 프론트에서도 제거
-    const updated = {...goalValues[selectedCategory]}
-    delete updated[label]
-    setGoalValues(prev => ({
-      ...prev,
-      [selectedCategory]: updated
-    }))
   }
 
-  // ✅ 저장 로직
   const handleSaveGoals = async () => {
     if (!selectedCategory || !goalValues[selectedCategory]) return
 
@@ -117,22 +116,19 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
         .map(([label, {value, unit, key}]) => ({
           indicatorKey: key,
           targetValue: Number(value),
-          unit
+          unit,
+          year: currentYear
         }))
     }
 
     try {
       await saveGoalsToServer(payload)
-      toast.success('✅ 목표 설정이 완료되었습니다!')
+      toast.success('목표 저장 완료')
       setIsGoalModalOpen(false)
-
-      // ✅ 저장 후 콜백 실행 (TotalDashboard 에서 loadGoalData 등)
-      if (onGoalsSaved) {
-        onGoalsSaved()
-      }
+      onGoalsSaved?.()
     } catch (err) {
+      toast.error('목표 저장 실패')
       console.error(err)
-      toast.error('❌ 목표 설정에 실패했습니다. 다시 시도해주세요.')
     }
   }
 
@@ -140,52 +136,64 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
     <Modal isOpen={isGoalModalOpen} onClose={() => setIsGoalModalOpen(false)}>
       <div className="flex w-full h-full font-apple">
         <div className="flex flex-col gap-y-3 w-full">
-          <div className="font-apple text-2xl">목표 설정</div>
-          <div className="flex w-full h-2 border-b-2" />
+          <div className="text-2xl font-apple">목표 설정 ({currentYear}년)</div>
+          <div className="w-full border-b-2 mb-2" />
 
-          {/* ✅ 카테고리 선택 */}
           <ComboboxWithCreate
             items={categoryOptions}
             selected={selectedCategory || ''}
-            onAdd={() => {}}
             onSelect={setSelectedCategory}
-            placeholder="항목 선택"
+            placeholder="카테고리 선택"
+            onAdd={function (newLabel: string): void {
+              throw new Error('Function not implemented.')
+            }}
           />
 
-          {/* ✅ 지표별 목표 입력 폼 */}
           {selectedCategory && goalValues[selectedCategory] && (
             <div className="mt-4 space-y-3">
-              <div className="text-lg font-semibold">{selectedCategory}</div>
-
               {Object.entries(goalValues[selectedCategory]).map(
-                ([label, {value, unit}]) => (
-                  <div
-                    key={label}
-                    className="grid grid-cols-4 w-full gap-4 items-center text-center">
-                    <span>{label}</span>
-                    <div className="flex flex-row gap-4 items-center col-span-2">
-                      <input
-                        type="number"
-                        className="w-full rounded-xl border-2 px-2 py-1"
-                        placeholder="목표 설정"
-                        value={value}
-                        onChange={e => handleInputChange(label, e.target.value)}
-                      />
-                      <span>{unit}</span>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveScope(label)}
-                      className="text-white text-xl bg-red-500 rounded-2xl w-12"
-                      title="삭제">
-                      -
-                    </button>
-                  </div>
-                )
-              )}
+                ([label, {value, unit, prevValue}]) => {
+                  const target = Number(value)
+                  const prev = Number(prevValue || 0)
+                  const percent = prev ? ((target / prev) * 100).toFixed(1) : 'N/A'
 
-              {/* ✅ 저장 버튼 */}
+                  return (
+                    <div
+                      key={label}
+                      className="grid grid-cols-4 gap-4 items-center text-center">
+                      <span className="truncate">{label}</span>
+                      <div className="flex flex-row gap-2 items-center col-span-2">
+                        <input
+                          type="number"
+                          className="w-full rounded-xl border-2 px-2 py-1"
+                          placeholder="목표값"
+                          value={value}
+                          onChange={e => handleInputChange(label, e.target.value)}
+                        />
+                        <span>{unit}</span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {prev ? (
+                          <>
+                            <div>{prev.toLocaleString()}</div>
+                            <div className="text-xs">{percent}%</div>
+                          </>
+                        ) : (
+                          '작년 값 없음'
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleRemoveScope(label)}
+                        className="text-white text-xl bg-red-500 rounded-2xl w-8 h-8 ml-1"
+                        title="삭제">
+                        ×
+                      </button>
+                    </div>
+                  )
+                }
+              )}
               <Button
-                className="mt-6 w-full bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-semibold py-2 rounded-xl shadow-md transition-all duration-200 font-apple"
+                className="mt-6 w-full bg-blue-600 text-white font-semibold py-2 rounded-xl shadow-md"
                 onClick={handleSaveGoals}>
                 목표 저장하기
               </Button>

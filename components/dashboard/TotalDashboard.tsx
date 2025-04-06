@@ -34,13 +34,15 @@ export default function TotalDashboard() {
     Governance: null
   })
 
-  // ✅ 목표 리로드 함수 분리
+  const currentYear = new Date().getFullYear()
+
+  // ✅ 목표 리로드 함수 (올해 목표 + 작년 기준 지표)
   const loadGoalData = async () => {
     try {
       const [env, soc, gov] = await Promise.all([
-        fetchGoalsByCategory('environmental'),
-        fetchGoalsByCategory('social'),
-        fetchGoalsByCategory('governance')
+        fetchGoalsByCategory('environmental', currentYear),
+        fetchGoalsByCategory('social', currentYear),
+        fetchGoalsByCategory('governance', currentYear)
       ])
 
       setGoalData({
@@ -49,7 +51,6 @@ export default function TotalDashboard() {
         Governance: gov
       })
 
-      // ✅ 각 카테고리의 첫 번째 지표를 기본 선택
       setSelectedIndicators({
         Environmental: env.length > 0 ? env[0].indicatorKey : null,
         Social: soc.length > 0 ? soc[0].indicatorKey : null,
@@ -95,18 +96,23 @@ export default function TotalDashboard() {
     const data = goalData[category] || []
     const selected = data.find(d => d.indicatorKey === selectedKey)
 
-    if (!selected) {
+    if (!selected || !selected.targetValue || !selected.prevValue) {
       return {
         labels: ['N/A'],
         datasets: [{data: [1], backgroundColor: ['#cccccc']}]
       }
     }
 
+    const prev = selected.prevValue
+    const target = selected.targetValue
+    const increase = target - prev
+    const percentChange = ((increase / prev) * 100).toFixed(1)
+
     return {
-      labels: [selected.indicatorKey, '목표까지'],
+      labels: ['작년 값', '증가분'],
       datasets: [
         {
-          data: [selected.targetValue, 100 - selected.targetValue],
+          data: [prev, increase],
           backgroundColor: [ESG_COLORS[category], '#eeeeee']
         }
       ]
@@ -154,7 +160,6 @@ export default function TotalDashboard() {
 
       {/* ESG 요약 차트 및 기여도 영역 */}
       <div className="grid grid-cols-[2.02fr_0.98fr] gap-4 h-full w-full">
-        {/* ESG 요약 파이차트 */}
         <div className="bg-white rounded-xl shadow-lg border-2 p-4 h-[400px]">
           <div className="flex flex-row gap-x-20 justify-center">
             {['Environmental', 'Social', 'Governance'].map(label => (
@@ -176,7 +181,6 @@ export default function TotalDashboard() {
           </div>
         </div>
 
-        {/* 기여도 차트 */}
         <div className="bg-white rounded-xl shadow-lg border-2 p-4 h-[400px]">
           <div className="flex justify-center font-apple">기여도</div>
           <div className="flex h-[320px] mt-2 justify-center">
@@ -185,7 +189,7 @@ export default function TotalDashboard() {
         </div>
       </div>
 
-      {/* 즐겨찾기 차트 그리드 */}
+      {/* 즐겨찾기 차트 */}
       <div className="flex font-apple ml-4">즐겨찾기</div>
       {isLoading ? (
         <p className="text-center text-gray-400 mt-10 font-apple">
