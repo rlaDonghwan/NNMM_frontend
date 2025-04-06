@@ -235,7 +235,8 @@ export default function TotalDashboard() {
                         font: {
                           weight: 'bold',
                           size: 15
-                        }
+                        },
+                        display: context => context.datasetIndex === 0 // 남은 목표치 바에는 라벨 안 달리게
                       },
                       tooltip: {
                         callbacks: {
