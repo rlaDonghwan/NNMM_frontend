@@ -30,6 +30,8 @@ export default function HeroSection() {
     scrollTargetRef.current?.scrollIntoView({behavior: 'smooth'})
   }
 
+  // 스크롤 이벤트 핸들러
+  // 스크롤 위치에 따라 버튼의 위치를 조정
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY
