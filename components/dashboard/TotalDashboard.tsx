@@ -1,3 +1,4 @@
+// TotalDashboard.tsx
 'use client'
 
 import {useEffect, useState} from 'react'
@@ -5,11 +6,31 @@ import {useESGModal} from '@/components/modal/ESGModalContext'
 import GridItem from './GridItem'
 import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
-import {Pie} from 'react-chartjs-2'
+import {Bar, Pie} from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 import {DndProvider} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
 import GoalsModal from '@/components/modal/goalsModal'
-import {fetchGoalsByCategory} from '@/services/esg-goal'
+import {fetchGoalsByCategory, fetchIndicatorsWithPrevYearData} from '@/services/esg-goal'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartDataLabels
+)
 
 export default function TotalDashboard() {
   const [gridItems, setGridItems] = useState<any[]>([])
@@ -29,35 +50,45 @@ export default function TotalDashboard() {
   })
 
   const [selectedIndicators, setSelectedIndicators] = useState({
-    Environmental: null,
-    Social: null,
-    Governance: null
+    Environmental: '',
+    Social: '',
+    Governance: ''
   })
 
   const currentYear = new Date().getFullYear()
 
-  // ✅ 목표 리로드 함수 (올해 목표 + 작년 기준 지표)
   const loadGoalData = async () => {
     try {
+      const fetchByCategory = async (category: string) => {
+        const [indicators, goals] = await Promise.all([
+          fetchIndicatorsWithPrevYearData(category, currentYear),
+          fetchGoalsByCategory(category, currentYear)
+        ])
+
+        return goals.map(goal => {
+          const matched = indicators.find(i => i.key === goal.indicatorKey)
+          return {
+            ...goal,
+            label: matched?.label ?? goal.indicatorKey,
+            prevValue: matched?.prevValue ?? null
+          }
+        })
+      }
+
       const [env, soc, gov] = await Promise.all([
-        fetchGoalsByCategory('environmental', currentYear),
-        fetchGoalsByCategory('social', currentYear),
-        fetchGoalsByCategory('governance', currentYear)
+        fetchByCategory('environmental'),
+        fetchByCategory('social'),
+        fetchByCategory('governance')
       ])
 
-      setGoalData({
-        Environmental: env,
-        Social: soc,
-        Governance: gov
-      })
-
+      setGoalData({Environmental: env, Social: soc, Governance: gov})
       setSelectedIndicators({
-        Environmental: env.length > 0 ? env[0].indicatorKey : null,
-        Social: soc.length > 0 ? soc[0].indicatorKey : null,
-        Governance: gov.length > 0 ? gov[0].indicatorKey : null
+        Environmental: env[0]?.label ?? '',
+        Social: soc[0]?.label ?? '',
+        Governance: gov[0]?.label ?? ''
       })
     } catch (err) {
-      console.error('목표값 로딩 실패:', err)
+      console.error('🎯 목표 로딩 실패:', err)
     }
   }
 
@@ -66,7 +97,7 @@ export default function TotalDashboard() {
       try {
         const data = await fetchUserCharts('')
         const favoritesOnly = data
-          .filter(chart => chart.isFavorite === true)
+          .filter(chart => chart.isFavorite)
           .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
         setGridItems(favoritesOnly)
       } catch (err) {
@@ -80,43 +111,10 @@ export default function TotalDashboard() {
     loadGoalData()
   }, [])
 
-  const handleGoalClick = () => {
-    setIsGoalModalOpen(true)
-  }
+  const handleGoalClick = () => setIsGoalModalOpen(true)
 
-  const handleIndicatorSelect = (category: string, indicatorKey: string) => {
-    setSelectedIndicators(prev => ({
-      ...prev,
-      [category]: indicatorKey
-    }))
-  }
-
-  const getPieDataForIndicator = (category: string) => {
-    const selectedKey = selectedIndicators[category]
-    const data = goalData[category] || []
-    const selected = data.find(d => d.indicatorKey === selectedKey)
-
-    if (!selected || !selected.targetValue || !selected.prevValue) {
-      return {
-        labels: ['N/A'],
-        datasets: [{data: [1], backgroundColor: ['#cccccc']}]
-      }
-    }
-
-    const prev = selected.prevValue
-    const target = selected.targetValue
-    const increase = target - prev
-    const percentChange = ((increase / prev) * 100).toFixed(1)
-
-    return {
-      labels: ['작년 값', '증가분'],
-      datasets: [
-        {
-          data: [prev, increase],
-          backgroundColor: [ESG_COLORS[category], '#eeeeee']
-        }
-      ]
-    }
+  const handleIndicatorSelect = (category: string, label: string) => {
+    setSelectedIndicators(prev => ({...prev, [category]: label}))
   }
 
   const getContributionRatio = () => {
@@ -125,130 +123,221 @@ export default function TotalDashboard() {
     const g = goalData.Governance.length
     const total = e + s + g
 
-    if (total === 0) {
-      return {
-        labels: ['N/A'],
-        datasets: [{data: [1], backgroundColor: ['#cccccc']}]
-      }
-    }
-
-    return {
-      labels: ['E', 'S', 'G'],
-      datasets: [
-        {
-          data: [e, s, g],
-          backgroundColor: [
-            ESG_COLORS.Environmental,
-            ESG_COLORS.Social,
-            ESG_COLORS.Governance
+    return total === 0
+      ? {labels: ['N/A'], datasets: [{data: [1], backgroundColor: ['#cccccc']}]}
+      : {
+          labels: ['E', 'S', 'G'],
+          datasets: [
+            {
+              data: [e, s, g],
+              backgroundColor: [
+                ESG_COLORS.Environmental,
+                ESG_COLORS.Social,
+                ESG_COLORS.Governance
+              ]
+            }
           ]
         }
-      ]
-    }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 w-full h-screen">
-      <button
-        className="w-[110px] h-[36px] border-2 rounded-xl font-apple"
-        onClick={handleGoalClick}>
-        목표 설정
-      </button>
+    <div className="flex flex-col px-6 py-4 w-full h-full font-apple gap-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">Total ESG Dashboard</h2>
+        <button
+          className="border px-4 py-1 rounded-xl shadow text-sm"
+          onClick={handleGoalClick}>
+          목표 설정
+        </button>
+      </div>
 
-      {/* ✅ 콜백 전달 */}
       <GoalsModal onGoalsSaved={loadGoalData} />
 
-      {/* ESG 요약 차트 및 기여도 영역 */}
-      <div className="grid grid-cols-[2.02fr_0.98fr] gap-4 h-full w-full">
-        <div className="bg-white rounded-xl shadow-lg border-2 p-4 h-[400px]">
-          <div className="flex flex-row gap-x-20 justify-center">
-            {['Environmental', 'Social', 'Governance'].map(label => (
-              <div key={label}>
-                <div className="flex justify-center">
-                  <ComboboxWithCreate
-                    items={goalData[label].map(goal => goal.indicatorKey)}
-                    selected={selectedIndicators[label] || ''}
-                    placeholder={`${label} 지표 선택`}
-                    onAdd={() => {}}
-                    onSelect={value => handleIndicatorSelect(label, value)}
-                  />
-                </div>
-                <div className="h-[320px] mt-2">
-                  <Pie data={getPieDataForIndicator(label)} />
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-6">
+        <div className="bg-white rounded-xl shadow-md border p-4 flex flex-col items-center gap-y-4">
+          {['Environmental', 'Social', 'Governance'].map(label => (
+            <div key={label} className="flex flex-col  w-full gap-y-2">
+              <ComboboxWithCreate
+                items={goalData[label].map(goal => goal.label)}
+                selected={selectedIndicators[label]}
+                placeholder={`${label} 지표 선택`}
+                onAdd={() => {}}
+                onSelect={value => handleIndicatorSelect(label, value)}
+              />
+
+              {/* ✅ 지표 이름을 차트 위에 표시 */}
+              {selectedIndicators[label] && (
+                <p className="text-sm font-semibold text-gray-600 -mb-2 justify-start">
+                  {selectedIndicators[label]}
+                </p>
+              )}
+
+              <div className="min-h-[10px] h-auto w-full px-6">
+                <Bar
+                  data={{
+                    labels: [selectedIndicators[label] || 'N/A'],
+                    datasets: [
+                      {
+                        label: '현재 값',
+                        data: [
+                          goalData[label].find(g => g.label === selectedIndicators[label])
+                            ?.currentValue || 0
+                        ],
+                        backgroundColor: ESG_COLORS[label],
+                        barThickness: 30
+                      },
+                      {
+                        label: '남은 목표치',
+                        data: [
+                          (() => {
+                            const selected = goalData[label].find(
+                              g => g.label === selectedIndicators[label]
+                            )
+                            if (!selected) return 0
+                            return Math.max(
+                              0,
+                              selected.targetValue - selected.currentValue
+                            )
+                          })()
+                        ],
+                        backgroundColor: '#eeeeee',
+                        barThickness: 20
+                      }
+                    ]
+                  }}
+                  options={{
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                      padding: {
+                        left: 0,
+                        right: 40,
+                        top: 10,
+                        bottom: 10
+                      }
+                    },
+                    plugins: {
+                      legend: {position: 'bottom'},
+                      datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        formatter: (value, context) => {
+                          const datasets = context.chart.data.datasets
+                          const currentVal = datasets[0].data[0] as number
+                          const total = currentVal + (datasets[1].data[0] as number)
+                          const percent = total
+                            ? Math.round((currentVal / total) * 100)
+                            : 0
+                          return `${percent}%`
+                        },
+                        color: '#333',
+                        font: {
+                          weight: 'bold',
+                          size: 15
+                        }
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: context =>
+                            `${context.dataset.label}: ${context.raw.toLocaleString()}`
+                        }
+                      }
+                    },
+                    scales: {
+                      x: {
+                        stacked: true,
+                        beginAtZero: true
+                      },
+                      y: {
+                        stacked: true,
+                        ticks: {
+                          display: false // ✅ y축 텍스트 제거
+                        },
+                        grid: {
+                          drawTicks: false // ✅ y축 tick 라인 제거 (옵션)
+                        }
+                      }
+                    }
+                  }}
+                />
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg border-2 p-4 h-[400px]">
-          <div className="flex justify-center font-apple">기여도</div>
-          <div className="flex h-[320px] mt-2 justify-center">
+        <div className="bg-white rounded-xl shadow-md border p-4">
+          <h3 className="text-center mb-2 font-semibold">기여도</h3>
+          <div className="h-[300px] flex justify-center items-center">
             <Pie data={getContributionRatio()} />
           </div>
         </div>
       </div>
 
-      {/* 즐겨찾기 차트 */}
-      <div className="flex font-apple ml-4">즐겨찾기</div>
-      {isLoading ? (
-        <p className="text-center text-gray-400 mt-10 font-apple">
-          차트를 불러오는 중입니다...
-        </p>
-      ) : (
-        <DndProvider backend={HTML5Backend}>
-          <div className="grid grid-cols-3 gap-4 pb-4">
-            {gridItems.map((item, index) => (
-              <GridItem
-                key={item._id}
-                item={item}
-                index={index}
-                isLast={false}
-                moveItem={async (dragIndex, hoverIndex) => {
-                  const updated = [...gridItems]
-                  const [removed] = updated.splice(dragIndex, 1)
-                  updated.splice(hoverIndex, 0, removed)
+      <div>
+        <h3 className="font-semibold text-lg mb-2">즐겨찾기</h3>
+        {isLoading ? (
+          <p className="text-gray-400">차트를 불러오는 중입니다...</p>
+        ) : (
+          <DndProvider backend={HTML5Backend}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {gridItems.map((item, index) => (
+                <GridItem
+                  key={item._id}
+                  item={item}
+                  index={index}
+                  isLast={false}
+                  moveItem={async (dragIndex, hoverIndex) => {
+                    const updated = [...gridItems]
+                    const [removed] = updated.splice(dragIndex, 1)
+                    updated.splice(hoverIndex, 0, removed)
 
-                  const orderedWithOrder = updated.map((item, index) => ({
-                    ...item,
-                    order: index + 1,
-                    category: item.category ?? 'governance',
-                    dashboardId: item.dashboardId
-                  }))
-                  setGridItems(orderedWithOrder)
+                    const orderedWithOrder = updated.map((item, index) => ({
+                      ...item,
+                      order: index + 1,
+                      category: item.category ?? 'governance',
+                      dashboardId: item.dashboardId
+                    }))
+                    setGridItems(orderedWithOrder)
 
-                  try {
-                    const formattedForRequest = orderedWithOrder.map(
-                      ({_id, order, dashboardId}) => ({
-                        chartId: _id,
-                        dashboardId,
-                        newOrder: order
+                    try {
+                      const formatted = orderedWithOrder.map(
+                        ({_id, order, dashboardId}) => ({
+                          chartId: _id,
+                          dashboardId,
+                          newOrder: order
+                        })
+                      )
+                      await updateChartOrder(formatted)
+                    } catch (err) {
+                      console.error('순서 저장 실패:', err)
+                    }
+                  }}
+                  handleClick={item => {
+                    setIsModalOpen(true, newChart => {
+                      setGridItems(prev => {
+                        const exists = prev.some(i => i._id === newChart._id)
+                        return exists
+                          ? prev.map(i => (i._id === newChart._id ? newChart : i))
+                          : [...prev, newChart]
                       })
-                    )
-                    await updateChartOrder(formattedForRequest)
-                  } catch (err) {
-                    console.error('순서 저장 실패:', err)
-                  }
-                }}
-                handleClick={item => {
-                  setIsModalOpen(true, newChart => {
-                    setGridItems(prev => {
-                      const exists = prev.some(i => i._id === newChart._id)
-                      return exists
-                        ? prev.map(i => (i._id === newChart._id ? newChart : i))
-                        : [...prev, newChart]
+                      setTimeout(() => {
+                        reset()
+                        setIsModalOpen(false)
+                      }, 100)
                     })
-                    setTimeout(() => {
-                      reset()
-                      setIsModalOpen(false)
-                    }, 100)
-                  })
-                }}
-              />
-            ))}
-          </div>
-        </DndProvider>
-      )}
+                  }}
+                  onFavoriteToggle={(chartId, isFavorite) => {
+                    if (!isFavorite) {
+                      setGridItems(prev => prev.filter(chart => chart._id !== chartId))
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          </DndProvider>
+        )}
+      </div>
     </div>
   )
 }

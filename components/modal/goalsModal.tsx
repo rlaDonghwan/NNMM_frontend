@@ -30,6 +30,7 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
     [category: string]: {
       [label: string]: {
         value: string
+        currentValue: string
         unit: string
         key?: string
         prevValue?: number
@@ -52,12 +53,13 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
           const saved = savedGoals.find(goal => goal.indicatorKey === field.key)
           acc[field.label] = {
             value: saved?.targetValue?.toString() || '',
+            currentValue: saved?.currentValue?.toString() || '',
             unit: field.unit || '',
             key: field.key || field.label,
             prevValue: field.prevValue || field.data?.[prevYear] || 0
           }
           return acc
-        }, {} as Record<string, {value: string; unit: string; key?: string; prevValue?: number}>)
+        }, {} as (typeof goalValues)[string])
 
         setGoalValues(prev => ({
           ...prev,
@@ -72,7 +74,11 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
     loadData()
   }, [selectedCategory])
 
-  const handleInputChange = (label: string, value: string) => {
+  const handleInputChange = (
+    label: string,
+    field: 'value' | 'currentValue',
+    value: string
+  ) => {
     if (!selectedCategory) return
     setGoalValues(prev => ({
       ...prev,
@@ -80,7 +86,7 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
         ...prev[selectedCategory],
         [label]: {
           ...prev[selectedCategory][label],
-          value
+          [field]: value
         }
       }
     }))
@@ -113,9 +119,10 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
       category: selectedCategory.toLowerCase(),
       goals: Object.entries(goalValues[selectedCategory])
         .filter(([_, {value}]) => value !== '')
-        .map(([label, {value, unit, key}]) => ({
+        .map(([_, {value, currentValue, unit, key}]) => ({
           indicatorKey: key,
           targetValue: Number(value),
+          currentValue: Number(currentValue),
           unit,
           year: currentYear
         }))
@@ -134,9 +141,9 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
 
   return (
     <Modal isOpen={isGoalModalOpen} onClose={() => setIsGoalModalOpen(false)}>
-      <div className="flex w-full h-full font-apple">
+      <div className="flex w-full h-full font-apple text-[15px]">
         <div className="flex flex-col gap-y-3 w-full">
-          <div className="text-2xl font-apple">목표 설정 ({currentYear}년)</div>
+          <div className="text-2xl font-semibold">목표 설정 ({currentYear}년)</div>
           <div className="w-full border-b-2 mb-2" />
 
           <ComboboxWithCreate
@@ -144,56 +151,111 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
             selected={selectedCategory || ''}
             onSelect={setSelectedCategory}
             placeholder="카테고리 선택"
-            onAdd={function (newLabel: string): void {
-              throw new Error('Function not implemented.')
-            }}
+            onAdd={() => {}}
           />
 
           {selectedCategory && goalValues[selectedCategory] && (
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 space-y-4">
               {Object.entries(goalValues[selectedCategory]).map(
-                ([label, {value, unit, prevValue}]) => {
+                ([label, {value, currentValue, unit, prevValue}]) => {
                   const target = Number(value)
+                  const current = Number(currentValue)
                   const prev = Number(prevValue || 0)
-                  const percent = prev ? ((target / prev) * 100).toFixed(1) : 'N/A'
+
+                  const usagePercent = target
+                    ? ((current / target) * 100).toFixed(1)
+                    : 'N/A'
+                  const diffPercent = prev
+                    ? ((target / prev) * 100 - 100).toFixed(1)
+                    : 'N/A'
+                  const arrow =
+                    prev && target
+                      ? target > prev
+                        ? '↑'
+                        : target < prev
+                        ? '↓'
+                        : '→'
+                      : ''
 
                   return (
                     <div
                       key={label}
-                      className="grid grid-cols-4 gap-4 items-center text-center">
-                      <span className="truncate">{label}</span>
-                      <div className="flex flex-row gap-2 items-center col-span-2">
+                      className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center bg-gray-50 p-3 rounded-lg shadow-sm">
+                      {/* 🏷 지표명 */}
+                      <div className="md:col-span-3 font-semibold truncate text-sm text-left px-1">
+                        {label}
+                      </div>
+
+                      {/* 🎯 목표값 입력 */}
+                      <div className="md:col-span-3 flex flex-row gap-2 items-center">
                         <input
                           type="number"
-                          className="w-full rounded-xl border-2 px-2 py-1"
+                          className="w-full rounded-lg border px-3 py-1 text-sm shadow-inner"
                           placeholder="목표값"
                           value={value}
-                          onChange={e => handleInputChange(label, e.target.value)}
+                          onChange={e =>
+                            handleInputChange(label, 'value', e.target.value)
+                          }
                         />
-                        <span>{unit}</span>
+                        <span className="text-xs text-gray-600">{unit}</span>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {prev ? (
-                          <>
-                            <div>{prev.toLocaleString()}</div>
-                            <div className="text-xs">{percent}%</div>
-                          </>
-                        ) : (
-                          '작년 값 없음'
-                        )}
+
+                      {/* 📌 현재 사용량 입력 */}
+                      <div className="md:col-span-2 flex flex-row gap-2 items-center">
+                        <input
+                          type="number"
+                          className="w-full rounded-lg border px-3 py-1 text-sm shadow-inner"
+                          placeholder="현재 사용량"
+                          value={currentValue}
+                          onChange={e =>
+                            handleInputChange(label, 'currentValue', e.target.value)
+                          }
+                        />
+                        <span className="text-xs text-gray-600">{unit}</span>
                       </div>
-                      <button
-                        onClick={() => handleRemoveScope(label)}
-                        className="text-white text-xl bg-red-500 rounded-2xl w-8 h-8 ml-1"
-                        title="삭제">
-                        ×
-                      </button>
+
+                      {/* 📊 비교 및 퍼센트 */}
+                      <div className="md:col-span-3 text-xs text-center text-gray-600 leading-snug">
+                        <div>
+                          전년도: {prev ? `${prev.toLocaleString()} ${unit}` : 'N/A'}
+                        </div>
+                        <div>
+                          {prev ? (
+                            <span
+                              className={
+                                arrow === '↑'
+                                  ? 'text-red-500'
+                                  : arrow === '↓'
+                                  ? 'text-blue-500'
+                                  : 'text-gray-400'
+                              }>
+                              {arrow} {diffPercent}%
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </div>
+                        <div>
+                          진행률: {target && current ? `${usagePercent}%` : '미입력'}
+                        </div>
+                      </div>
+
+                      {/* ❌ 삭제 */}
+                      <div className="md:col-span-1 flex justify-center">
+                        <button
+                          onClick={() => handleRemoveScope(label)}
+                          className="text-white text-xs bg-red-500 hover:bg-red-600 rounded-full w-6 h-6 flex items-center justify-center"
+                          title="삭제">
+                          ×
+                        </button>
+                      </div>
                     </div>
                   )
                 }
               )}
+
               <Button
-                className="mt-6 w-full bg-blue-600 text-white font-semibold py-2 rounded-xl shadow-md"
+                className="mt-6 w-full bg-blue-600 text-white font-semibold py-2 rounded-xl shadow-md hover:bg-blue-700 transition-all"
                 onClick={handleSaveGoals}>
                 목표 저장하기
               </Button>
