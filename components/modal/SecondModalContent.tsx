@@ -480,7 +480,7 @@ export default function SecondModalContent({
               const randomColors = selectedRows.map(() => getRandomColor())
               setColorSet(randomColors)
             }}
-            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-600 text-white rounded font-apple mb-4">
+            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-300 text-white rounded font-apple mb-4">
             랜덤 색상
           </Button>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
@@ -535,21 +535,21 @@ export default function SecondModalContent({
             {isEditModalOpen ? (
               <>
                 <Button
-                  className="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded font-apple"
+                  className="bg-red-400 hover:bg-red-300 text-white px-4 py-2 rounded font-apple"
                   onClick={handleDelete}>
-                  삭제 🗑️
+                  삭제
                 </Button>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
+                  className="bg-blue-400 hover:bg-blue-300 text-white px-4 py-2 rounded font-apple"
                   onClick={handleUpdate}>
-                  수정 저장 ✔
+                  수정 저장
                 </Button>
               </>
             ) : (
               <Button
                 className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
                 onClick={handleSave}>
-                저장 ✔
+                저장
               </Button>
             )}
           </div>

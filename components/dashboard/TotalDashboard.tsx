@@ -38,9 +38,9 @@ export default function TotalDashboard() {
   const {setIsModalOpen, reset, setIsGoalModalOpen} = useESGModal()
 
   const ESG_COLORS = {
-    Environmental: '#2ECC71',
-    Social: '#3498DB',
-    Governance: '#9B59B6'
+    Environmental: '#B5E48C',
+    Social: '#BDE0FE',
+    Governance: '#FFCAD4'
   }
 
   const [goalData, setGoalData] = useState({

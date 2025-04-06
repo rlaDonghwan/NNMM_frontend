@@ -255,7 +255,7 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
               )}
 
               <Button
-                className="mt-6 w-full bg-blue-600 text-white font-semibold py-2 rounded-xl shadow-md hover:bg-blue-700 transition-all"
+                className="mt-6 bg-blue-300 text-white font-semibold py-2 rounded-xl shadow-md hover:bg-blue-400 transition-all "
                 onClick={handleSaveGoals}>
                 목표 저장하기
               </Button>
