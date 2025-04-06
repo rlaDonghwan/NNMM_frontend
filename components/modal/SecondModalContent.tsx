@@ -22,7 +22,7 @@ import toast from 'react-hot-toast'
 import {usePathname} from 'next/navigation'
 import {showWarning} from '@/utils/toast'
 import {SecondModalContentProps} from '@/interface/modal'
-import {useESGModal} from './ESGModalContext' // 👈 추가 필요
+import {useESGModal} from './ESGModalContext'
 
 // Chart.js 구성요소 등록
 ChartJS.register(
@@ -62,10 +62,11 @@ function recommendChartTypes(rows, years) {
   // 조건별 추천
   if (indicatorsCount === 1 && yearsCount > 1 && isTimeSeries) return ['Bar', 'Line']
   if (indicatorsCount > 1 && yearsCount === 1)
-    return ['Pie', 'Doughnut', 'PolarArea', 'Radar']
-  if (indicatorsCount > 1 && yearsCount > 1) return ['Line']
+    return ['Bar', 'Pie', 'Doughnut', 'PolarArea', 'Radar']
+  if (indicatorsCount > 1 && yearsCount > 1) return ['Bar', 'Line']
   return ['Bar']
 }
+
 //----------------------------------------------------------------------------------------------------
 
 // 차트에 표시할 label 생성 함수
@@ -108,6 +109,24 @@ export default function SecondModalContent({
     : pathname.includes('environmental')
     ? 'environmental'
     : 'governance'
+
+  const niceColorPalette = [
+    '#A8DADC', // 부드러운 민트
+    '#F4A261', // 살구 오렌지
+    '#E76F51', // 연한 토마토 레드
+    '#B5E48C', // 연두색
+    '#FFD6A5', // 복숭아색
+    '#D3C0F9', // 연보라
+    '#FDCBBA', // 살구빛 핑크
+    '#D2E3C8', // 연한 올리브 그린
+    '#BDE0FE', // 연한 하늘색
+    '#FFCAD4' // 베이비 핑크
+  ]
+
+  const getNiceColor = (index: number) => {
+    return niceColorPalette[index % niceColorPalette.length]
+  }
+
   //----------------------------------------------------------------------------------------------------
 
   // 차트 자동 추천
@@ -123,12 +142,6 @@ export default function SecondModalContent({
 
   useEffect(() => {
     if (isEditModalOpen && chartToEdit) {
-      console.log('[🧩 chartToEdit]', chartToEdit) // 이건 잘 됐고
-
-      // 이거 추가해봐
-      console.log('[🆔 ChartId 확인]', chartToEdit._id)
-      console.log('[🧾 DashboardId 확인]', chartToEdit.dashboardId)
-
       if (!chartToEdit.dashboardId) {
         toast.error('dashboardId가 없습니다. 수정 요청 실패 ⚠️')
       }
@@ -146,7 +159,18 @@ export default function SecondModalContent({
     setSelectedRows?.(prev => prev.filter(i => i >= 0 && i < rows.length))
   }, [rows])
   //----------------------------------------------------------------------------------------------------
-
+  // 모달 닫을 때 기본값 초기화
+  useEffect(() => {
+    if (!isEditModalOpen) {
+      // 생성 모드일 때 기본값 초기화
+      setTitle('')
+      setSelectedChart(null)
+      setChartType('')
+      setColorSet([])
+      setSelectedRows([])
+    }
+  }, [isEditModalOpen])
+  //----------------------------------------------------------------------------------------------------
   // 색상 변경
   const handleColorChange = (index: number, newColor: string) => {
     const updated = [...colorSet]
@@ -161,27 +185,37 @@ export default function SecondModalContent({
   // 차트 데이터 구성
   const chartData = isPieLike
     ? {
-        labels: selectedRows.map(i => generateLabel(rows[i], indicators)),
+        labels: selectedRows
+          .map(i => rows[i])
+          .filter(Boolean)
+          .map(row => generateLabel(row, indicators)),
         datasets: [
           {
-            data: selectedRows.map(i => Number(rows[i].values[years[0]]) || 0),
+            data: selectedRows
+              .map(i => rows[i])
+              .filter(Boolean)
+              .map(row => Number(row.values?.[years[0]]) || 0),
             backgroundColor: colorSet
           }
         ]
       }
     : {
         labels: years,
-        datasets: selectedRows.map((rowIndex, idx) => {
-          const row = rows[rowIndex]
-          return {
-            label: generateLabel(row, indicators),
-            data: years.map(y => Number(row.values[y]) || 0),
-            backgroundColor: colorSet[idx % colorSet.length],
-            borderColor: colorSet[idx % colorSet.length],
-            borderWidth: 2
-          }
-        })
+        datasets: selectedRows
+          .map((rowIndex, idx) => {
+            const row = rows[rowIndex]
+            if (!row) return null
+            return {
+              label: generateLabel(row, indicators),
+              data: years.map(y => Number(row.values?.[y]) || 0),
+              backgroundColor: colorSet[idx % colorSet.length],
+              borderColor: colorSet[idx % colorSet.length],
+              borderWidth: 2
+            }
+          })
+          .filter(Boolean) // null 제거
       }
+
   //----------------------------------------------------------------------------------------------------
 
   // 차트 옵션
@@ -210,10 +244,11 @@ export default function SecondModalContent({
   //colorset 랜덤 초기화
   useEffect(() => {
     if (colorSet.length < selectedRows.length) {
-      const newColors = selectedRows.map(() => getRandomColor())
+      const newColors = selectedRows.map((_, idx) => getNiceColor(idx))
       setColorSet(newColors)
     }
   }, [selectedRows])
+
   //----------------------------------------------------------------------------------------------------
 
   // 저장 버튼 클릭 핸들러
@@ -251,8 +286,16 @@ export default function SecondModalContent({
 
       // 저장 후 콜백 실행 (차트 포맷 재가공)
       if (onChartSaved) {
+        const dashboardId = res.data._id
+        const userId = res.data.userId
+        const chart = res.data.charts?.[0]
+
         const formatted = {
-          ...res.data,
+          ...chart,
+          _id: chart._id,
+          chartId: chart._id,
+          dashboardId,
+          userId,
           chartType: selectedChart.toLowerCase(),
           title,
           years,
@@ -267,6 +310,7 @@ export default function SecondModalContent({
         }
         onChartSaved(formatted)
       }
+
       // 모달 닫기
       setTimeout(() => {
         closeModal?.()
@@ -285,15 +329,20 @@ export default function SecondModalContent({
     }
 
     try {
+      // ✅ 첫 번째 row에서 unit 추출 (없으면 indicator 단위 참고)
+      const firstRow = rows[selectedRows[0]]
+      const fallbackUnit = indicators.find(
+        ind => ind.key === firstRow?.indicatorKey
+      )?.unit
+
       const updateDto = {
         chartType: selectedChart,
         title,
-        unit:
-          indicators.find(ind => ind.key === rows[selectedRows[0]]?.indicatorKey)?.unit ||
-          '',
+        unit: firstRow?.unit || fallbackUnit || '기본단위', // ✅ 빈 문자열 방지
         years,
         fields: selectedRows.map((rowIndex, i) => {
           const row = rows[rowIndex]
+          const fallbackUnit = indicators.find(ind => ind.key === row?.indicatorKey)?.unit
           return {
             key: row.indicatorKey,
             label:
@@ -301,7 +350,7 @@ export default function SecondModalContent({
               row.indicatorKey,
             field1: row.field1,
             field2: row.field2,
-            unit: row.unit,
+            unit: row.unit || fallbackUnit || '기본단위', // ✅ 각 필드에도 unit 보장
             color: colorSet[i],
             data: Object.fromEntries(years.map(y => [y, Number(row.values[y] || 0)]))
           }
@@ -332,6 +381,7 @@ export default function SecondModalContent({
       toast.error('차트 수정에 실패했습니다 ❌')
     }
   }
+
   //----------------------------------------------------------------------------------------------------
 
   // 삭제 핸들러
@@ -430,7 +480,7 @@ export default function SecondModalContent({
               const randomColors = selectedRows.map(() => getRandomColor())
               setColorSet(randomColors)
             }}
-            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-600 text-white rounded font-apple">
+            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-300 text-white rounded font-apple mb-4">
             랜덤 색상
           </Button>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
@@ -485,21 +535,21 @@ export default function SecondModalContent({
             {isEditModalOpen ? (
               <>
                 <Button
-                  className="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded font-apple"
+                  className="bg-red-400 hover:bg-red-300 text-white px-4 py-2 rounded font-apple"
                   onClick={handleDelete}>
-                  삭제 🗑️
+                  삭제
                 </Button>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
+                  className="bg-blue-400 hover:bg-blue-300 text-white px-4 py-2 rounded font-apple"
                   onClick={handleUpdate}>
-                  수정 저장 ✔
+                  수정 저장
                 </Button>
               </>
             ) : (
               <Button
                 className="bg-black hover:bg-blue-400 text-white px-4 py-2 rounded font-apple"
                 onClick={handleSave}>
-                저장 ✔
+                저장
               </Button>
             )}
           </div>
