@@ -1,62 +1,42 @@
-'use client'
-import {Sidebar, SidebarContent} from '@/components/ui/sidebar'
-import {useSidebar} from '@/components/ui/sidebar'
-import Link from 'next/link'
 import {RiDashboardFill} from 'react-icons/ri'
-import {usePathname} from 'next/navigation'
+import {GoLaw} from 'react-icons/go'
+import {FaUserFriends} from 'react-icons/fa'
+import {MdForest} from 'react-icons/md'
 import React from 'react'
 
+// components/layout/DashboardSidebar.tsx
 export default function DashboardSidebar() {
-  const pathname = usePathname()
-
   return (
-    <Sidebar className="fixed mt-14 h-full z-[10]">
-      <SidebarContent className="flex flex-col space-y-2 p-3">
-        <Link href="/dashboard">
-          <button className="flex flex-row w-full items-center space-x-10">
-            <RiDashboardFill className="fixed w-6 h-6" />
-            <span
-              className={`flex gap-x-3 p-2 rounded-md w-[110px] hover:bg-gray-500/30 font-apple ${
-                pathname === '/dashboard' ? 'bg-blue-500 text-white' : ''
-              }`}>
-              Dashboard
-            </span>
-          </button>
-        </Link>
-        <Link href="/dashboard/environmental">
-          <button className="flex flex-row w-full items-center space-x-4">
-            <img src="/images/E.png" alt="E" className="w-6 h-6" />
-            <span
-              className={`flex items-center gap-x-3 p-2 rounded-md w-[110px] hover:bg-gray-500/30 font-apple ${
-                pathname === '/dashboard/environmental' ? 'bg-blue-500 text-white' : ''
-              }`}>
-              Environment
-            </span>
-          </button>
-        </Link>
-        <Link href="/dashboard/social">
-          <button className="flex flex-row w-full items-center space-x-4">
-            <img src="/images/S.png" alt="S" className="w-6 h-6" />
-            <span
-              className={`flex items-center gap-x-3 p-2 rounded-md w-[110px] hover:bg-gray-500/30 font-apple ${
-                pathname === '/dashboard/social' ? 'bg-blue-500 text-white' : ''
-              }`}>
-              Social
-            </span>
-          </button>
-        </Link>
-        <Link href="/dashboard/governance">
-          <button className="flex flex-row w-full items-center space-x-4">
-            <img src="/images/G.png" alt="G" className="w-6 h-6" />
-            <span
-              className={`flex items-center gap-x-3 p-2 rounded-xl w-[110px] hover:bg-gray-500/30 font-apple ${
-                pathname === '/dashboard/governance' ? 'bg-blue-500 text-white' : ''
-              }`}>
-              Governance
-            </span>
-          </button>
-        </Link>
-      </SidebarContent>
-    </Sidebar>
+    <aside className="group sidebar flex flex-col border-r items-start h-full bg-white text-black transition-all duration-300 ease-in-out hover:w-60 w-16 overflow-hidden">
+      <div className="p-4">
+        <span className="text-lg font-semibold">NNMM</span>
+      </div>
+      <nav className="flex flex-col mt-4 space-y-2">
+        <a
+          href="/dashboard"
+          className="flex flex-row px-4 py-2 hover:bg-[#75757D] hover:text-white rounded items-center gap-4 font-apple">
+          <RiDashboardFill className="w-8 h-8" />
+          Dashboard
+        </a>
+        <a
+          href="/dashboard/environmental"
+          className="flex flex-row px-4 py-2 hover:bg-[#75757D] hover:text-white rounded items-center gap-4 font-apple">
+          <MdForest className="w-8 h-8" />
+          Environmental
+        </a>
+        <a
+          href="/dashboard/social"
+          className="flex flex-row px-4 py-2 hover:bg-[#75757D] hover:text-white rounded items-center gap-4 font-apple">
+          <FaUserFriends className="w-8 h-8" />
+          Social
+        </a>
+        <a
+          href="/dashboard/governance"
+          className="flex flex-row px-4 py-2 hover:bg-[#75757D] hover:text-white rounded items-center gap-4 font-apple">
+          <GoLaw className="w-8 h-8" />
+          governance
+        </a>
+      </nav>
+    </aside>
   )
 }
