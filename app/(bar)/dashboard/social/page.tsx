@@ -10,7 +10,7 @@ export default function SocialPage() {
   return (
     <DndProvider backend={HTML5Backend}>
       <ESGModalProvider>
-        <div className="flex h-full w-full bg-white px-4 py-8">
+        <div className="flex h-full w-full px-4 py-8">
           {/* 대시보드 화면 위치 잡기 */}
           <Social />
         </div>

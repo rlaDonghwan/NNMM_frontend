@@ -212,3 +212,15 @@ export const deleteChart = async ({
   }
 }
 //----------------------------------------------------------------------------------------------------
+export async function fetchChartCountByCategory() {
+  try {
+    const res = await axios.get(`${BASE_URL}/esg-dashboard/count-by-category`, {
+      withCredentials: true
+    })
+    return res.data
+  } catch (err) {
+    console.error('[❌ 차트 수 조회 실패]', err)
+    throw err
+  }
+  //----------------------------------------------------------------------------------------------------
+}

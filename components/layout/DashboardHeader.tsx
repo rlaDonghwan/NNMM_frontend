@@ -33,7 +33,7 @@ export default function DashboardHeader() {
   }, [])
 
   return (
-    <NavigationMenu className="fixed flex-row justify-between min-w-full p-4 bg-white shadow-md h-14">
+    <NavigationMenu className="fixed flex-row justify-between min-w-full p-4 bg-white shadow-sm h-14">
       <NavigationMenuList className="text-2xl font-bold">
         <NavigationMenuLink className="flex flex-row items-center font-apple" href="/">
           <RiDashboardFill className="mr-2" />
@@ -53,9 +53,7 @@ export default function DashboardHeader() {
           <div>로그인 정보 없음</div>
         )}
         <LogoutButton />
-        <Link href="/mypage">
-          <UserAvatar />
-        </Link>
+        <Link href="/mypage"></Link>
       </NavigationMenuList>
     </NavigationMenu>
   )

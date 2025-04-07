@@ -37,11 +37,11 @@ export default function ComboboxWithCreate({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-[170px] justify-center font-apple">
+        <Button variant="outline" className="w-[220px] justify-center font-apple">
           {selected || placeholder || '선택하세요'}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[170px] p-0 font-apple">
+      <PopoverContent className="w-[220px] p-0 font-apple">
         <Command>
           <CommandInput
             placeholder="검색 또는 추가"

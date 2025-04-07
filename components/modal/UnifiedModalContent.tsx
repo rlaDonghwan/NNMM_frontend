@@ -101,10 +101,10 @@ export default function UnifiedModalContent({
   }, [rows])
   //----------------------------------------------------------------------------------------------------
   return (
-    <div className="w-auto overflow-auto bg-white rounded-xl shadow p-5">
+    <div className="flex flex-col w-full h-full overflow-auto">
       {/* 헤더 */}
       <div className="flex items-center justify-between border-b pb-4 mb-6">
-        <h2 className="font-apple text-2xl border-b pb-4 mb-6">
+        <h2 className="font-apple text-2xl">
           {chartToEdit ? '데이터 수정' : '데이터 입력'}
         </h2>
       </div>
@@ -270,7 +270,7 @@ export default function UnifiedModalContent({
         </table>
       </div>
 
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-end w-full mt-4 gap-2">
         <Button
           onClick={() => {
             if (rows.length === 0 || years.length === 0) {
@@ -289,7 +289,7 @@ export default function UnifiedModalContent({
 
             onSubmitPage?.()
           }}
-          className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded font-apple">
+          className="bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 font-apple">
           다음 &gt;
         </Button>
       </div>

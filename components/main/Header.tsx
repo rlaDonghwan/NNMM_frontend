@@ -59,9 +59,10 @@ export default function HeroSection() {
       <div
         className="absolute w-full h-full"
         style={{
-          background: 'url(/main/banner.svg) no-repeat center center/cover',
-          zIndex: '-10'
-        }}></div>
+          clipPath: 'polygon(0 0, 100% 0, 100% 3%, 70% 50%, 100% 97%, 100% 100%, 0 100%)',
+          background: 'linear-gradient(to bottom, #87CEFA, #ffffff)'
+        }}
+      />
       {/* 컨텐츠 래퍼 */}
       {/* 왼쪽 텍스트 */}
       <div className="relative flex flex-col md:flex-row w-full h-screen justify-center items-center md:space-x-28 space-x-0">
