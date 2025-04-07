@@ -516,7 +516,7 @@ export default function SecondModalContent({
         {/* 오른쪽: 차트 미리보기 영역 */}
         <div className="flex flex-col w-full md:w-[50%] items-center">
           <div className="bg-white-100 w-full max-w-full rounded-xl flex overflow-x-auto">
-            <div className="flex w-full h-auto min-h-[500px] max-h-[500px] justify-center">
+            <div className="flex w-full h-auto min-h-[400px] max-h-[400px] justify-center">
               {selectedChart &&
                 chartComponentMap[selectedChart] &&
                 React.createElement(chartComponentMap[selectedChart], {

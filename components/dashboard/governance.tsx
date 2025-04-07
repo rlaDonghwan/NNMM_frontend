@@ -116,7 +116,7 @@ export default function Governance() {
   }
   //------------------------------------------------------------------------------------
   return (
-    <div className="font-apple w-full h-screen">
+    <div className="font-apple w-full h-full">
       {isLoading ? (
         <p className="text-center text-gray-400 mt-10 font-apple">
           차트를 불러오는 중입니다...

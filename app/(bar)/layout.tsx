@@ -15,7 +15,7 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
     <div className="flex flex-col w-full h-full">
       {/* ✅ 최상단 네비게이션 바 */}
       <DashboardHeader />
-      <div className="relative flex flex-1">
+      <div className="relative flex flex-1 w-full h-full bg-[#E5F0F9]">
         {/* ✅ 좌측 사이드바 */}
         <SidebarProvider>
           <DashboardSidebar />

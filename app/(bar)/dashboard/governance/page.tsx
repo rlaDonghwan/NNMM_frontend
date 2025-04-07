@@ -10,7 +10,7 @@ export default function governance() {
   return (
     <DndProvider backend={HTML5Backend}>
       <ESGModalProvider>
-        <div className="flex h-full w-full px-4 py-8 bg-[#E5F0F9]">
+        <div className="flex h-full w-full px-4 py-8">
           {/* className="flex h-full w-full bg-white px-4 py-8"로 수정------------------------------ */}
           <Governance />
         </div>
