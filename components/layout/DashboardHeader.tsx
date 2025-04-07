@@ -53,9 +53,7 @@ export default function DashboardHeader() {
           <div>로그인 정보 없음</div>
         )}
         <LogoutButton />
-        <Link href="/mypage">
-          <UserAvatar />
-        </Link>
+        <Link href="/mypage"></Link>
       </NavigationMenuList>
     </NavigationMenu>
   )
