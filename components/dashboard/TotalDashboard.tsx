@@ -1,12 +1,15 @@
-// TotalDashboard.tsx
 'use client'
 
 import {useEffect, useState} from 'react'
 import {useESGModal} from '@/components/modal/ESGModalContext'
 import GridItem from './GridItem'
-import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
+import {
+  fetchUserCharts,
+  updateChartOrder,
+  fetchChartCountByCategory
+} from '@/services/chart-config'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
-import {Bar, Doughnut, Pie} from 'react-chartjs-2'
+import {Bar, Doughnut} from 'react-chartjs-2'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -35,6 +38,11 @@ ChartJS.register(
 export default function TotalDashboard() {
   const [gridItems, setGridItems] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [chartCounts, setChartCounts] = useState({
+    environmental: 0,
+    social: 0,
+    governance: 0
+  })
   const {setIsModalOpen, reset, setIsGoalModalOpen} = useESGModal()
 
   const ESG_COLORS = {
@@ -107,8 +115,18 @@ export default function TotalDashboard() {
       }
     }
 
+    const loadChartCounts = async () => {
+      try {
+        const counts = await fetchChartCountByCategory()
+        setChartCounts(counts)
+      } catch (err) {
+        console.error('📊 차트 카운트 로딩 실패:', err)
+      }
+    }
+
     loadFavoriteCharts()
     loadGoalData()
+    loadChartCounts()
   }, [])
 
   const handleGoalClick = () => setIsGoalModalOpen(true)
@@ -138,6 +156,22 @@ export default function TotalDashboard() {
             }
           ]
         }
+  }
+
+  const getChartCountData = () => {
+    return {
+      labels: ['E', 'S', 'G'],
+      datasets: [
+        {
+          data: [chartCounts.environmental, chartCounts.social, chartCounts.governance],
+          backgroundColor: [
+            ESG_COLORS.Environmental,
+            ESG_COLORS.Social,
+            ESG_COLORS.Governance
+          ]
+        }
+      ]
+    }
   }
 
   return (
@@ -266,23 +300,45 @@ export default function TotalDashboard() {
             </div>
           ))}
         </div>
-
         <div className="flex flex-col bg-white rounded-xl shadow-md border p-4 gap-y-12">
           <div>
-            <h3 className="text-center mb-2 font-semibold">기여도</h3>
+            <h3 className="text-center mb-2 font-semibold">기여도 (목표 설정 지표)</h3>
             <div className="h-[300px] flex justify-center items-center">
               <Doughnut data={getContributionRatio()} />
             </div>
           </div>
           <div>
-            <h3 className="text-center font-semibold">기여도</h3>
+            <h3 className="text-center font-semibold">저장된 차트 수</h3>
             <div className="h-[300px] flex justify-center items-center">
-              <Bar data={getContributionRatio()} />
+              <Bar
+                data={getChartCountData()}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {display: false},
+                    tooltip: {
+                      callbacks: {
+                        label: context => `${context.raw}개`
+                      }
+                    }
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: '차트 수'
+                      }
+                    }
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
       </div>
 
+      {/* 즐겨찾기 차트 영역 */}
       <div>
         <h3 className="font-semibold text-lg mb-2 mt-6">즐겨찾기</h3>
         {isLoading ? (
