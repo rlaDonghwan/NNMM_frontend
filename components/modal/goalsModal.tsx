@@ -74,19 +74,30 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
     loadData()
   }, [selectedCategory])
 
+  // 🔹 숫자 포맷 함수 (콤마 붙이기)
+  const formatNumber = (value: string) => {
+    const num = value.replace(/,/g, '') // 기존 콤마 제거
+    if (isNaN(Number(num))) return value
+    return Number(num).toLocaleString()
+  }
+
+  // 🔹 입력 처리 함수 수정
   const handleInputChange = (
     label: string,
     field: 'value' | 'currentValue',
-    value: string
+    input: string
   ) => {
     if (!selectedCategory) return
+    const numericValue = input.replace(/,/g, '') // 숫자만 추출
+    if (isNaN(Number(numericValue))) return // 숫자가 아니면 무시
+
     setGoalValues(prev => ({
       ...prev,
       [selectedCategory]: {
         ...prev[selectedCategory],
         [label]: {
           ...prev[selectedCategory][label],
-          [field]: value
+          [field]: numericValue // 실제 저장은 숫자만
         }
       }
     }))
@@ -189,28 +200,30 @@ export default function GoalsModal({onGoalsSaved}: GoalsModalProps) {
                       {/* 🎯 목표값 입력 */}
                       <div className="md:col-span-3 flex flex-row gap-2 items-center">
                         <input
-                          type="number"
+                          type="text"
                           className="w-full rounded-lg border px-3 py-1 text-sm shadow-inner"
                           placeholder="목표값"
-                          value={value}
+                          value={value ? formatNumber(value) : ''}
                           onChange={e =>
                             handleInputChange(label, 'value', e.target.value)
                           }
                         />
+
                         <span className="text-xs text-gray-600">{unit}</span>
                       </div>
 
                       {/* 📌 현재 사용량 입력 */}
                       <div className="md:col-span-2 flex flex-row gap-2 items-center">
                         <input
-                          type="number"
+                          type="text"
                           className="w-full rounded-lg border px-3 py-1 text-sm shadow-inner"
                           placeholder="현재 사용량"
-                          value={currentValue}
+                          value={value ? formatNumber(currentValue) : ''}
                           onChange={e =>
                             handleInputChange(label, 'currentValue', e.target.value)
                           }
                         />
+
                         <span className="text-xs text-gray-600">{unit}</span>
                       </div>
 

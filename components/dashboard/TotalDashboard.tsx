@@ -302,7 +302,7 @@ export default function TotalDashboard() {
         </div>
         <div className="flex flex-col bg-white rounded-xl shadow-md border p-4 gap-y-12">
           <div>
-            <h3 className="text-center mb-2 font-semibold">기여도 (목표 설정 지표)</h3>
+            <h3 className="text-center mb-2 font-semibold">목표 설정 지표</h3>
             <div className="h-[300px] flex justify-center items-center">
               <Doughnut data={getContributionRatio()} />
             </div>
