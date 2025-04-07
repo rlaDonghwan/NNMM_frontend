@@ -126,7 +126,7 @@ export default function GridItem({
 
   const chartOptions = {
     responsive: true,
-    maintainAspectRatio: isPieLike ? false : true,
+    // maintainAspectRatio: isPieLike ? false : true,
     plugins: {
       legend: {display: true, position: 'top' as const},
       title: {
@@ -138,7 +138,7 @@ export default function GridItem({
     scales: isPieLike ? {} : {y: {beginAtZero: true}}
   }
 
-  const [isFavorite, setIsFavorite] = useState(item.isFavorite || false)
+  const [isFavorite, setIsFavorite] = useState(item.isFavorite || false) //지현이 귀여워... you are the best!!
 
   return (
     <div

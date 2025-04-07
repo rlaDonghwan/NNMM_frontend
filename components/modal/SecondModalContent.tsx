@@ -421,13 +421,13 @@ export default function SecondModalContent({
         {/* 왼쪽 설정 영역 */}
         <div className="flex flex-col w-full md:w-[50%]">
           <h3 className="font-apple mb-4">그래프 종류 선택</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 w-96">
             {chartIcons
               .filter(({type}) => availableCharts.includes(type))
               .map(({type, image}) => (
                 <button
                   key={type}
-                  className={`w-20 h-20 rounded-lg border flex items-center justify-center shadow-sm mx-auto ${
+                  className={`w-20 h-20 rounded-lg border flex items-center justify-center shadow-sm ${
                     selectedChart === type ? 'border-black' : 'border-gray-300'
                   }`}
                   onClick={() => {
@@ -465,24 +465,24 @@ export default function SecondModalContent({
                 - 삭제
               </Button>
             )}
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder="차트 제목을 입력하세요"
-              className="w-full px-4 py-2 border rounded font-apple"
-            />
+            {/* 지표별 선택 및 색상 설정 */}
+            <Button
+              onClick={() => {
+                const randomColors = selectedRows.map(() => getRandomColor())
+                setColorSet(randomColors)
+              }}
+              className="text-sm bg-blue-400 hover:bg-blue-300 px-3 py-1 mr-3 font-apple">
+              랜덤 색상
+            </Button>
           </div>
+          <input
+            type="text"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder="차트 제목을 입력하세요"
+            className="px-4 py-2 border rounded font-apple mb-2 w-[50%]"
+          />
 
-          {/* 지표별 선택 및 색상 설정 */}
-          <Button
-            onClick={() => {
-              const randomColors = selectedRows.map(() => getRandomColor())
-              setColorSet(randomColors)
-            }}
-            className="ml-2 px-3 py-1 bg-blue-400 hover:bg-blue-300 text-white rounded font-apple mb-4">
-            랜덤 색상
-          </Button>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
             {selectedRows.map((rowIndex, idx) => (
               <div key={idx} className="flex items-center">
@@ -516,7 +516,7 @@ export default function SecondModalContent({
         {/* 오른쪽: 차트 미리보기 영역 */}
         <div className="flex flex-col w-full md:w-[50%] items-center">
           <div className="bg-white-100 w-full max-w-full rounded-xl flex overflow-x-auto">
-            <div className="flex w-full h-auto min-h-[400px] p-4 justify-center">
+            <div className="flex w-full h-auto min-h-[500px] max-h-[500px] justify-center">
               {selectedChart &&
                 chartComponentMap[selectedChart] &&
                 React.createElement(chartComponentMap[selectedChart], {

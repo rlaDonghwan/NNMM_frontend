@@ -6,7 +6,7 @@ import {useESGModal} from '@/components/modal/ESGModalContext'
 import GridItem from './GridItem'
 import {fetchUserCharts, updateChartOrder} from '@/services/chart-config'
 import ComboboxWithCreate from '@/components/ui/comboboxWithCreate'
-import {Bar, Pie} from 'react-chartjs-2'
+import {Bar, Doughnut, Pie} from 'react-chartjs-2'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -141,18 +141,18 @@ export default function TotalDashboard() {
   }
 
   return (
-    <div className="flex flex-col px-6 py-4 w-full h-full font-apple gap-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Total ESG Dashboard</h2>
-        <button
-          className="border px-4 py-1 rounded-xl shadow text-sm"
-          onClick={handleGoalClick}>
-          목표 설정
-        </button>
+    <div className="flex flex-col px-6 py-4 w-full h-full font-apple ">
+      <div className="grid grid-cols-[3fr_1fr] w-full gap-6 mb-2">
+        <div className="flex flex-row justify-between">
+          <h2 className="text-xl font-bold">Total ESG Dashboard</h2>
+          <button
+            className="border px-4 py-1 rounded-xl bg-white shadow text-sm"
+            onClick={handleGoalClick}>
+            목표 설정
+          </button>
+        </div>
       </div>
-
       <GoalsModal onGoalsSaved={loadGoalData} />
-
       <div className="grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-6">
         <div className="bg-white rounded-xl shadow-md border p-4 flex flex-col items-center gap-y-4">
           {['Environmental', 'Social', 'Governance'].map(label => (
@@ -167,7 +167,7 @@ export default function TotalDashboard() {
 
               {/* ✅ 지표 이름을 차트 위에 표시 */}
               {selectedIndicators[label] && (
-                <p className="text-sm font-semibold text-gray-600 -mb-2 justify-start">
+                <p className="flex flex-row text-sm font-semibold text-gray-600 mb-2 justify-center">
                   {selectedIndicators[label]}
                 </p>
               )}
@@ -267,16 +267,24 @@ export default function TotalDashboard() {
           ))}
         </div>
 
-        <div className="bg-white rounded-xl shadow-md border p-4">
-          <h3 className="text-center mb-2 font-semibold">기여도</h3>
-          <div className="h-[300px] flex justify-center items-center">
-            <Pie data={getContributionRatio()} />
+        <div className="flex flex-col bg-white rounded-xl shadow-md border p-4 gap-y-12">
+          <div>
+            <h3 className="text-center mb-2 font-semibold">기여도</h3>
+            <div className="h-[300px] flex justify-center items-center">
+              <Doughnut data={getContributionRatio()} />
+            </div>
+          </div>
+          <div>
+            <h3 className="text-center font-semibold">기여도</h3>
+            <div className="h-[300px] flex justify-center items-center">
+              <Bar data={getContributionRatio()} />
+            </div>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="font-semibold text-lg mb-2">즐겨찾기</h3>
+        <h3 className="font-semibold text-lg mb-2 mt-6">즐겨찾기</h3>
         {isLoading ? (
           <p className="text-gray-400">차트를 불러오는 중입니다...</p>
         ) : (

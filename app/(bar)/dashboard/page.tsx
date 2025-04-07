@@ -10,7 +10,7 @@ export default function DashboardPage() {
   return (
     <DndProvider backend={HTML5Backend}>
       <ESGModalProvider>
-        <div className="flex h-full w-full">
+        <div className="flex h-full w-full bg-[#E5F0F9]">
           <DashboardGrid />
         </div>
       </ESGModalProvider>
