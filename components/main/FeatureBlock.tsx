@@ -22,7 +22,7 @@ export default function FeatureBlock() {
         </div>
         <img
           src="/images/dash.png"
-          className="w-full max-w-2xl h-[300px] rounded-lg"></img>
+          className="w-full max-w-2xl h-[300px] rounded-lg shadow-md"></img>
       </div>
 
       <div className="w-full px-6 py-12 bg-white flex flex-col lg:flex-row justify-center items-center gap-10 lg:gap-20">
@@ -45,7 +45,7 @@ export default function FeatureBlock() {
         </div>
         <img
           src="/images/dash.png"
-          className="w-full max-w-2xl h-[300px] rounded-lg"></img>
+          className="w-full max-w-2xl h-[300px] rounded-lg shadow-md"></img>
       </div>
 
       <div className="w-full px-6 py-12 bg-slate-100 flex flex-col lg:flex-row justify-center items-center gap-10 lg:gap-20">
@@ -69,7 +69,7 @@ export default function FeatureBlock() {
         </div>
         <img
           src="/images/dash.png"
-          className="w-full max-w-2xl h-[300px] rounded-lg"></img>
+          className="w-full max-w-2xl h-[300px] rounded-lg shadow-md"></img>
       </div>
     </>
   )
