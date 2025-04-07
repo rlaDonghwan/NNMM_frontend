@@ -20,7 +20,9 @@ export default function FeatureBlock() {
             대시보드를 구축할 수 있습니다.
           </div>
         </div>
-        <div className="w-full max-w-xl h-[300px] bg-zinc-300 rounded-lg"></div>
+        <img
+          src="/images/dash.png"
+          className="w-full max-w-2xl h-[300px] rounded-lg"></img>
       </div>
 
       <div className="w-full px-6 py-12 bg-white flex flex-col lg:flex-row justify-center items-center gap-10 lg:gap-20">
@@ -41,7 +43,9 @@ export default function FeatureBlock() {
             다양한 형식의 데이터를 쉽게 업로드하고 분석에 활용할 수 있습니다.
           </div>
         </div>
-        <div className="w-full max-w-xl h-[300px] bg-zinc-300 rounded-lg"></div>
+        <img
+          src="/images/dash.png"
+          className="w-full max-w-2xl h-[300px] rounded-lg"></img>
       </div>
 
       <div className="w-full px-6 py-12 bg-slate-100 flex flex-col lg:flex-row justify-center items-center gap-10 lg:gap-20">
@@ -63,7 +67,9 @@ export default function FeatureBlock() {
             있습니다.
           </div>
         </div>
-        <div className="w-full max-w-xl h-[300px] bg-zinc-300 rounded-lg"></div>
+        <img
+          src="/images/dash.png"
+          className="w-full max-w-2xl h-[300px] rounded-lg"></img>
       </div>
     </>
   )
