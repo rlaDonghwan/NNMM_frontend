@@ -1,144 +1,131 @@
-## ✅ App Router 방식 구조 리팩토링 기준
+# NNMM - ESG 분석 및 통합 대시보드
 
-### 1. **`pages` 폴더 제거**
-
-- ❌ `pages/` → ✅ `app/` 폴더 중심으로 전환
-- ✅ 모든 라우트는 `app/` 폴더 하위에서 `page.tsx`, `layout.tsx` 기반으로 구성
-
-### 2. **공통 layout.tsx는 app 루트에 위치**
-
-```tsx
-// app/layout.tsx
-export default function RootLayout({children}: {children: React.ReactNode}) {
-  return (
-    <html lang="ko">
-      <body>{children}</body>
-    </html>
-  )
-}
-```
-
-### 3. **`app/` 내 라우트 구조**
-
-예시:
-
-```
-app/
-├─ (auth)/
-│  ├─ signin/
-│  │  └─ page.tsx
-│  ├─ signup/
-│  │  ├─ page.tsx
-│  │  └─ layout.tsx
-├─ (bar)/
-│  ├─ dashboard/
-│  │  ├─ page.tsx
-│  │  ├─ layout.tsx ← DashboardHeader + Sidebar
-│  │  ├─ environmental/
-│  │  │  └─ page.tsx
-│  │  ├─ governance/
-│  │  │  └─ page.tsx
-│  │  └─ social/
-│  │     └─ page.tsx
-│  └─ mypage/
-│     ├─ page.tsx
-│     └─ layout.tsx
-├─ (main)/
-│  ├─ layout.tsx
-│  └─ page.tsx ← 랜딩 페이지
-```
+Next.js, Nest.js, MongoDB, Mongoose를 기반으로 한 ESG 데이터 시각화 및 관리 플랫폼입니다.
 
 ---
 
-## ✅ 글로벌 스타일 적용
+## 📘 프로젝트 개요
 
-- `app/globals.css` → 유지
-- `tailwind.config.ts`에 전역 font, 색상 등 커스텀
-
-```tsx
-// app/layout.tsx
-import './globals.css'
-```
-
----
-
-## ✅ `components/` 분리 가이드
-
-- `components/ui/` → shadcn 기반 UI 요소들
-- `components/layout/` → Header, Sidebar 등
-- `components/dashboard/` → ESG 관련 구성요소 (ex. 카드, 그리드 등)
-- `components/auth/` → 로그인/회원가입 컴포넌트
+- **프로젝트 명**: NNMM (Next.js + Nest.js + MongoDB + Mongoose)
+- **개발 기간**: 2025.03.24 ~ 2025.04.07
+- **팀원 및 역할**:
+  - 김동환: Backend, Frontend, Design
+  - 김지현: Backend, Frontend, Design
+  - 정상진: Backend, Frontend, Design
 
 ---
 
-## ✅ 기타 경로 기준
+## ✨ 프로젝트 요약문
 
-- `/services` → API 통신 함수
-- `/utils` → 인증, 날짜 등 헬퍼
-- `/lib` → 전역 상태, 클래스 유틸 등
-
-좋아! 차트 유형별로 어떤 식으로 데이터를 입력해야 하는지 **Markdown 표 형식**으로 깔끔하게 정리해줄게. 직접 모달에서 입력하거나 CSV 준비할 때 참고하면 돼.
+NNMM은 ESG(Environmental, Social, Governance) 데이터를 통합적으로 수집·관리하고, 이를 시각화하여 한눈에 파악할 수 있도록 지원하는 ESG 분석 대시보드 플랫폼입니다.  
+Next.js, NestJS, MongoDB, Mongoose 기반으로 구현된 본 시스템은 사용자 맞춤형 차트 설정, 목표 지표 관리, 자동 시각화 추천 기능 등을 통해 기업의 ESG 경영 활동을 디지털화하고 데이터 기반의 의사결정을 지원합니다.  
+유연한 데이터 구조와 직관적인 UI를 통해 ESG 정보를 쉽게 기록하고 추적할 수 있으며, 모든 변경 내역은 이력으로 관리되어 투명하고 신뢰성 있는 ESG 관리 환경을 제공합니다.
 
 ---
 
-## 📊 Bar / Line 차트용 입력
+## 🎯 프로젝트 목적
 
-> ✅ **하나의 지표에 여러 연도 데이터 입력**
-
-| 지표      | 2022 | 2023 | 2024 |
-| --------- | ---- | ---- | ---- |
-| 총 임직원 | 100  | 110  | 120  |
-
----
-
-## 🥧 Pie / Doughnut 차트용 입력
-
-> ✅ **여러 지표 + 하나의 연도 데이터 입력**
-
-| 지표             | 2023 |
-| ---------------- | ---- |
-| 총 임직원        | 100  |
-| 여성 임직원 비율 | 35   |
-| 비정규직 비율    | 15   |
+- ESG 데이터의 디지털화 및 시각화
+- 유연하고 확장 가능한 ESG 관리 시스템 구축
+- 지표 기반 목표 설정 및 성과 추적 기능 제공
+- 자동화된 차트 생성 및 추천 기능 도입
 
 ---
 
-## 🌀 PolarArea 차트용 입력
+## 🌟 기대 효과
 
-> ✅ **Pie와 동일하게 동작**  
-> → **여러 지표 + 하나의 연도**
-
-| 지표            | 2023 |
-| --------------- | ---- |
-| 온실가스 배출량 | 200  |
-| 에너지 사용량   | 80   |
-| 수자원 사용량   | 40   |
+- ESG 경영 활성화 지원
+- 데이터 기반 의사결정 강화
+- 사용자 맞춤형 대시보드 경험 제공
+- 장기적으로 기업의 지속가능성 제고
 
 ---
 
-## 🕸️ Radar 차트용 입력
+## 🛠 사용 기술 스택
 
-> ✅ **여러 지표 + 하나의 연도**  
-> → 점수나 평가 항목 등에 적합
-
-| 지표          | 2024 |
-| ------------- | ---- |
-| 환경 점수     | 85   |
-| 사회 점수     | 78   |
-| 지배구조 점수 | 72   |
+- **Frontend**: Next.js, TypeScript, TailwindCSS
+- **Backend**: NestJS, TypeScript
+- **Database**: MongoDB, Mongoose
+- **시각화**: Chart.js, Recharts 등
 
 ---
 
-## ✅ 정리 요약
+## 🔧 주요 기능
 
-| 차트 종류      | 지표 수 | 연도 수 | 사용 예시                       |
-| -------------- | ------- | ------- | ------------------------------- |
-| Bar / Line     | 1개     | 여러 개 | 1개 지표의 시간 흐름            |
-| Pie / Doughnut | 여러 개 | 1개     | 1년 기준으로 지표 비율 비교     |
-| PolarArea      | 여러 개 | 1개     | 비율형 비교 (방사형 시각화)     |
-| Radar          | 여러 개 | 1개     | 평가 점수/항목 비교 (정규화 용) |
+- ESG 데이터(환경, 사회, 지배구조) 입력 및 관리
+- 통합 대시보드에서 차트 생성 및 커스터마이징
+- 지표별 목표 설정 기능
+- 데이터 변경 이력 추적 (Audit Log)
+- 차트 자동 생성 및 추천 기능
 
 ---
 
-필요하면 이걸 CSV나 JSON 형태로도 바꿔줄 수 있어!  
-추가로 차트 미리보기 전용 "샘플 자동 삽입 버튼" 같은 것도 만들까?
+## 🔄 플로우 차트 및 시스템 다이어그램
+
+### 1. 유스케이스 다이어그램
+
+사용자의 주요 활동과 기능 간의 관계를 나타낸 다이어그램입니다.
+
+<div align="center">
+  <img src="./assets/유스케이스.png" alt="유스케이스 다이어그램" width="700"/>
+</div>
+
+---
+
+### 2. ERD(Entity Relationship Diagram)
+
+MongoDB 기반의 컬렉션 및 필드 구조를 표현한 ERD입니다.
+
+<div align="center">
+  <img src="./assets/ERD.png" alt="ERD 다이어그램" width="700"/>
+</div>
+
+---
+
+### 3. 로그인 플로우
+
+사용자 인증 및 JWT 발급 과정을 나타낸 흐름도입니다.
+
+<div align="center">
+  <img src="./assets/로그인.png" alt="로그인 플로우" width="400"/>
+</div>
+
+---
+
+### 4. 회원가입 플로우
+
+유효성 검사, 이메일 중복 확인, 가입 요청까지의 흐름을 포함합니다.
+
+<div align="center">
+  <img src="./assets/회원가입.png" alt="회원가입 플로우" width="400"/>
+</div>
+
+---
+
+### 5. 데이터 입력 및 차트 생성 흐름
+
+<div align="center">
+  <img src="./assets/데이터 입력 및 차트 생성.png" alt="데이터 입력 및 차트 생성 흐름" width="600"/>
+</div>
+
+---
+
+### 6. 지표 목표 설정 플로우
+
+카테고리 선택 → 차트 구성 → 목표 설정 및 진행률 시각화
+
+<div align="center">
+  <img src="./assets/지표 목표 설정.png" alt="지표 목표 설정 플로우" width="600"/>
+</div>
+
+---
+
+### 7. 차트 수정/삭제 플로우
+
+사용자가 차트를 수정 또는 삭제하는 전체 과정입니다.
+
+<div align="center">
+  <img src="./assets/차트 수정 삭제.png" alt="차트 수정 및 삭제 플로우" width="400"/>
+</div>
+
+---
