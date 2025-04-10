@@ -1,3 +1,4 @@
+'user client'
 import {Toaster} from 'react-hot-toast'
 import './global.css'
 import {Avatar} from '@radix-ui/react-avatar'

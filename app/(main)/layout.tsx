@@ -1,3 +1,4 @@
+'user client'
 import '../global.css'
 import MainHeader from '@/components/layout/MainHeader'
 
