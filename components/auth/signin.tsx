@@ -49,10 +49,9 @@ export default function SignInForm() {
 
       if (token) {
         setCookie('accessToken', token, {
-          maxAge: 60 * 60 * 24,
           path: '/',
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict'
+          secure: false, // ✅ VM이 HTTPS 아니면 false로!
+          sameSite: 'lax' // ✅ strict 대신 lax
         })
 
         toast.success('로그인 성공!')
