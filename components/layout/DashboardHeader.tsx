@@ -9,7 +9,6 @@ import {
   NavigationMenuLink
 } from '@/components/ui/navigation-menu'
 import LogoutButton from './LogoutButton'
-import UserAvatar from './UserAvatar'
 import {fetchCurrentUser} from '@/services/auth' // 사용자 정보 가져오기
 
 // 대시보드 페이지 헤더
