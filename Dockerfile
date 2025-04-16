@@ -15,7 +15,7 @@ COPY . .
 # 🔥 Next.js가 빌드 타임에 환경변수를 인식할 수 있도록
 RUN npm run build
 
-# 2단계: 실행용
+# 2단계: 실행용  
 FROM node:22-alpine
 
 WORKDIR /app
