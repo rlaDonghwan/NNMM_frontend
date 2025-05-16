@@ -14,7 +14,7 @@
 * **개발 기간**: 2025.03.24 \~ 2025.04.07
 * **팀 구성 및 역할**:
 
-  * 김동환: Backend, Frontend, UI/UX
+  * 김동환: 총괄 팀장
   * 김지현: Backend, Frontend
   * 정상진: Backend, Frontend
 
