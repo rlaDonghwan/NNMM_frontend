@@ -62,33 +62,121 @@
 
 ## 🧠 시스템 구성도 및 플로우
 
-### ✅ 유스케이스 다이어그램
+### ✅ 프론트엔드 라우팅 구조
 
-<div align="center"><img src="./assets/유스케이스.png" width="700"/></div>
+Next.js App Router를 사용한 라우트 그룹 구조입니다.
 
-### ✅ ERD (MongoDB 컬렉션 구조)
+```mermaid
+graph TD
+    A[앱 루트] --> B["(main) 그룹"]
+    A --> C["(auth) 그룹"]
+    A --> D["(bar) 그룹"]
+    
+    B --> E[메인 페이지]
+    B --> F[메인 레이아웃]
+    
+    C --> G[로그인 페이지]
+    C --> H[회원가입 페이지]
+    C --> I[인증 레이아웃]
+    
+    D --> J[대시보드 메인]
+    D --> K[환경 대시보드]
+    D --> L[사회 대시보드]
+    D --> M[지배구조 대시보드]
+    D --> N[대시보드 레이아웃]
+```
 
-<div align="center"><img src="./assets/ERD.png" width="700"/></div>
+### ✅ 프론트엔드 인증 플로우
 
-### ✅ 로그인 플로우 (JWT 기반 인증)
+미들웨어 기반 인증 시스템의 동작 방식입니다.
 
-<div align="center"><img src="./assets/로그인.png" width="400"/></div>
+```mermaid
+sequenceDiagram
+    participant U as 사용자
+    participant M as 미들웨어
+    participant C as 쿠키
+    participant P as 보호된 페이지
+    participant A as 인증 페이지
 
-### ✅ 회원가입 플로우
+    U->>M: 페이지 요청
+    M->>C: accessToken 확인
+    
+    alt 토큰이 있는 경우
+        C-->>M: 토큰 반환
+        M->>P: 페이지 접근 허용
+        P-->>U: 페이지 렌더링
+    else 토큰이 없는 경우
+        C-->>M: 토큰 없음
+        M->>A: /signin으로 리디렉트
+        A-->>U: 로그인 페이지 표시
+    end
+```
 
-<div align="center"><img src="./assets/회원가입.png" width="400"/></div>
+### ✅ 컴포넌트 구조
 
-### ✅ ESG 데이터 입력 → 차트 생성 흐름
+주요 UI 컴포넌트들의 계층 구조입니다.
 
-<div align="center"><img src="./assets/데이터 입력 및 차트 생성.png" width="600"/></div>
+```mermaid
+graph TD
+    A[앱 컴포넌트] --> B[레이아웃 컴포넌트]
+    B --> C[헤더 컴포넌트]
+    B --> D[사이드바 컴포넌트]
+    B --> E[메인 콘텐츠]
+    
+    C --> F[사용자 아바타]
+    C --> G[로그아웃 버튼]
+    
+    D --> H[대시보드 네비게이션]
+    
+    E --> I[대시보드 페이지]
+    I --> J[차트 컴포넌트]
+    I --> K[그리드 아이템]
+    I --> L[모달 컴포넌트]
+    
+    J --> M[Chart.js 차트]
+    J --> N[Recharts 차트]
+    
+    L --> O[ESG 데이터 입력 모달]
+    L --> P[목표 설정 모달]
+```
 
-### ✅ 지표 목표 설정 프로세스
+### ✅ 사용자 워크플로우
 
-<div align="center"><img src="./assets/지표 목표 설정.png" width="600"/></div>
+사용자가 시스템을 사용하는 전체적인 흐름입니다.
 
-### ✅ 차트 수정/삭제 플로우
-
-<div align="center"><img src="./assets/차트 수정 삭제.png" width="400"/></div>
+```mermaid
+flowchart TD
+    A[사용자 접속] --> B{로그인 상태?}
+    
+    B -->|No| C[로그인/회원가입 페이지]
+    C --> D[인증 정보 입력]
+    D --> E[백엔드 인증 요청]
+    E --> F[JWT 토큰 발급]
+    F --> G[쿠키에 토큰 저장]
+    
+    B -->|Yes| H[대시보드 메인 페이지]
+    G --> H
+    
+    H --> I[ESG 카테고리 선택]
+    I --> J[환경/사회/지배구조 대시보드]
+    
+    J --> K[차트 보기/생성]
+    K --> L{차트 작업}
+    
+    L -->|생성| M[데이터 입력 모달]
+    L -->|수정| N[차트 편집 모달]
+    L -->|삭제| O[삭제 확인]
+    
+    M --> P[차트 추천 알고리즘]
+    P --> Q[차트 생성 및 저장]
+    Q --> R[대시보드 업데이트]
+    
+    N --> R
+    O --> R
+    
+    R --> S[목표 설정 가능]
+    S --> T[진행률 시각화]
+```
 
 ---
 
